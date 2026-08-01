@@ -66,6 +66,8 @@ def main() -> int:
     parser.add_argument("--doi-provenance-audit", type=Path)
     parser.add_argument("--v8-audit", type=Path)
     parser.add_argument("--oai-format-audit", type=Path)
+    parser.add_argument("--github-public-audit", type=Path)
+    parser.add_argument("--fastq-batch-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
@@ -78,6 +80,8 @@ def main() -> int:
     doi_provenance_path = args.doi_provenance_audit.resolve() if args.doi_provenance_audit else None
     v8_path = args.v8_audit.resolve() if args.v8_audit else None
     oai_format_path = args.oai_format_audit.resolve() if args.oai_format_audit else None
+    github_public_path = args.github_public_audit.resolve() if args.github_public_audit else None
+    fastq_batch_path = args.fastq_batch_audit.resolve() if args.fastq_batch_audit else None
     additional_range_paths = [path.resolve() for path in args.additional_range_audit]
     output = args.output.resolve()
     if output.exists():
@@ -144,6 +148,28 @@ def main() -> int:
             raise SystemExit("Figshare OAI format audit has an unexpected status")
         if oai_format_audit.get("payload_downloaded") is not False or oai_format_audit.get("processed_payload_admitted") is not False:
             raise SystemExit("Figshare OAI format audit does not prove that no processed payload was admitted")
+    github_public_audit = None
+    if github_public_path is not None:
+        github_public_audit = load_json(github_public_path)
+        if github_public_audit.get("status") not in {
+            "GITHUB_PUBLIC_METADATA_AVAILABLE",
+            "BLOCKED_GITHUB_PUBLIC_METADATA_ROUTE",
+        }:
+            raise SystemExit("GitHub public metadata audit has an unexpected status")
+        if github_public_audit.get("payload_downloaded") is not False or github_public_audit.get("processed_payload_admitted") is not False:
+            raise SystemExit("GitHub public metadata audit does not prove that no processed payload was admitted")
+    fastq_batch_audit = None
+    if fastq_batch_path is not None:
+        fastq_batch_audit = load_json(fastq_batch_path)
+        if fastq_batch_audit.get("status") not in {
+            "BATCH_COMPLETE",
+            "BATCH_PARTIAL_PENDING_OR_BLOCKED",
+        }:
+            raise SystemExit("FASTQ batch audit has an unexpected status")
+        if fastq_batch_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+            raise SystemExit("FASTQ batch audit does not preserve the scientific stop rule")
+        if fastq_batch_audit.get("raw_sequence_content_emitted") is not False or fastq_batch_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("FASTQ batch audit is not fail-closed")
     additional_range_audits = []
     for additional_range_path in additional_range_paths:
         additional_range = load_json(additional_range_path)
@@ -223,6 +249,23 @@ def main() -> int:
         ledger["latest_figshare_oai_format_audit"] = file_record(oai_format_path)
         ledger["latest_figshare_oai_format_audit_status"] = oai_format_audit.get("status")
         ledger["latest_figshare_oai_format_payload_downloaded"] = False
+    if github_public_path is not None and github_public_audit is not None:
+        route_evidence["latest_github_public_metadata_audit"] = file_record(github_public_path)
+        route_evidence["latest_github_public_metadata_audit_status"] = github_public_audit.get("status")
+        route_evidence["latest_github_public_metadata_successful_route_count"] = github_public_audit.get("successful_route_count")
+        route_evidence["latest_github_public_metadata_payload_downloaded"] = False
+        ledger["latest_github_public_metadata_audit"] = file_record(github_public_path)
+        ledger["latest_github_public_metadata_audit_status"] = github_public_audit.get("status")
+        ledger["latest_github_public_metadata_payload_downloaded"] = False
+    if fastq_batch_path is not None and fastq_batch_audit is not None:
+        route_evidence["latest_fastq_batch_audit"] = file_record(fastq_batch_path)
+        route_evidence["latest_fastq_batch_audit_status"] = fastq_batch_audit.get("status")
+        route_evidence["latest_fastq_batch_failed_run_count"] = fastq_batch_audit.get("failed_run_count")
+        route_evidence["latest_fastq_batch_pending_run_count"] = fastq_batch_audit.get("pending_run_count")
+        route_evidence["latest_fastq_batch_scientific_gate_effect"] = fastq_batch_audit.get("scientific_gate_effect")
+        ledger["latest_fastq_batch_audit"] = file_record(fastq_batch_path)
+        ledger["latest_fastq_batch_audit_status"] = fastq_batch_audit.get("status")
+        ledger["latest_fastq_batch_scientific_gate_effect"] = fastq_batch_audit.get("scientific_gate_effect")
     if additional_range_paths:
         route_evidence["latest_additional_range_probes"] = [file_record(path) for path in additional_range_paths]
         route_evidence["latest_additional_range_probe_statuses"] = [audit.get("status") for audit in additional_range_audits]
@@ -255,6 +298,14 @@ def main() -> int:
                 requirement.setdefault("additional_evidence", [])
                 if str(oai_format_path) not in requirement["additional_evidence"]:
                     requirement["additional_evidence"].append(str(oai_format_path))
+            if github_public_path is not None and github_public_audit is not None:
+                requirement.setdefault("additional_evidence", [])
+                if str(github_public_path) not in requirement["additional_evidence"]:
+                    requirement["additional_evidence"].append(str(github_public_path))
+            if fastq_batch_path is not None and fastq_batch_audit is not None:
+                requirement.setdefault("additional_evidence", [])
+                if str(fastq_batch_path) not in requirement["additional_evidence"]:
+                    requirement["additional_evidence"].append(str(fastq_batch_path))
             for additional_range_path in additional_range_paths:
                 requirement.setdefault("additional_evidence", [])
                 if str(additional_range_path) not in requirement["additional_evidence"]:

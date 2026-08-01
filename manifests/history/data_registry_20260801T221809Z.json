@@ -60,7 +60,7 @@
       "license_status": "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED",
       "public_raw_fastq_route": "ENA_filereport_and_FASTQ_mirror",
       "public_raw_fastq_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "raw_fastq_status": "PUBLIC_RAW_FASTQ_PARTIALS_PRESENT_PENDING_RECOVERY_AND_FINAL_INTEGRITY_AUDIT",
+      "raw_fastq_status": "PUBLIC_PAYLOAD_DOWNLOAD_IN_PROGRESS_CONSTRUCT_LEVEL_RECONCILIATION_PENDING",
       "figshare_status": "BLOCKED_HTTP_403_DIRECT_AND_NDOWNLOADER_ROUTES_PRESERVED",
       "download_failure_status": "PRESERVED_PARTIAL_FAILURES",
       "download_failure_events": [
@@ -99,8 +99,8 @@
       "download_resume_diagnostic_status": "ACTIVE_TRANSPORT_INSTABILITY_UNRESOLVED",
       "download_partial_size_regression_third_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json",
       "download_partial_size_regression_third_status": "THIRD_REGRESSION_FROZEN_FOR_DIAGNOSTICS",
-      "fastq_batch_audit_path": "phase0/audits/selected_fastq_partial_state_20260801T222125Z.json",
-      "fastq_batch_audit_status": "BATCH_PARTIAL_PENDING_OR_BLOCKED",
+      "fastq_batch_audit_path": "phase0/audits/full_selected_ena_fastq_reconciliation_20260801T203216Z.json",
+      "fastq_batch_audit_status": "BATCH_COMPLETE",
       "processed_dms_payload_route_audit": "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json",
       "processed_dms_payload_status": "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403",
       "zenodo_code_record_route_audit": "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json",
@@ -119,7 +119,7 @@
       "dms_phase0_dependency_ledger_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "processed_dms_payload_latest_readme_route_reprobe_current": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "processed_dms_payload_latest_readme_route_reprobe_current_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T222125Z.json",
+      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T220235Z.json",
       "dms_phase0_dependency_ledger_current_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "public_source_repository_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
       "public_source_repository_tree_status": "GITHUB_TREE_METADATA_COMPLETE",
@@ -152,9 +152,7 @@
       "processed_dms_payload_figshare_v8_route_audit_current": "phase0/audits/figshare_v8_route_audit_20260801T215150Z.json",
       "processed_dms_payload_figshare_v8_route_audit_current_status": "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE",
       "processed_dms_payload_oai_format_audit_current": "phase0/audits/figshare_oai_format_audit_20260801T220235Z.json",
-      "processed_dms_payload_oai_format_audit_current_status": "FIGSHARE_OAI_FORMAT_METADATA_AVAILABLE",
-      "public_github_release_tree_metadata_audit_current": "phase0/audits/github_public_metadata_audit_20260801T221809Z.json",
-      "public_github_release_tree_metadata_audit_current_status": "GITHUB_PUBLIC_METADATA_AVAILABLE"
+      "processed_dms_payload_oai_format_audit_current_status": "FIGSHARE_OAI_FORMAT_METADATA_AVAILABLE"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -576,18 +574,6 @@
       "run_id": "20260801T220235Z",
       "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T220235Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T221809Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T221809Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T222125Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T222125Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ]

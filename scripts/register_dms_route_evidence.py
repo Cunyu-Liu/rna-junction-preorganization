@@ -74,6 +74,8 @@ def main() -> int:
     parser.add_argument("--doi-provenance-audit", type=Path)
     parser.add_argument("--v8-audit", type=Path)
     parser.add_argument("--oai-format-audit", type=Path)
+    parser.add_argument("--github-public-audit", type=Path)
+    parser.add_argument("--fastq-batch-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
@@ -90,6 +92,8 @@ def main() -> int:
     doi_provenance_audit_path = args.doi_provenance_audit.resolve() if args.doi_provenance_audit else None
     v8_audit_path = args.v8_audit.resolve() if args.v8_audit else None
     oai_format_audit_path = args.oai_format_audit.resolve() if args.oai_format_audit else None
+    github_public_audit_path = args.github_public_audit.resolve() if args.github_public_audit else None
+    fastq_batch_audit_path = args.fastq_batch_audit.resolve() if args.fastq_batch_audit else None
     additional_range_audit_paths = [path.resolve() for path in args.additional_range_audit]
     route = load(route_path)
     ledger = load(ledger_path)
@@ -148,6 +152,25 @@ def main() -> int:
             raise SystemExit("Figshare OAI format audit has an unexpected status")
         if oai_format_audit.get("payload_downloaded") is not False or oai_format_audit.get("processed_payload_admitted") is not False:
             raise SystemExit("Figshare OAI format audit is not fail-closed")
+    github_public_audit = None
+    if github_public_audit_path is not None:
+        github_public_audit = load(github_public_audit_path)
+        if github_public_audit.get("status") not in {
+            "GITHUB_PUBLIC_METADATA_AVAILABLE",
+            "BLOCKED_GITHUB_PUBLIC_METADATA_ROUTE",
+        }:
+            raise SystemExit("GitHub public metadata audit has an unexpected status")
+        if github_public_audit.get("payload_downloaded") is not False or github_public_audit.get("processed_payload_admitted") is not False:
+            raise SystemExit("GitHub public metadata audit is not fail-closed")
+    fastq_batch_audit = None
+    if fastq_batch_audit_path is not None:
+        fastq_batch_audit = load(fastq_batch_audit_path)
+        if fastq_batch_audit.get("status") not in {"BATCH_COMPLETE", "BATCH_PARTIAL_PENDING_OR_BLOCKED"}:
+            raise SystemExit("FASTQ batch audit has an unexpected status")
+        if fastq_batch_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+            raise SystemExit("FASTQ batch audit does not preserve the scientific stop rule")
+        if fastq_batch_audit.get("raw_sequence_content_emitted") is not False or fastq_batch_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("FASTQ batch audit is not fail-closed")
     additional_range_audits = []
     for additional_range_audit_path in additional_range_audit_paths:
         additional_range_audit = load(additional_range_audit_path)
@@ -179,6 +202,8 @@ def main() -> int:
     doi_provenance_rel = str(doi_provenance_audit_path.relative_to(artifact_root)) if doi_provenance_audit_path is not None else None
     v8_rel = str(v8_audit_path.relative_to(artifact_root)) if v8_audit_path is not None else None
     oai_format_rel = str(oai_format_audit_path.relative_to(artifact_root)) if oai_format_audit_path is not None else None
+    github_public_rel = str(github_public_audit_path.relative_to(artifact_root)) if github_public_audit_path is not None else None
+    fastq_batch_rel = str(fastq_batch_audit_path.relative_to(artifact_root)) if fastq_batch_audit_path is not None else None
     additional_range_rels = [str(path.relative_to(artifact_root)) for path in additional_range_audit_paths]
     now = datetime.now(timezone.utc).isoformat()
 
@@ -272,6 +297,18 @@ def main() -> int:
             "kind": "processed_dms_payload_oai_format_audit_current",
             **relative_artifact(artifact_root, oai_format_audit_path, status=oai_format_audit["status"], successful_route_count=oai_format_audit.get("successful_route_count"), metadata_only=True, payload_downloaded=False, processed_payload_admitted=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if github_public_audit_path is not None and github_public_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_github_release_tree_metadata_audit_current",
+            **relative_artifact(artifact_root, github_public_audit_path, status=github_public_audit["status"], successful_route_count=github_public_audit.get("successful_route_count"), release_asset_count=github_public_audit.get("release_asset_count"), tree_payload_like_path_count=github_public_audit.get("tree_payload_like_path_count"), metadata_only=True, payload_downloaded=False, processed_payload_admitted=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
+    if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_raw_fastq_partial_state_audit_current",
+            **relative_artifact(artifact_root, fastq_batch_audit_path, status=fastq_batch_audit["status"], selected_run_count=len(fastq_batch_audit.get("selected_runs", [])), failed_run_count=fastq_batch_audit.get("failed_run_count"), pending_run_count=fastq_batch_audit.get("pending_run_count"), raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
@@ -320,6 +357,13 @@ def main() -> int:
             if oai_format_audit_path is not None and oai_format_audit is not None:
                 source["processed_dms_payload_oai_format_audit_current"] = oai_format_rel
                 source["processed_dms_payload_oai_format_audit_current_status"] = oai_format_audit["status"]
+            if github_public_audit_path is not None and github_public_audit is not None:
+                source["public_github_release_tree_metadata_audit_current"] = github_public_rel
+                source["public_github_release_tree_metadata_audit_current_status"] = github_public_audit["status"]
+            if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
+                source["fastq_batch_audit_path"] = fastq_batch_rel
+                source["fastq_batch_audit_status"] = fastq_batch_audit["status"]
+                source["raw_fastq_status"] = "PUBLIC_RAW_FASTQ_PARTIALS_PRESENT_PENDING_RECOVERY_AND_FINAL_INTEGRITY_AUDIT"
             if additional_range_audit_paths:
                 source["processed_dms_payload_additional_range_probes_current"] = additional_range_rels
                 source["processed_dms_payload_additional_range_probes_current_status"] = [audit["status"] for audit in additional_range_audits]
@@ -353,6 +397,10 @@ def main() -> int:
         evidence.append(v8_rel)
     if oai_format_audit_path is not None and oai_format_audit is not None and oai_format_rel not in evidence:
         evidence.append(oai_format_rel)
+    if github_public_audit_path is not None and github_public_audit is not None and github_public_rel not in evidence:
+        evidence.append(github_public_rel)
+    if fastq_batch_audit_path is not None and fastq_batch_audit is not None and fastq_batch_rel not in evidence:
+        evidence.append(fastq_batch_rel)
     for additional_range_rel in additional_range_rels:
         if additional_range_rel not in evidence:
             evidence.append(additional_range_rel)
@@ -373,6 +421,10 @@ def main() -> int:
         acceptance["note"] += f" The newly identified Figshare v8 landing/download/API routes at {args.run_id} returned {v8_audit.get('status')}; no payload was downloaded or admitted."
     if oai_format_audit_path is not None and oai_format_audit is not None:
         acceptance["note"] += f" Figshare OAI-PMH METS/QDC/RDF/CERIF metadata routes returned {oai_format_audit.get('status')} at {args.run_id}; METS exposed file sizes and FLocat URLs, but no processed payload was downloaded or admitted and the 128 MiB transfer gate remains closed."
+    if github_public_audit_path is not None and github_public_audit is not None:
+        acceptance["note"] += f" Official GitHub release/tree metadata returned {github_public_audit.get('status')} at {args.run_id}; release assets and repository payload-like paths were inventoried without downloading repository files, and this metadata cannot substitute for the external processed-DMS payload."
+    if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
+        acceptance["note"] += f" A current fail-closed FASTQ partial-state audit at {args.run_id} returned {fastq_batch_audit.get('status')} for {len(fastq_batch_audit.get('selected_runs', []))} explicitly scoped runs; {fastq_batch_audit.get('failed_run_count')} run(s) still contain preserved partial files, so recovery and final integrity audit remain pending."
     if additional_range_audit_paths:
         acceptance["note"] += f" Newly discovered Figshare file IDs were each subjected to one exact 128 MiB Range probe at {args.run_id}; all recorded results remain fail-closed and no complete payload was admitted."
     dump_atomic(acceptance_path, acceptance)
@@ -416,6 +468,14 @@ def main() -> int:
             blockers.append(blocker)
     if oai_format_audit_path is not None and oai_format_audit is not None:
         blocker = f"Figshare OAI-PMH METS/QDC/RDF/CERIF metadata was available at {args.run_id}, but metadata-only evidence cannot substitute for a verified processed-DMS payload or unlock the 128 MiB transfer gate."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if github_public_audit_path is not None and github_public_audit is not None:
+        blocker = f"Official GitHub release/tree metadata returned {github_public_audit.get('status')} at {args.run_id}; code-repository metadata cannot substitute for the external processed-DMS payload or primary labels."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
+        blocker = f"The current FASTQ partial-state audit returned {fastq_batch_audit.get('status')} at {args.run_id}; preserved partial files remain and no recovery or final integrity PASS is accepted while the guarded downloader process exists."
         if blocker not in blockers:
             blockers.append(blocker)
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):

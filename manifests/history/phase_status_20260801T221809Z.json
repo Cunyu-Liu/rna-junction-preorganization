@@ -113,16 +113,9 @@
     "Additional Figshare range probe figshare_file_66482831_range_probe_20260801T214209Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
     "Additional Figshare range probe figshare_file_64021168_alt_host_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
     "Additional Figshare range probe figshare_file_66482831_alt_host_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
-    "Additional Figshare range probe figshare_article_27880434_v8_alt_download_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
-    "The latest official processed-DMS route re-probe (20260801T221809Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "Figshare OAI-PMH METS/QDC/RDF/CERIF metadata was available at 20260801T221809Z, but metadata-only evidence cannot substitute for a verified processed-DMS payload or unlock the 128 MiB transfer gate.",
-    "Official GitHub release/tree metadata returned GITHUB_PUBLIC_METADATA_AVAILABLE at 20260801T221809Z; code-repository metadata cannot substitute for the external processed-DMS payload or primary labels.",
-    "The latest official processed-DMS route re-probe (20260801T222125Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "Figshare OAI-PMH METS/QDC/RDF/CERIF metadata was available at 20260801T222125Z, but metadata-only evidence cannot substitute for a verified processed-DMS payload or unlock the 128 MiB transfer gate.",
-    "Official GitHub release/tree metadata returned GITHUB_PUBLIC_METADATA_AVAILABLE at 20260801T222125Z; code-repository metadata cannot substitute for the external processed-DMS payload or primary labels.",
-    "The current FASTQ partial-state audit returned BATCH_PARTIAL_PENDING_OR_BLOCKED at 20260801T222125Z; preserved partial files remain and no recovery or final integrity PASS is accepted while the guarded downloader process exists."
+    "Additional Figshare range probe figshare_article_27880434_v8_alt_download_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted."
   ],
-  "last_transition": "2026-08-01T22:23:41.810430+00:00",
+  "last_transition": "2026-08-01T22:07:23.992532+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json",
   "scientific_gate_effect": "NO_UNLOCK"
 }

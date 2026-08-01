@@ -1273,66 +1273,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T221809Z.json",
-      "exists": true,
-      "size_bytes": 18134,
-      "sha256": "5b362b0462f032a84200231acd91ccb14469ec7df81d8f11d6a6fe621491749a",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_github_release_tree_metadata_audit_current",
-      "relative_path": "phase0/audits/github_public_metadata_audit_20260801T221809Z.json",
-      "exists": true,
-      "size_bytes": 6788,
-      "sha256": "3bf9a3b2c22df1e7c64da21baff985b5fc5afb335eb4f12e6652e8c35fa3c65d",
-      "status": "GITHUB_PUBLIC_METADATA_AVAILABLE",
-      "successful_route_count": 2,
-      "release_asset_count": 0,
-      "tree_payload_like_path_count": 0,
-      "metadata_only": true,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T222125Z.json",
-      "exists": true,
-      "size_bytes": 19252,
-      "sha256": "0b1dc56e28f43fdfc6a08a23b2fb71fd907bb3495e0e6d838555eb0950fc700a",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_raw_fastq_partial_state_audit_current",
-      "relative_path": "phase0/audits/selected_fastq_partial_state_20260801T222125Z.json",
-      "exists": true,
-      "size_bytes": 3957,
-      "sha256": "f28caab311d9ff7a0b65f483d53fa8fa55e9ceffdabf331d58d451833664a5e2",
-      "status": "BATCH_PARTIAL_PENDING_OR_BLOCKED",
-      "selected_run_count": 3,
-      "failed_run_count": 3,
-      "pending_run_count": 0,
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1354,7 +1294,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T22:23:41.810430+00:00",
+  "last_refresh_utc": "2026-08-01T22:07:23.992532+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
