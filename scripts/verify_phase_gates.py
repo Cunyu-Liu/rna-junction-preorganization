@@ -21,6 +21,9 @@ CODE_ROOT = Path("/home/cunyuliu/rna_junction_preorganization_v1_1_20260801")
 EXPECTED_CONTRACT_SHA256 = (
     "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9"
 )
+MANUAL_MATCHING_COMPONENT_PATH = Path(
+    "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801"
+) / "phase0" / "audits" / "manual_matching_acceptance.json"
 
 
 def load_json(path: Path) -> dict:
@@ -50,6 +53,25 @@ def main() -> int:
     registry = load_json(manifest_dir / "data_registry.json")
     audit = load_json(manifest_dir / "source_metadata_audit.json")
     matching = load_json(manifest_dir / "matching_audit.json")
+    manual_matching = None
+    if MANUAL_MATCHING_COMPONENT_PATH.is_file():
+        try:
+            manual_matching = load_json(MANUAL_MATCHING_COMPONENT_PATH)
+        except (OSError, json.JSONDecodeError, ValueError):
+            violations.append("MANUAL_MATCHING_COMPONENT_JSON_INVALID")
+        else:
+            allowed_manual_statuses = {
+                "BLOCKED_MANUAL_MATCHING_AUDIT",
+                "PASS_MANUAL_MATCHING_COMPONENT",
+            }
+            if manual_matching.get("status") not in allowed_manual_statuses:
+                violations.append("MANUAL_MATCHING_COMPONENT_STATUS_UNEXPECTED")
+            if manual_matching.get("raw_sequence_content_emitted") is not False:
+                violations.append("MANUAL_MATCHING_COMPONENT_MUST_NOT_EMIT_RAW_SEQUENCE")
+            if manual_matching.get("primary_labels_admitted") is not False:
+                violations.append("MANUAL_MATCHING_COMPONENT_MUST_NOT_ADMIT_PRIMARY_LABELS")
+            if manual_matching.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+                violations.append("MANUAL_MATCHING_COMPONENT_MUST_NOT_UNLOCK_PHASE_0")
 
     observed_contract_sha256 = None
     if contract_path.is_file():
@@ -119,6 +141,10 @@ def main() -> int:
         "source_registry_status": registry.get("status"),
         "metadata_audit_status": audit.get("status"),
         "matching_audit_status": matching.get("status"),
+        "manual_matching_component_path": str(MANUAL_MATCHING_COMPONENT_PATH),
+        "manual_matching_component_status": (
+            manual_matching.get("status") if manual_matching is not None else "NOT_PRESENT"
+        ),
         "scientific_gate_effect": "NO_UNLOCK",
     }
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
