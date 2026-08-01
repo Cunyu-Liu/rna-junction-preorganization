@@ -1,0 +1,25 @@
+{
+  "current_phase": "PHASE_0",
+  "overall_status": "IN_PROGRESS",
+  "gates": {
+    "phase_0_data_semantics": "IN_PROGRESS",
+    "phase_0_5_four_specs": "LOCKED_UNTIL_PHASE_0_PASS",
+    "phase_1_registry_qc_benchmark": "LOCKED",
+    "phase_2_synthetic_robust_identification": "LOCKED",
+    "phase_3_tecto_real_data": "LOCKED",
+    "phase_4_dms_increment": "LOCKED",
+    "phase_5_target_preorganization": "LOCKED",
+    "phase_6_sequence_deployment": "FORBIDDEN_UNTIL_L3",
+    "phase_7_external_validation": "LOCKED",
+    "phase_8_reproducibility_freeze": "LOCKED"
+  },
+  "stop_rules": [
+    "fatal field ambiguity or untraceable primary labels",
+    "manual matching accuracy below 0.95",
+    "any four-specification contradiction or failed round-trip/sanity test",
+    "CUDA unavailable or CPU fallback during authorized GPU work",
+    "missing complete acceptance evidence"
+  ],
+  "last_transition": "2026-08-01T13:06:28+08:00",
+  "transition_evidence": "reports/remote_preflight_20260801.md"
+}

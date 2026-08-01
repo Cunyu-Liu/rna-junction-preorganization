@@ -1,0 +1,41 @@
+{
+  "project_id": "rna_junction_preorganization_v1_1_20260801",
+  "contract": {
+    "version": "v1.1",
+    "decision": "CONDITIONAL_GO_AFTER_PHASE_0_5",
+    "source_relative_path": "contract/1.1.docx",
+    "sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+    "date": "2026-08-01",
+    "remote_source_status": "NOT_DEPLOYED_EGRESS_AUTHORIZATION_REQUIRED"
+  },
+  "roots": {
+    "code_root": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801",
+    "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801"
+  },
+  "phase_state": {
+    "current": "PHASE_0",
+    "phase_0": "IN_PROGRESS",
+    "phase_0_5": "LOCKED_UNTIL_PHASE_0_PASS",
+    "phase_1": "LOCKED",
+    "phase_2": "LOCKED",
+    "phase_3": "LOCKED",
+    "phase_4": "LOCKED",
+    "phase_5": "LOCKED",
+    "phase_6_sequence_model": "FORBIDDEN_UNTIL_L3",
+    "phase_7": "LOCKED",
+    "phase_8": "LOCKED"
+  },
+  "gpu_policy": {
+    "training_or_gpu_validation": "CUDA_ONLY_FAIL_CLOSED",
+    "cpu_fallback": "FORBIDDEN",
+    "shared_occupied_gpu": "DO_NOT_DISTURB_EXISTING_JOBS"
+  },
+  "evidence_policy": {
+    "test_exposure": "DEGRADE_TEST_TO_DEVELOPMENT_AND_REFREEZE",
+    "negative_results": "PRESERVE",
+    "proxy_or_smoke": "NOT_A_SCIENTIFIC_GATE"
+  },
+  "created_at": "2026-08-01T13:06:28+08:00",
+  "last_preflight_log": "logs/preflight_20260801T051420Z.log",
+  "status": "REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED"
+}

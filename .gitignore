@@ -1,0 +1,13 @@
+# Large or mutable artifacts live outside the Git code root.
+/data/
+/weights/
+/runs/
+/outputs/
+/tmp/
+/cache/
+/logs/*.log
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/

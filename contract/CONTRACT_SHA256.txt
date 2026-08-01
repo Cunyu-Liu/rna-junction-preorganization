@@ -1,0 +1,8 @@
+source_path=/Users/liucunyu/Documents/课题idea 数据 结论/浙江大学/RNA 相关模型/RNA 三级结构/1.1.docx
+source_size_bytes=678936
+source_sha256=218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9
+contract_title=RESEARCH CONTRACT / CONDITIONAL GO AFTER PHASE 0.5 / v1.1
+contract_date=2026-08-01
+render_pages=45
+paragraph_count=562
+table_count=51
