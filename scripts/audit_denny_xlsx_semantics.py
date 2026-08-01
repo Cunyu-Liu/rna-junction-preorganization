@@ -43,6 +43,13 @@ KEYWORDS = (
     "11 bp",
     "9bp",
     "11bp",
+    "limit",
+    "saturat",
+    "floor",
+    "upper bound",
+    "lower bound",
+    "below",
+    "above",
 )
 SEQUENCE_LIKE = re.compile(r"^[ACGUTNRYKMSWBDHVXacgutnrykmswbdhvx]{8,}$")
 
@@ -145,6 +152,8 @@ def audit_sheet(archive: ZipFile, path: str, strings: list[str]) -> dict[str, ob
     nonempty_row_count = 0
     semantic_keyword_counts: Counter[str] = Counter()
     semantic_examples: dict[str, list[str]] = {keyword: [] for keyword in KEYWORDS}
+    sentinel_value_counts: Counter[str] = Counter()
+    sentinel_columns: dict[str, Counter[str]] = {}
 
     with archive.open(path) as handle:
         for event, row in ET.iterparse(handle, events=("end",)):
@@ -170,6 +179,9 @@ def audit_sheet(archive: ZipFile, path: str, strings: list[str]) -> dict[str, ob
                         "distinct_truncated": False,
                         "numeric_distinct_values": set(),
                         "numeric_distinct_truncated": False,
+                        "sentinel_below_count": 0,
+                        "sentinel_above_count": 0,
+                        "sentinel_equal_count": 0,
                         "numeric_sum": Decimal(0),
                         "numeric_count": 0,
                         "numeric_min": None,
@@ -183,6 +195,16 @@ def audit_sheet(archive: ZipFile, path: str, strings: list[str]) -> dict[str, ob
                     info["type_counts"]["text"] += 1
                 else:
                     info["type_counts"]["numeric"] += 1
+                    if parsed < Decimal("-7.1"):
+                        info["sentinel_below_count"] = int(info["sentinel_below_count"]) + 1
+                    elif parsed > Decimal("-7.1"):
+                        info["sentinel_above_count"] = int(info["sentinel_above_count"]) + 1
+                    else:
+                        info["sentinel_equal_count"] = int(info["sentinel_equal_count"]) + 1
+                    for sentinel in ("-7.1", "7.1"):
+                        if parsed == Decimal(sentinel):
+                            sentinel_value_counts[sentinel] += 1
+                            sentinel_columns.setdefault(column, Counter())[sentinel] += 1
                     if not info["numeric_distinct_truncated"]:
                         info["numeric_distinct_values"].add(parsed)
                         if len(info["numeric_distinct_values"]) > 20000:
@@ -257,6 +279,21 @@ def audit_sheet(archive: ZipFile, path: str, strings: list[str]) -> dict[str, ob
                 "min": str(info["numeric_min"]),
                 "max": str(info["numeric_max"]),
             }
+        if info["sentinel_equal_count"]:
+            below = int(info["sentinel_below_count"])
+            above = int(info["sentinel_above_count"])
+            if below == 0 and above > 0:
+                direction_consistency = "CONSISTENT_WITH_LOWER_BOUND_FLOOR_NOT_PROOF"
+            elif above == 0 and below > 0:
+                direction_consistency = "CONSISTENT_WITH_UPPER_BOUND_CAP_NOT_PROOF"
+            else:
+                direction_consistency = "NOT_DIRECTIONAL_FROM_AGGREGATES"
+            result["sentinel_context_minus_7_1"] = {
+                "equal_count": int(info["sentinel_equal_count"]),
+                "below_count": below,
+                "above_count": above,
+                "direction_consistency": direction_consistency,
+            }
         if isinstance(distinct_count, int) and distinct_count in TARGET_COUNTS:
             target_distinct_matches.append(
                 {
@@ -299,6 +336,11 @@ def audit_sheet(archive: ZipFile, path: str, strings: list[str]) -> dict[str, ob
         "semantic_keyword_examples": {
             keyword: examples for keyword, examples in semantic_examples.items() if examples
         },
+        "sentinel_value_counts": dict(sorted(sentinel_value_counts.items())),
+        "sentinel_columns": {
+            column: dict(sorted(counts.items())) for column, counts in sorted(sentinel_columns.items())
+        },
+        "censor_direction_status": "NOT_ESTABLISHED_SENTINEL_PRESENCE_IS_NOT_DIRECTIONAL_EVIDENCE",
         "raw_values_emitted": False,
         "sequence_values_emitted": False,
         "primary_labels_admitted": False,
