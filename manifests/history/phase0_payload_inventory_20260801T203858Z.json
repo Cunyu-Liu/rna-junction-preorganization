@@ -838,35 +838,6 @@
       "raw_sequence_content_emitted": false,
       "scientific_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_current_readme_route_reprobe",
-      "relative_path": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "exists": true,
-      "size_bytes": 3017,
-      "sha256": "33a458ec0b7de58b15a50ddf7db8b297f09e6ad203bc9ae0fcb5fe697edfefb8",
-      "route_probe_tsv": "phase0/source_metadata/figshare_readme_reprobe_20260801T203858Z.tsv",
-      "status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "request_referer": "https://figshare.com/",
-      "payload_downloaded": false,
-      "access_control_bypassed": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
-      "exists": true,
-      "size_bytes": 6513,
-      "sha256": "6f32fd44724d2e6f720b13d4ba6e5046faa40af5f4ce441dc71ed5efa6727a68",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -883,12 +854,11 @@
     "matching accuracy at least 0.95 and no fatal ambiguity",
     "produce and manually adjudicate an evidence-linked opaque matching table with at least 50 matched and 30 rejected-or-ambiguous cases",
     "reconcile raw FASTQ to construct-level DMS counts, background, read-depth and QC semantics",
-    "safe resume of every preserved partial download, followed by final size/hash/gzip/pair audit",
-    "verified official processed-DMS 2xx route with expected payload size, then 128 MiB range download and hash/gzip/provenance audit"
+    "safe resume of every preserved partial download, followed by final size/hash/gzip/pair audit"
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T20:43:17.516084+00:00",
+  "last_refresh_utc": "2026-08-01T20:32:48.818741+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

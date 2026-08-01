@@ -59,10 +59,8 @@
     "The pinned official processing README confirms data.zip/file 66482813 as the processed-data route, but the README snapshot is metadata/source semantics only; the payload itself remains unavailable and cannot unlock construct-level DMS reconciliation.",
     "The Phase 0 DMS dependency ledger is BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE: processed payload, mutation histograms, rna-map environment, construct reference/mapping, processed JSON hierarchy, and manual matching prerequisites are not all present; no modeling or primary labels may proceed.",
     "The selected-run FASTQ batch audit is COMPLETE_PUBLIC_FASTQ_FILE_RECONCILIATION; pending or failed payload integrity must be resolved before any Phase 0 consideration, and this audit cannot unlock the gate.",
-    "The selected-run FASTQ batch audit completed file-integrity checks, but this evidence does not establish construct-level DMS semantics, source-defined background/read-depth hierarchy, or manual matching acceptance; Phase 0 remains locked.",
-    "The latest official processed-DMS route re-probe (20260801T203858Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active."
+    "The selected-run FASTQ batch audit completed file-integrity checks, but this evidence does not establish construct-level DMS semantics, source-defined background/read-depth hierarchy, or manual matching acceptance; Phase 0 remains locked."
   ],
-  "last_transition": "2026-08-01T20:43:17.516084+00:00",
-  "transition_evidence": "manifests/phase0_payload_inventory.json",
-  "scientific_gate_effect": "NO_UNLOCK"
+  "last_transition": "2026-08-01T20:32:49.578170+00:00",
+  "transition_evidence": "manifests/phase0_payload_inventory.json"
 }

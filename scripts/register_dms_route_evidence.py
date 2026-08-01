@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+"""Register a new blocked DMS route audit and ledger in Phase 0 manifests."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import shutil
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def load(path: Path) -> dict:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"expected JSON object: {path}")
+    return value
+
+
+def dump_atomic(path: Path, value: dict) -> None:
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(value, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def relative_artifact(artifact_root: Path, path: Path, **extra: object) -> dict:
+    relative = str(path.resolve().relative_to(artifact_root.resolve()))
+    result: dict[str, object] = {
+        "relative_path": relative,
+        "exists": path.is_file(),
+        "size_bytes": path.stat().st_size if path.is_file() else None,
+        "sha256": sha256(path) if path.is_file() else None,
+    }
+    result.update(extra)
+    return result
+
+
+def append_unique(items: list[dict], entry: dict) -> None:
+    key = (entry.get("relative_path"), entry.get("kind"), entry.get("source_id"))
+    if not any((item.get("relative_path"), item.get("kind"), item.get("source_id")) == key for item in items):
+        items.append(entry)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--code-root", required=True, type=Path)
+    parser.add_argument("--artifact-root", required=True, type=Path)
+    parser.add_argument("--route-audit", required=True, type=Path)
+    parser.add_argument("--ledger", required=True, type=Path)
+    parser.add_argument("--run-id", required=True)
+    args = parser.parse_args()
+
+    code_root = args.code_root.resolve()
+    artifact_root = args.artifact_root.resolve()
+    route_path = args.route_audit.resolve()
+    ledger_path = args.ledger.resolve()
+    route = load(route_path)
+    ledger = load(ledger_path)
+    if route.get("status") != "ROUTE_REPROBE_BLOCKED_NO_2XX" or route.get("payload_downloaded") is not False:
+        raise SystemExit("route audit is not a blocked no-payload result")
+    if ledger.get("status") != "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE" or ledger.get("primary_labels_admitted") is not False:
+        raise SystemExit("ledger is not fail-closed")
+
+    manifests = code_root / "manifests"
+    history = manifests / "history"
+    history.mkdir(parents=True, exist_ok=True)
+    for name in ("phase0_payload_inventory.json", "data_registry.json", "acceptance_phase0.json", "phase_status.json"):
+        current = manifests / name
+        backup = history / f"{name.removesuffix('.json')}_{args.run_id}.json"
+        if backup.exists():
+            raise SystemExit(f"refusing to overwrite existing manifest backup: {backup}")
+        shutil.copy2(current, backup)
+
+    route_rel = str(route_path.relative_to(artifact_root))
+    route_tsv_rel = str((artifact_root / "phase0/source_metadata" / f"figshare_readme_reprobe_{args.run_id}.tsv").relative_to(artifact_root))
+    ledger_rel = str(ledger_path.relative_to(artifact_root))
+    now = datetime.now(timezone.utc).isoformat()
+
+    inventory_path = manifests / "phase0_payload_inventory.json"
+    inventory = load(inventory_path)
+    inventory["last_refresh_utc"] = now
+    inventory["scientific_gate_effect"] = "NO_PHASE_0_PASS"
+    inventory["primary_labels_admitted"] = False
+    inventory.setdefault("artifacts", [])
+    append_unique(inventory["artifacts"], {
+        "source_id": "deenalattha_2026_dms",
+        "kind": "processed_dms_payload_current_readme_route_reprobe",
+        **relative_artifact(artifact_root, route_path, route_probe_tsv=route_tsv_rel, status=route.get("status"), request_referer=route.get("request_referer"), payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+    })
+    append_unique(inventory["artifacts"], {
+        "source_id": "deenalattha_2026_dms",
+        "kind": "DMS_phase0_dependency_ledger_current",
+        **relative_artifact(artifact_root, ledger_path, status=ledger.get("status"), payload_downloaded=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+    })
+    inventory.setdefault("required_next_evidence", [])
+    inventory["required_next_evidence"] = sorted(set(inventory["required_next_evidence"]) | {
+        "verified official processed-DMS 2xx route with expected payload size, then 128 MiB range download and hash/gzip/provenance audit",
+    })
+    dump_atomic(inventory_path, inventory)
+
+    registry_path = manifests / "data_registry.json"
+    registry = load(registry_path)
+    registry["metadata_audit_status"] = "PARTIAL_METADATA_AND_PUBLIC_FASTQ_INVENTORY_NOT_PHASE0_PASS"
+    registry.setdefault("phase0_evidence_updates", []).append({"run_id": args.run_id, "processed_dms_route_reprobe": route_rel, "dms_dependency_ledger": ledger_rel, "scientific_gate_effect": "NO_PHASE_0_PASS"})
+    for source in registry.get("sources", []):
+        if source.get("source_id") == "deenalattha_2026_dms":
+            source["processed_dms_payload_latest_readme_route_reprobe_current"] = route_rel
+            source["processed_dms_payload_latest_readme_route_reprobe_current_status"] = route.get("status")
+            source["dms_phase0_dependency_ledger_current"] = ledger_rel
+            source["dms_phase0_dependency_ledger_current_status"] = ledger.get("status")
+            source["processed_dms_payload_status"] = "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403"
+            source["dms_reconstruction_status"] = "BLOCKED_RECONSTRUCTION_INPUTS_MISSING"
+    dump_atomic(registry_path, registry)
+
+    acceptance_path = manifests / "acceptance_phase0.json"
+    acceptance = load(acceptance_path)
+    acceptance["status"] = "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_AUDIT"
+    acceptance["pass"] = False
+    evidence = acceptance.setdefault("evidence_paths", [])
+    for value in (route_rel, route_tsv_rel, ledger_rel):
+        if value not in evidence:
+            evidence.append(value)
+    acceptance["note"] = str(acceptance.get("note", "")) + f" A low-frequency official processed-DMS route re-probe at {args.run_id} returned {route.get('status')} for {len(route.get('routes', [])) if isinstance(route.get('routes'), list) else 'unknown'} routes; no payload was downloaded, no access control was bypassed, and the updated dependency ledger remains fail-closed."
+    dump_atomic(acceptance_path, acceptance)
+
+    phase_path = manifests / "phase_status.json"
+    phase = load(phase_path)
+    phase["last_transition"] = now
+    phase["transition_evidence"] = "manifests/phase0_payload_inventory.json"
+    phase["scientific_gate_effect"] = "NO_UNLOCK"
+    blockers = phase.setdefault("blocking_conditions", [])
+    blocker = f"The latest official processed-DMS route re-probe ({args.run_id}) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active."
+    if blocker not in blockers:
+        blockers.append(blocker)
+    dump_atomic(phase_path, phase)
+    print(json.dumps({"status": "PHASE0_DMS_EVIDENCE_REGISTERED_FAIL_CLOSED", "route": route_rel, "ledger": ledger_rel, "run_id": args.run_id}, ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
