@@ -189,6 +189,7 @@ def main() -> int:
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_download_partial_size_regression", **rel_artifact(args.artifact_root, "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T111109Z.json", status="UNRESOLVED_PARTIAL_SIZE_REGRESSION_REQUIRES_FINAL_INTEGRITY_AUDIT", partial_files_deleted=False, final_files_overwritten=False, raw_sequence_content_emitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_download_partial_size_regression_reobserved", **rel_artifact(args.artifact_root, "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T113210Z.json", status="REOBSERVED_UNRESOLVED_PARTIAL_SIZE_REGRESSION_REQUIRES_FINAL_INTEGRITY_AUDIT", partial_files_deleted=False, final_files_overwritten=False, raw_sequence_content_emitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_download_resume_diagnostic", **rel_artifact(args.artifact_root, "phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json", status="ACTIVE_DOWNLOAD_TRANSPORT_INSTABILITY_DIAGNOSTIC_UNRESOLVED", partial_files_deleted=False, final_files_overwritten=False, raw_sequence_content_emitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
+    append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_download_partial_size_regression_third_observation", **rel_artifact(args.artifact_root, "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json", status="THIRD_PARTIAL_SIZE_REGRESSION_FROZEN_FOR_DIAGNOSTICS", partial_files_deleted=False, final_files_overwritten=False, raw_sequence_content_emitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     inventory["required_next_evidence"] = sorted(set(inventory.get("required_next_evidence", [])) | {"complete selected ENA FASTQ download and batch hash/gzip/pair audit", "complete and record the stable SRR31402664_2 single-file integrity audit", "reconcile raw FASTQ to construct-level DMS counts, background, read-depth and QC semantics", "establish source-defined DMS treatment/background hierarchy before any matching", "produce and manually adjudicate an evidence-linked opaque matching table with at least 50 matched and 30 rejected-or-ambiguous cases"})
     dump(inventory_path, inventory)
 
@@ -217,6 +218,8 @@ def main() -> int:
             source["download_partial_size_regression_reobserved_status"] = "REOBSERVED_UNRESOLVED_REQUIRES_FINAL_INTEGRITY_AUDIT"
             source["download_resume_diagnostic_path"] = "phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json"
             source["download_resume_diagnostic_status"] = "ACTIVE_TRANSPORT_INSTABILITY_UNRESOLVED"
+            source["download_partial_size_regression_third_path"] = "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json"
+            source["download_partial_size_regression_third_status"] = "THIRD_REGRESSION_FROZEN_FOR_DIAGNOSTICS"
             if batch_audit_data is not None and batch_audit_relative is not None:
                 source["fastq_batch_audit_path"] = batch_audit_relative
                 source["fastq_batch_audit_status"] = batch_audit_data.get("status")
@@ -239,6 +242,8 @@ def main() -> int:
         acceptance["evidence_paths"].append("phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T113210Z.json")
     if "phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json" not in acceptance["evidence_paths"]:
         acceptance["evidence_paths"].append("phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json")
+    if "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json" not in acceptance["evidence_paths"]:
+        acceptance["evidence_paths"].append("phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json")
     acceptance["note"] = "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed."
     if download_failures:
         acceptance["note"] += " At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion."
@@ -252,6 +257,7 @@ def main() -> int:
     acceptance["note"] += " An unresolved SRR38259812_2 partial-size regression was observed after an earlier larger read-only observation; the partial remains preserved and requires final size/hash/gzip/pair audit, with no inference of cause."
     acceptance["note"] += " A second read-only SRR38259812_2 observation found the active partial materially smaller than its prior observation; the new anomaly is preserved independently, with no cause, repair, deletion, overwrite, or scientific interpretation inferred."
     acceptance["note"] += " Read-only inspection also preserved the active curl resume command and repeated transport return code 56 events; this is transport evidence only, with no cause or scientific interpretation inferred."
+    acceptance["note"] += " A third partial-size regression was frozen after a guarded SIGSTOP of the two project download processes; no process was killed, no partial was deleted, and no cause or scientific interpretation is inferred."
     acceptance["note"] += " SRR35766785 is audited separately as a complete paired run when its batch artifact is present; this remains file-integrity evidence only and does not establish construct-level DMS labels or unlock Phase 0."
     if batch_audit_data is not None:
         acceptance["note"] += f" The selected-run FASTQ batch audit was registered with status {batch_audit_data.get('status')}; it is file-integrity evidence only and cannot unlock Phase 0 without construct-level DMS reconciliation and manual matching acceptance."
@@ -304,6 +310,9 @@ def main() -> int:
     blocker = "The active SRR38259812_2 curl transfer showed repeated transport return code 56 events while no terminal event was recorded; this diagnostic is unresolved and requires final terminal-state integrity audit, with no cause or scientific meaning inferred."
     if blocker not in blockers:
         blockers.append(blocker)
+    blocker = "A third SRR38259812_2 partial-size regression was frozen after a guarded SIGSTOP of the two project download processes; the original partial remains evidence-only and requires a separately audited recovery path."
+    if blocker not in blockers:
+        blockers.append(blocker)
     blocker = "SRR35766785 paired FASTQ audit, when present, covers only one selected run; all selected payloads, raw/background/read-depth reconciliation, and manual matching remain required before Phase 0 can pass."
     if blocker not in blockers:
         blockers.append(blocker)
@@ -354,6 +363,7 @@ def main() -> int:
         "- An unresolved SRR38259812_2 partial-size regression was preserved as a separate anomaly artifact; no cause or scientific meaning is inferred, and final integrity audit remains mandatory.\n\n"
         "- A second SRR38259812_2 partial-size regression was independently preserved after a later read-only observation; no cause, repair, deletion, overwrite, or scientific meaning is inferred.\n\n"
         "- Read-only transport diagnostics preserved the active curl resume options and repeated return code 56 events; no cause or scientific meaning is inferred, and terminal-state integrity audit remains mandatory.\n\n"
+        "- A third partial-size regression was frozen after a guarded SIGSTOP of the two project download processes; the original partial remains preserved and a separately audited chunked recovery path is required.\n\n"
         "- SRR35766785 is independently audited as a paired run when its batch artifact is present; this remains file-integrity evidence only and does not establish construct-level DMS labels.\n\n"
         + batch_note
         + failure_note
