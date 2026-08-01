@@ -50,6 +50,6 @@
     "A third SRR38259812_2 partial-size regression was frozen after a guarded SIGSTOP of the two project download processes; the original partial remains evidence-only and requires a separately audited recovery path.",
     "The selected-run FASTQ batch audit is ONE_SELECTED_RUN_PAIR_AUDIT_COMPLETE_BATCH_PENDING; pending or failed payload integrity must be resolved before any Phase 0 consideration, and this audit cannot unlock the gate."
   ],
-  "last_transition": "2026-08-01T16:56:04.241973+00:00",
+  "last_transition": "2026-08-01T16:52:17.806380+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }

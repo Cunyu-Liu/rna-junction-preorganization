@@ -91,7 +91,24 @@ def main() -> int:
     inventory["scientific_gate_effect"] = "NO_PHASE_0_PASS"
     inventory["primary_labels_admitted"] = False
     inventory.setdefault("artifacts", [])
+    # Preserve historical failure evidence even when the current downloader
+    # log is empty or belongs to a later recovery run. This keeps a successful
+    # recovery from erasing the evidence of the earlier partial failure.
     download_failures: list[dict[str, object]] = []
+
+    def preserve_failure(item: object) -> None:
+        if isinstance(item, dict) and item not in download_failures:
+            download_failures.append(item)
+
+    for item in inventory.get("download_failure_events", []):
+        preserve_failure(item)
+    for historical_path in sorted(history.glob("phase0_payload_inventory_*.json")):
+        try:
+            historical_inventory = load(historical_path)
+        except (OSError, json.JSONDecodeError, ValueError):
+            continue
+        for item in historical_inventory.get("download_failure_events", []):
+            preserve_failure(item)
     try:
         for raw_line in Path(args.download_log).read_text(encoding="utf-8", errors="replace").splitlines():
             if not raw_line.startswith("{"):
@@ -101,18 +118,17 @@ def main() -> int:
             except json.JSONDecodeError:
                 continue
             if event.get("status") in {"DOWNLOAD_FAILED_PARTIAL_PRESERVED", "DOWNLOAD_SIZE_MISMATCH_PARTIAL_PRESERVED"}:
-                download_failures.append(
-                    {
-                        "run": event.get("run"),
-                        "path": event.get("path"),
-                        "expected_bytes": event.get("expected_bytes"),
-                        "observed_bytes": event.get("observed_bytes"),
-                        "returncode": event.get("returncode"),
-                        "status": event.get("status"),
-                    }
-                )
+                normalized = {
+                    "run": event.get("run"),
+                    "path": event.get("path"),
+                    "expected_bytes": event.get("expected_bytes"),
+                    "observed_bytes": event.get("observed_bytes"),
+                    "returncode": event.get("returncode"),
+                    "status": event.get("status"),
+                }
+                preserve_failure(normalized)
     except OSError:
-        download_failures = []
+        pass
     inventory["download_failure_events"] = download_failures
     if download_failures:
         inventory["status"] = "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES"
