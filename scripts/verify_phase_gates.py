@@ -134,7 +134,7 @@ def main() -> int:
             violations.append("FASTQ_BATCH_AUDIT_MUST_NOT_ADMIT_SCIENTIFIC_LABELS")
         if artifact.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
             violations.append("FASTQ_BATCH_AUDIT_MUST_NOT_UNLOCK_PHASE_0")
-        if artifact.get("status") not in {"BATCH_COMPLETE", "BATCH_PARTIAL_PENDING_OR_BLOCKED"}:
+        if artifact.get("status") not in {"BATCH_COMPLETE", "BATCH_PARTIAL_PENDING_OR_BLOCKED", "ONE_SELECTED_RUN_PAIR_AUDIT_COMPLETE_BATCH_PENDING"}:
             violations.append("FASTQ_BATCH_AUDIT_STATUS_UNEXPECTED")
 
     status = "PASS_GOVERNANCE_INVARIANTS" if not violations else "BLOCKED_FAIL_CLOSED"

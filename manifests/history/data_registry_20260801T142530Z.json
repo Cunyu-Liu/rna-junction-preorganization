@@ -91,9 +91,7 @@
       "download_resume_diagnostic_path": "phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json",
       "download_resume_diagnostic_status": "ACTIVE_TRANSPORT_INSTABILITY_UNRESOLVED",
       "download_partial_size_regression_third_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json",
-      "download_partial_size_regression_third_status": "THIRD_REGRESSION_FROZEN_FOR_DIAGNOSTICS",
-      "fastq_batch_audit_path": "phase0/audits/selected_fastq_recovery_scope_20260801T142500Z.json",
-      "fastq_batch_audit_status": "ONE_SELECTED_RUN_PAIR_AUDIT_COMPLETE_BATCH_PENDING"
+      "download_partial_size_regression_third_status": "THIRD_REGRESSION_FROZEN_FOR_DIAGNOSTICS"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -334,14 +332,6 @@
       "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
       "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T142530Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T142500Z.json"
     }
   ]
 }
