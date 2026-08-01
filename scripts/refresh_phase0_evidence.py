@@ -80,12 +80,13 @@ def main() -> int:
                 event = json.loads(raw_line)
             except json.JSONDecodeError:
                 continue
-            if event.get("status") == "DOWNLOAD_FAILED_PARTIAL_PRESERVED":
+            if event.get("status") in {"DOWNLOAD_FAILED_PARTIAL_PRESERVED", "DOWNLOAD_SIZE_MISMATCH_PARTIAL_PRESERVED"}:
                 download_failures.append(
                     {
                         "run": event.get("run"),
                         "path": event.get("path"),
                         "expected_bytes": event.get("expected_bytes"),
+                        "observed_bytes": event.get("observed_bytes"),
                         "returncode": event.get("returncode"),
                         "status": event.get("status"),
                     }
