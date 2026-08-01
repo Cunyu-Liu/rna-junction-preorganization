@@ -71,6 +71,37 @@ def main() -> int:
     inventory["scientific_gate_effect"] = "NO_PHASE_0_PASS"
     inventory["primary_labels_admitted"] = False
     inventory.setdefault("artifacts", [])
+    download_failures: list[dict[str, object]] = []
+    try:
+        for raw_line in Path(args.download_log).read_text(encoding="utf-8", errors="replace").splitlines():
+            if not raw_line.startswith("{"):
+                continue
+            try:
+                event = json.loads(raw_line)
+            except json.JSONDecodeError:
+                continue
+            if event.get("status") == "DOWNLOAD_FAILED_PARTIAL_PRESERVED":
+                download_failures.append(
+                    {
+                        "run": event.get("run"),
+                        "path": event.get("path"),
+                        "expected_bytes": event.get("expected_bytes"),
+                        "returncode": event.get("returncode"),
+                        "status": event.get("status"),
+                    }
+                )
+    except OSError:
+        download_failures = []
+    inventory["download_failure_events"] = download_failures
+    if download_failures:
+        inventory["status"] = "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES"
+        inventory.setdefault("required_next_evidence", [])
+        inventory["required_next_evidence"] = sorted(
+            set(inventory["required_next_evidence"])
+            | {
+                "safe resume of every preserved partial download, followed by final size/hash/gzip/pair audit"
+            }
+        )
 
     def append_unique(entry: dict) -> None:
         key = (entry.get("relative_path"), entry.get("kind"), entry.get("source_id"))
@@ -119,6 +150,8 @@ def main() -> int:
             source["raw_fastq_status"] = "PUBLIC_PAYLOAD_DOWNLOAD_IN_PROGRESS_CONSTRUCT_LEVEL_RECONCILIATION_PENDING"
             source["figshare_status"] = "BLOCKED_HTTP_403_PRESERVED"
             source["license_status"] = "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED"
+            source["download_failure_status"] = "PRESERVED_PARTIAL_FAILURES" if download_failures else "NO_PRESERVED_FAILURES_OBSERVED"
+            source["download_failure_events"] = download_failures
     dump(registry_path, registry)
 
     acceptance_path = manifests / "acceptance_phase0.json"
@@ -130,6 +163,8 @@ def main() -> int:
         if path not in acceptance["evidence_paths"]:
             acceptance["evidence_paths"].append(path)
     acceptance["note"] = "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed."
+    if download_failures:
+        acceptance["note"] += " At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion."
     dump(acceptance_path, acceptance)
 
     phase_path = manifests / "phase_status.json"
@@ -148,9 +183,23 @@ def main() -> int:
     for blocker in additions:
         if blocker not in blockers:
             blockers.append(blocker)
+    if download_failures:
+        blocker = "A selected ENA transfer logged DOWNLOAD_FAILED_PARTIAL_PRESERVED; the partial file was retained and requires safe resume plus final hash/gzip/pair audit."
+        if blocker not in blockers:
+            blockers.append(blocker)
     dump(phase_path, phase)
 
     report = args.code_root / "reports" / f"phase0_payload_inventory_{args.run_id}.md"
+    failure_note = (
+        "- Download failure evidence: "
+        + "; ".join(
+            f"{item.get('run')} returncode={item.get('returncode')} partial preserved"
+            for item in download_failures
+        )
+        + ". Safe resume is required.\n"
+        if download_failures
+        else ""
+    )
     report.write_text(
         f"# Phase 0 payload inventory refresh ({args.run_id})\n\n"
         "This refresh is governance evidence only. It does not unlock Phase 0 or admit primary labels.\n\n"
@@ -163,7 +212,8 @@ def main() -> int:
         "- A dependency-free Denny XLSX OOXML structure audit completed without decoding any cell values; semantic count/censor/matching evidence remains unresolved.\n\n"
         "- Official DMS processing source code was pinned to a public Git commit and its field semantics were registered; no source-code field was admitted as a primary label.\n\n"
         "- One selected main-library paired FASTQ run passed hash/gzip/record/pair-ID audit; this is file-integrity evidence only and does not establish construct-level DMS labels or QC hierarchy.\n\n"
-        "## Gate\n\n"
+        + failure_note
+        + "## Gate\n\n"
         "`PHASE_0 = IN_PROGRESS`; `scientific_gate_effect = NO_PHASE_0_PASS`; `primary_labels_admitted = false`.\n",
         encoding="utf-8",
     )

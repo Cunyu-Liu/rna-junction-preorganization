@@ -2,7 +2,7 @@
   "gate_id": "PHASE_0",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_AUDIT",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "note": "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed. At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion.",
+  "note": "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed.",
   "required_evidence": [
     "source_file_sha256_and_license_registry",
     "Denny_schema_and_count_reconciliation",

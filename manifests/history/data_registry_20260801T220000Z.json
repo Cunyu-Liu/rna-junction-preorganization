@@ -59,17 +59,7 @@
       "public_raw_fastq_route": "ENA_filereport_and_FASTQ_mirror",
       "public_raw_fastq_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
       "raw_fastq_status": "PUBLIC_PAYLOAD_DOWNLOAD_IN_PROGRESS_CONSTRUCT_LEVEL_RECONCILIATION_PENDING",
-      "figshare_status": "BLOCKED_HTTP_403_PRESERVED",
-      "download_failure_status": "PRESERVED_PARTIAL_FAILURES",
-      "download_failure_events": [
-        {
-          "run": "SRR31402663",
-          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz.partial",
-          "expected_bytes": null,
-          "returncode": 56,
-          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
-        }
-      ]
+      "figshare_status": "BLOCKED_HTTP_403_PRESERVED"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -208,13 +198,6 @@
     },
     {
       "run_id": "20260801T210000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T220000Z",
       "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
       "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
       "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
