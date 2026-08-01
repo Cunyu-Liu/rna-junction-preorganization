@@ -199,6 +199,7 @@ def main() -> int:
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "Figshare_ndownloader_HEAD_stderr_probe", **rel_artifact(args.artifact_root, "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.stderr", status="BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_route_audit", **rel_artifact(args.artifact_root, "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json", route_probe_tsv="phase0/source_metadata/figshare_route_probe_20260801T192200Z.tsv", status="BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_route_reprobe", **rel_artifact(args.artifact_root, "phase0/audits/figshare_route_reprobe_20260801T194600Z.json", route_probe_tsv="phase0/source_metadata/figshare_route_reprobe_20260801T194600Z.tsv", status="ROUTE_REPROBE_BLOCKED_NO_2XX", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
+    append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_readme_route_reprobe", **rel_artifact(args.artifact_root, "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json", route_probe_tsv="phase0/source_metadata/figshare_readme_reprobe_20260801T195800Z.tsv", status="ROUTE_REPROBE_BLOCKED_NO_2XX", request_referer="https://figshare.com/", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_article_page", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html", status="PUBLIC_ARTICLE_PAGE_METADATA_COMPLETE", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_supplement_link_inventory", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv", status="PUBLIC_SUPPLEMENT_LINK_INVENTORY_COMPLETE", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_supplement_download_body_probe", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc_media-1_20260801T113000Z.body", status="BLOCKED_HTML_POW_CHALLENGE_NOT_DOCX", payload_downloaded=False)})
@@ -244,6 +245,8 @@ def main() -> int:
             source["processed_dms_payload_status"] = "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403"
             source["processed_dms_payload_route_reprobe"] = "phase0/audits/figshare_route_reprobe_20260801T194600Z.json"
             source["processed_dms_payload_route_reprobe_status"] = "ROUTE_REPROBE_BLOCKED_NO_2XX"
+            source["processed_dms_payload_readme_route_reprobe"] = "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json"
+            source["processed_dms_payload_readme_route_reprobe_status"] = "ROUTE_REPROBE_BLOCKED_NO_2XX"
             source["zenodo_code_record_route_audit"] = "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json"
             source["zenodo_code_record_route_status"] = "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000"
             source["dms_reconstruction_feasibility_audit"] = "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json"
@@ -291,6 +294,9 @@ def main() -> int:
     for path in ("phase0/source_metadata/figshare_route_reprobe_20260801T194600Z.tsv", "phase0/audits/figshare_route_reprobe_20260801T194600Z.json"):
         if path not in acceptance["evidence_paths"]:
             acceptance["evidence_paths"].append(path)
+    for path in ("phase0/source_metadata/figshare_readme_reprobe_20260801T195800Z.tsv", "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json"):
+        if path not in acceptance["evidence_paths"]:
+            acceptance["evidence_paths"].append(path)
     if "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json" not in acceptance["evidence_paths"]:
         acceptance["evidence_paths"].append("phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json")
     if "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json" not in acceptance["evidence_paths"]:
@@ -305,6 +311,7 @@ def main() -> int:
     acceptance["note"] += " The official processing README Figshare ndownloader HEAD probe returned HTTP 403; no data payload was downloaded and no access control was bypassed."
     acceptance["note"] += " Five official Figshare-equivalent processed-DMS routes were probed at the recorded timestamp and all returned HTTP 403; the route audit is preserved, no payload was downloaded, and construct-level DMS hierarchy remains blocked."
     acceptance["note"] += " A low-frequency re-probe of the same five official routes at 2026-08-01T19:51:25Z again returned HTTP 403 with 118-byte text/html responses; no payload was downloaded and no access control was bypassed."
+    acceptance["note"] += " A strict reproduction of the official README curl headers, including Referer https://figshare.com/, at 2026-08-01T19:58:01Z again returned HTTP 403 for all five recorded routes; the official data.zip payload remains not downloaded and no access control was bypassed."
     acceptance["note"] += " The public Zenodo code-record API route was separately probed and returned connection refused/HTTP 000; this is a network-route failure and does not establish data absence or admit the code record as processed-DMS payload."
     acceptance["note"] += " A source-defined DMS reconstruction feasibility audit found public FASTQ pair evidence but no rna-map executable/environment, construct reference FASTA/sequence-structure CSV, mutation histograms, or processed construct JSON; no reconstruction or primary labels were admitted."
     acceptance["note"] += " A stable SRR31402664_2 single-file integrity audit was started with immutable run provenance; its final result is recorded separately and does not unlock Phase 0."
@@ -357,6 +364,9 @@ def main() -> int:
     if blocker not in blockers:
         blockers.append(blocker)
     blocker = "A low-frequency re-probe of the five recorded official processed-DMS routes again returned HTTP 403 with no 2xx response; the payload remains unavailable through the tested public routes and no access-control bypass is permitted."
+    if blocker not in blockers:
+        blockers.append(blocker)
+    blocker = "The official README's documented User-Agent/Referer request was reproduced for all five recorded Figshare routes and still returned HTTP 403 with no 2xx response; data.zip remains unavailable and no access-control bypass is permitted."
     if blocker not in blockers:
         blockers.append(blocker)
     blocker = "The public Zenodo code-record API route returned connection refused/HTTP 000; the code record was not downloaded from this host and cannot substitute for the processed-DMS payload."

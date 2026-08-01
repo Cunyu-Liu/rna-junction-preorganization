@@ -75,7 +75,7 @@ def read_urls(path: Path) -> list[tuple[str, str]]:
     return routes
 
 
-def probe(url: str) -> dict[str, object]:
+def probe(url: str, referer: str) -> dict[str, object]:
     with tempfile.TemporaryDirectory(prefix="figshare_route_reprobe_") as temporary_dir:
         headers = Path(temporary_dir) / "headers.txt"
         completed = subprocess.run(
@@ -94,7 +94,7 @@ def probe(url: str) -> dict[str, object]:
                 "--user-agent",
                 "Mozilla/5.0",
                 "--referer",
-                "https://www.ebi.ac.uk/",
+                referer,
                 "--dump-header",
                 str(headers),
                 "--output",
@@ -108,6 +108,7 @@ def probe(url: str) -> dict[str, object]:
         observed = parse_last_headers(headers) if headers.is_file() else {"status_line": None, "status_code": None}
         return {
             "url": url,
+            "request_referer": referer,
             "curl_exit": completed.returncode,
             "status_line": observed.get("status_line"),
             "http_code": observed.get("status_code"),
@@ -126,6 +127,7 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--report-tsv", required=True, type=Path)
     parser.add_argument("--run-id", required=True)
+    parser.add_argument("--referer", default="https://figshare.com/")
     args = parser.parse_args()
     if shutil.which("curl") is None:
         parser.error("curl is required")
@@ -141,7 +143,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.report_tsv.parent.mkdir(parents=True, exist_ok=True)
     routes = read_urls(args.source_route_tsv)
-    results = [{"route": route, **probe(url)} for route, url in routes]
+    results = [{"route": route, **probe(url, args.referer)} for route, url in routes]
     successful_head = [item for item in results if isinstance(item.get("http_code"), int) and 200 <= item["http_code"] < 300]
     status = "ROUTE_REPROBE_PUBLIC_HEAD_OK_PAYLOAD_NOT_DOWNLOADED" if successful_head else "ROUTE_REPROBE_BLOCKED_NO_2XX"
     payload = {
@@ -149,6 +151,7 @@ def main() -> int:
         "status": status,
         "run_id": args.run_id,
         "checked_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "request_referer": args.referer,
         "contract_path": str(args.contract.resolve()),
         "contract_sha256": observed_contract_sha256,
         "source_route_tsv": str(args.source_route_tsv.resolve()),
@@ -162,9 +165,9 @@ def main() -> int:
         "next_action": "Use the existing 128 MiB range downloader only after a verified 2xx route and expected payload size are established." if successful_head else "Preserve the route failure and continue searching only through official public routes; do not bypass access controls.",
     }
     atomic_write(args.output, json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
-    tsv_lines = ["run_id\troute\thttp_code\tcurl_exit\tcontent_type\tcontent_length\tpayload_downloaded\turl"]
+    tsv_lines = ["run_id\troute\trequest_referer\thttp_code\tcurl_exit\tcontent_type\tcontent_length\tpayload_downloaded\turl"]
     for item in results:
-        tsv_lines.append("\t".join([args.run_id] + [str(item.get(key, "")) for key in ("route", "http_code", "curl_exit", "content_type", "content_length", "payload_downloaded", "url")]))
+        tsv_lines.append("\t".join([args.run_id] + [str(item.get(key, "")) for key in ("route", "request_referer", "http_code", "curl_exit", "content_type", "content_length", "payload_downloaded", "url")]))
     atomic_write(args.report_tsv, "\n".join(tsv_lines) + "\n")
     print(json.dumps({"status": status, "route_count": len(results), "successful_head_count": len(successful_head), "output": str(args.output)}, sort_keys=True))
     return 0

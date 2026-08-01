@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T200100Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T195300Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -735,22 +735,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_readme_route_reprobe",
-      "relative_path": "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json",
-      "exists": true,
-      "size_bytes": 3017,
-      "sha256": "56598deabc240321b42a35e012f8d36b2914deb64222ceaf9441a090a3e816f7",
-      "route_probe_tsv": "phase0/source_metadata/figshare_readme_reprobe_20260801T195800Z.tsv",
-      "status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "request_referer": "https://figshare.com/",
-      "payload_downloaded": false,
-      "access_control_bypassed": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -771,7 +755,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T19:59:23.852524+00:00",
+  "last_refresh_utc": "2026-08-01T19:52:39.814064+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
