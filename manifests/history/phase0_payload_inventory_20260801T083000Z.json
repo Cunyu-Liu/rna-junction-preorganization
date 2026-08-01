@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T083000Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T074000Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_AUDIT",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -208,45 +208,6 @@
       ],
       "raw_sequence_content_emitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "denny_2018_tectorna",
-      "kind": "PMC_BioC_article_metadata",
-      "relative_path": "phase0/source_metadata/pmc_bioc_PMC6053692.json",
-      "exists": true,
-      "size_bytes": 151811,
-      "sha256": "37d03a1b4c9dfe5cfb54f992d7e19a0c22ed0cfb06419e1db101b2309eec9f2a",
-      "status": "PUBLIC_ARTICLE_METADATA_COMPLETE"
-    },
-    {
-      "source_id": "denny_2018_tectorna",
-      "kind": "PMC_semantics_term_audit",
-      "relative_path": "phase0/audits/denny_pmc_semantics_20260801T082000Z.json",
-      "exists": true,
-      "size_bytes": 751,
-      "sha256": "ca0d3e722051b8ec6520dad2df934bf6229fe52ef147122ba0695b78d491d1c0",
-      "log_path": "phase0/audits/denny_pmc_semantics_20260801T082000Z.log",
-      "status": "TERM_AUDIT_COMPLETE_CENSOR_DIRECTION_NOT_ESTABLISHED",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_OA_manifest",
-      "relative_path": "phase0/source_metadata/pmc_oa_manifest_PMC11601540.xml",
-      "exists": true,
-      "size_bytes": 611,
-      "sha256": "8070e80e1d05830fd346c7a6b92cf49f85dac7bdbebf062e67df296b8d45c0a1",
-      "status": "PUBLIC_OA_MANIFEST_REGISTERED"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_OA_package_probe",
-      "relative_path": "phase0/source_metadata/pmc_oa_package_PMC11601540.probe",
-      "exists": true,
-      "size_bytes": 553,
-      "sha256": "6ca4338d0f862b61637ab2ffb9406a7f0ca8f345073544ccc29fc78bd5c4c799",
-      "status": "BLOCKED_HTTP_404_NO_SUPPLEMENT_PAYLOAD",
-      "payload_downloaded": false
     }
   ],
   "required_next_evidence": [
@@ -264,6 +225,6 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T07:13:52.519245+00:00",
+  "last_refresh_utc": "2026-08-01T07:06:50.004097+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS"
 }
