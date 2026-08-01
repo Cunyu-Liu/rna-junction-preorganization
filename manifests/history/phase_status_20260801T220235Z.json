@@ -102,20 +102,9 @@
     "Additional Figshare range probe figshare_file_66482831_range_probe_20260801T214209Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T215150Z; no complete processed-DMS payload is admitted.",
     "Additional Figshare range probe figshare_file_64021168_alt_host_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T215150Z; no complete processed-DMS payload is admitted.",
     "Additional Figshare range probe figshare_file_66482831_alt_host_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T215150Z; no complete processed-DMS payload is admitted.",
-    "Additional Figshare range probe figshare_article_27880434_v8_alt_download_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T215150Z; no complete processed-DMS payload is admitted.",
-    "The latest official processed-DMS route re-probe (20260801T220235Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "A real 128 MiB Range GET probe at 20260801T220235Z returned HTTP 403 with zero body bytes and no Content-Range; no processed-DMS chunk is admitted and the payload download gate remains closed.",
-    "The official Figshare file metadata endpoint returned HTTP 403 at 20260801T220235Z; expected processed-DMS payload size remains unverified.",
-    "The DataCite/OAI provenance audit returned DOI_OAI_PROVENANCE_METADATA_AVAILABLE at 20260801T220235Z; metadata relationships do not substitute for a verified processed-DMS payload.",
-    "The Figshare v8 route audit returned BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE at 20260801T220235Z; no v8-specific 2xx payload route is available.",
-    "Figshare OAI-PMH METS/QDC/RDF/CERIF metadata was available at 20260801T220235Z, but metadata-only evidence cannot substitute for a verified processed-DMS payload or unlock the 128 MiB transfer gate.",
-    "Additional Figshare range probe figshare_file_64021168_range_probe_20260801T214209Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
-    "Additional Figshare range probe figshare_file_66482831_range_probe_20260801T214209Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
-    "Additional Figshare range probe figshare_file_64021168_alt_host_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
-    "Additional Figshare range probe figshare_file_66482831_alt_host_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted.",
-    "Additional Figshare range probe figshare_article_27880434_v8_alt_download_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T220235Z; no complete processed-DMS payload is admitted."
+    "Additional Figshare range probe figshare_article_27880434_v8_alt_download_range_probe_20260801T215150Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260801T215150Z; no complete processed-DMS payload is admitted."
   ],
-  "last_transition": "2026-08-01T22:07:23.992532+00:00",
+  "last_transition": "2026-08-01T21:55:26.639001+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json",
   "scientific_gate_effect": "NO_UNLOCK"
 }

@@ -1244,35 +1244,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T220235Z.json",
-      "exists": true,
-      "size_bytes": 17023,
-      "sha256": "c08e3e0774b5a76d509f5f9e791c046744b0a2c65a64d66aed1f9177ad5ea867",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_oai_format_audit_current",
-      "relative_path": "phase0/audits/figshare_oai_format_audit_20260801T220235Z.json",
-      "exists": true,
-      "size_bytes": 9870,
-      "sha256": "3b33477275d8d4b65895538d75ec79af4af6d04aca509e34db8a7f047ad40642",
-      "status": "FIGSHARE_OAI_FORMAT_METADATA_AVAILABLE",
-      "successful_route_count": 4,
-      "metadata_only": true,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1294,7 +1265,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T22:07:23.992532+00:00",
+  "last_refresh_utc": "2026-08-01T21:55:26.639001+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

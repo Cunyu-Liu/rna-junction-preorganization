@@ -119,7 +119,7 @@
       "dms_phase0_dependency_ledger_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "processed_dms_payload_latest_readme_route_reprobe_current": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "processed_dms_payload_latest_readme_route_reprobe_current_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T220235Z.json",
+      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T215150Z.json",
       "dms_phase0_dependency_ledger_current_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "public_source_repository_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
       "public_source_repository_tree_status": "GITHUB_TREE_METADATA_COMPLETE",
@@ -150,9 +150,7 @@
         "BLOCKED_HTTP_403_RANGE_PROBE"
       ],
       "processed_dms_payload_figshare_v8_route_audit_current": "phase0/audits/figshare_v8_route_audit_20260801T215150Z.json",
-      "processed_dms_payload_figshare_v8_route_audit_current_status": "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE",
-      "processed_dms_payload_oai_format_audit_current": "phase0/audits/figshare_oai_format_audit_20260801T220235Z.json",
-      "processed_dms_payload_oai_format_audit_current_status": "FIGSHARE_OAI_FORMAT_METADATA_AVAILABLE"
+      "processed_dms_payload_figshare_v8_route_audit_current_status": "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -568,12 +566,6 @@
       "run_id": "20260801T215150Z",
       "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T215150Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T220235Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T220235Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ]
