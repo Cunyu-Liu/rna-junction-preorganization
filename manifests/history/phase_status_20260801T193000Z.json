@@ -36,6 +36,6 @@
     "The official PMC media-1.docx link returned HTTP 200 text/html with a Preparing to download/POW challenge rather than a DOCX; no challenge was bypassed.",
     "The official Zenodo code-archive route probe exited 7 with HTTP status 000 due connection refusal; record contents remain unverified and this is not treated as evidence that data are absent."
   ],
-  "last_transition": "2026-08-01T07:55:43.813591+00:00",
+  "last_transition": "2026-08-01T07:50:13.282566+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }

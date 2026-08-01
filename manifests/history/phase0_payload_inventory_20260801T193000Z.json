@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T193000Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T174500Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_AUDIT",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -377,28 +377,6 @@
       "raw_cell_values_read": false,
       "raw_values_emitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_processing_source_code_registry",
-      "relative_path": "phase0/source_metadata/dms_processing_source_registry_20260801T190000Z.json",
-      "exists": true,
-      "size_bytes": 2469,
-      "sha256": "dffe7c6a072b174cdbd451cc27c5e3feb19b3be2920ae7e2ca9694d743353727",
-      "status": "PUBLIC_SOURCE_CODE_SEMANTICS_REGISTERED_PRIMARY_PAYLOAD_NOT_ADMITTED",
-      "raw_sequence_content_emitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_processing_source_code_commit_probe",
-      "relative_path": "phase0/source_metadata/dms_github_main_commit_20260801T190000Z.txt",
-      "exists": true,
-      "size_bytes": 57,
-      "sha256": "40bcfb7569f64380cf931824b1fc92ed66092637151db65559f63c7bc01cf5cb",
-      "status": "PUBLIC_SOURCE_CODE_COMMIT_PINNED",
-      "raw_sequence_content_emitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -416,6 +394,6 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T07:55:43.584115+00:00",
+  "last_refresh_utc": "2026-08-01T07:50:13.022285+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS"
 }
