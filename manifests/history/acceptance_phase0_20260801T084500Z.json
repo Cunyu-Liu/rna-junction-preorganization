@@ -37,13 +37,7 @@
     "phase0/source_metadata/ena_fastq_inventory_20260801.json",
     "phase0/source_metadata/pmc_bioc_PMC11601540.json",
     "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-    "phase0/audits/junction_design_1_fastq_20260801T064900Z.log",
-    "phase0/source_metadata/pmc_bioc_PMC6053692.json",
-    "phase0/audits/denny_pmc_semantics_20260801T082000Z.json",
-    "phase0/audits/denny_pmc_semantics_20260801T082000Z.log",
-    "phase0/source_metadata/license_registry_20260801.json",
-    "phase0/source_metadata/pmc_oa_manifest_PMC11601540.xml",
-    "phase0/source_metadata/pmc_oa_package_PMC11601540.probe"
+    "phase0/audits/junction_design_1_fastq_20260801T064900Z.log"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",
