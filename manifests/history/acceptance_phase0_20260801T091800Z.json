@@ -2,7 +2,7 @@
   "gate_id": "PHASE_0",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_AUDIT",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "note": "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed. At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion. A wrapper process-detection incident was preserved and corrected; the corrected wrapper was tested to block while the original downloader remained active. Denny semantic evidence extraction found an explicit 24,073 variant-count sum, a 1,713 numeric cardinality candidate, and -7.1 behavior consistent with an upper-bound cap in seven ΔG columns; this is not directional proof, and exact 1,687/1,713/1,636 subset mapping and censor/raw-interpolated acceptance remain unresolved. A read-only size anomaly was observed for an active SRR31402664 partial; no repair was attempted and final size/hash/gzip/pair audit remains required. The manual matching acceptance component is explicitly tracked fail-closed; no opaque matching table or manually adjudicated rows are admitted until evidence-linked records are available. The official processing README Figshare ndownloader HEAD probe returned HTTP 403; no data payload was downloaded and no access control was bypassed.",
+  "note": "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed. At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion. A wrapper process-detection incident was preserved and corrected; the corrected wrapper was tested to block while the original downloader remained active. Denny semantic evidence extraction found an explicit 24,073 variant-count sum, a 1,713 numeric cardinality candidate, and -7.1 behavior consistent with an upper-bound cap in seven ΔG columns; this is not directional proof, and exact 1,687/1,713/1,636 subset mapping and censor/raw-interpolated acceptance remain unresolved. A read-only size anomaly was observed for an active SRR31402664 partial; no repair was attempted and final size/hash/gzip/pair audit remains required. The manual matching acceptance component is explicitly tracked fail-closed; no opaque matching table or manually adjudicated rows are admitted until evidence-linked records are available.",
   "required_evidence": [
     "source_file_sha256_and_license_registry",
     "Denny_schema_and_count_reconciliation",
@@ -64,10 +64,7 @@
     "phase0/audits/denny_xlsx_semantic_evidence_20260801T165000Z.json",
     "phase0/audits/download_partial_size_anomaly_20260801T084716Z.json",
     "phase0/audits/denny_xlsx_semantic_evidence_20260801T090500Z.json",
-    "phase0/audits/manual_matching_acceptance.json",
-    "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.headers",
-    "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status",
-    "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.stderr"
+    "phase0/audits/manual_matching_acceptance.json"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",

@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T091800Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T091000Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -474,36 +474,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Figshare_ndownloader_HEAD_headers_probe",
-      "relative_path": "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.headers",
-      "exists": true,
-      "size_bytes": 118,
-      "sha256": "746fef1b31c0a28b076f3772c5f2dfb3cd04f37d574b3495ba28cea28ae67f06",
-      "status": "BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Figshare_ndownloader_HEAD_status_probe",
-      "relative_path": "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status",
-      "exists": true,
-      "size_bytes": 90,
-      "sha256": "64e2f958f59ee4cb4364f87e4553b6a5a7844a1c1c6b5ba7c43cd6304cfc2b76",
-      "status": "BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Figshare_ndownloader_HEAD_stderr_probe",
-      "relative_path": "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.stderr",
-      "exists": true,
-      "size_bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "status": "BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED",
-      "payload_downloaded": false
     }
   ],
   "required_next_evidence": [
@@ -523,7 +493,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T09:19:02.467317+00:00",
+  "last_refresh_utc": "2026-08-01T09:09:41.552701+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

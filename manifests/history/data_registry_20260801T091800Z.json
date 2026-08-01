@@ -61,7 +61,7 @@
       "public_raw_fastq_route": "ENA_filereport_and_FASTQ_mirror",
       "public_raw_fastq_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
       "raw_fastq_status": "PUBLIC_PAYLOAD_DOWNLOAD_IN_PROGRESS_CONSTRUCT_LEVEL_RECONCILIATION_PENDING",
-      "figshare_status": "BLOCKED_HTTP_403_DIRECT_AND_NDOWNLOADER_ROUTES_PRESERVED",
+      "figshare_status": "BLOCKED_HTTP_403_PRESERVED",
       "download_failure_status": "PRESERVED_PARTIAL_FAILURES",
       "download_failure_events": [
         {
@@ -84,8 +84,7 @@
       "resume_wrapper_incident": "phase0/audits/resume_wrapper_incident_20260801T161500Z.json",
       "resume_wrapper_status": "CORRECTED_FAIL_CLOSED_TESTED_WHILE_ORIGINAL_DOWNLOADER_ACTIVE",
       "download_partial_size_anomaly_path": "phase0/audits/download_partial_size_anomaly_20260801T084716Z.json",
-      "download_partial_size_anomaly_status": "OBSERVED_REQUIRES_FINAL_INTEGRITY_AUDIT",
-      "figshare_ndownloader_probe": "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status"
+      "download_partial_size_anomaly_status": "OBSERVED_REQUIRES_FINAL_INTEGRITY_AUDIT"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -266,13 +265,6 @@
     },
     {
       "run_id": "20260801T091000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T091800Z",
       "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
       "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
       "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
