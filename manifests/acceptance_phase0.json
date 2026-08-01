@@ -27,7 +27,8 @@
     "phase0/audits/denny_semantics_20260801T065000Z.log",
     "phase0/source_metadata/sra_runinfo_PRJNA1188187.csv",
     "phase0/audits/sra_runinfo_20260801T071500Z.json",
-    "phase0/audits/sra_runinfo_20260801T071500Z.log"
+    "phase0/audits/sra_runinfo_20260801T071500Z.log",
+    "phase0/source_metadata/oup_supplement_endpoint.probe"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",

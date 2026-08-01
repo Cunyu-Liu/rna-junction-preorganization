@@ -81,6 +81,15 @@
     },
     {
       "source_id": "deenalattha_2026_dms",
+      "kind": "OUP_article_endpoint_probe",
+      "relative_path": "phase0/source_metadata/oup_supplement_endpoint.probe",
+      "status": "BLOCKED_HTTP_403_PUBLISHER_ACCESS_CHALLENGE",
+      "http_code": 403,
+      "payload_downloaded": false,
+      "next_action": "preserve failure; use browser-visible article metadata only and do not bypass the challenge"
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
       "kind": "public_code_refs",
       "relative_path": "phase0/source_metadata/yesselman_dms_code_refs.txt",
       "relative_sha256_path": "phase0/source_metadata/yesselman_dms_code_refs.sha256",

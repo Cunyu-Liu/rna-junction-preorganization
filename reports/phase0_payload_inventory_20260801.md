@@ -82,6 +82,12 @@ as an access-probe artifact; it is not treated as a license denial or as proof
 that the dataset is unavailable. An approved alternate public route may be
 used later, but access controls will not be bypassed.
 
+The remote publisher article endpoint also returned HTTP 403 with an access
+challenge when probed without a browser. That probe is retained at
+`phase0/source_metadata/oup_supplement_endpoint.probe`; no supplement payload
+was downloaded and the challenge was not bypassed. Browser-visible article
+metadata was used only to record provenance and reported processing claims.
+
 The official article and its public code identify additional provenance that
 must be reconciled before payload admission: 7,500 constructs; a standard
 quality filter requiring more than 2,000 aligned reads and signal-to-noise
