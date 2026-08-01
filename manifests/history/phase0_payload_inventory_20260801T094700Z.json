@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T094700Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T091800Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -504,18 +504,6 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "status": "BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED",
       "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_single_file_audit_run_provenance",
-      "relative_path": "phase0/audits/SRR31402664_2_fastq_audit_20260801T092500Z.run.json",
-      "exists": true,
-      "size_bytes": 1224,
-      "sha256": "48bfc08575154291c5cfb6c9f2d397bc2da64e9a4671b798e5247a7dcdf65c2f",
-      "status": "IN_PROGRESS_STABLE_PAYLOAD_INTEGRITY_AUDIT",
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -524,7 +512,6 @@
     "Denny censor direction, units, and raw/interpolated semantics",
     "Denny exact count reconciliation for 1687/1713/1636 with source-defined subset mapping",
     "Denny replicate/bootstrap/covariance semantics",
-    "complete and record the stable SRR31402664_2 single-file integrity audit",
     "complete selected ENA FASTQ download and batch hash/gzip/pair audit",
     "establish source-defined DMS treatment/background hierarchy before any matching",
     "manual audit of at least 50 matched and 30 rejected_or_ambiguous cases",
@@ -536,7 +523,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T09:45:04.059143+00:00",
+  "last_refresh_utc": "2026-08-01T09:19:02.467317+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

@@ -43,6 +43,6 @@
     "The manual matching acceptance component is missing or blocked; no candidate correspondence may be treated as accepted until an evidence-linked opaque table has at least 50 manually matched and 30 rejected-or-ambiguous cases with agreement at least 0.95.",
     "The official processing README Figshare ndownloader route returned HTTP 403; the data.zip payload remains unavailable through the recorded public route and no bypass was attempted."
   ],
-  "last_transition": "2026-08-01T09:45:04.671296+00:00",
+  "last_transition": "2026-08-01T09:19:02.872813+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
