@@ -38,3 +38,13 @@ The first read-only scan did not read controlled sequence/label/effect-value
 content. A shallow public-data name scan and source/license/hash registry are
 still required before Phase 0 can pass. The remote preflight log generated in
 the new project is the authoritative command-level record for this snapshot.
+
+The shallow `/mnt/cunyuliu` top-level directory-name scan found no dedicated
+Denny/DMS/tectoRNA/junction root. A deeper name-only scan entered NFS
+uninterruptible I/O (`D` state), so it was terminated as the agent's own
+diagnostic process. This is an infrastructure limitation, not evidence that
+the public data are unavailable. No raw data content was read.
+
+The retained preflight log is
+`logs/preflight_20260801T051420Z.log` with SHA-256
+`30252385b81e254a5df3a5377c346b39fff51ffc6d68e43659de05bc5f8ca7c8`.

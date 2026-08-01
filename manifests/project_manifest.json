@@ -37,5 +37,6 @@
   },
   "created_at": "2026-08-01T13:06:28+08:00",
   "last_preflight_log": "logs/preflight_20260801T051420Z.log",
+  "last_preflight_log_sha256": "30252385b81e254a5df3a5377c346b39fff51ffc6d68e43659de05bc5f8ca7c8",
   "status": "REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED"
 }
