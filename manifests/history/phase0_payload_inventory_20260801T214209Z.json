@@ -1055,90 +1055,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T214209Z.json",
-      "exists": true,
-      "size_bytes": 12369,
-      "sha256": "6c4d95f96dae75fa0539abf1cd6b9726b6cd52d75283558f7a6c855e6f7c2a75",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_source_repository_tree_audit",
-      "relative_path": "phase0/audits/dms_github_tree_payload_audit_20260801T214209Z.json",
-      "exists": true,
-      "size_bytes": 944,
-      "sha256": "d92466342dd239995ace467db0eac76cc4641d9de266a32ac983cae7f257c798",
-      "status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
-      "source_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_doi_oai_provenance_audit_current",
-      "relative_path": "phase0/audits/doi_oai_provenance_route_audit_20260801T213706Z.json",
-      "exists": true,
-      "size_bytes": 6739,
-      "sha256": "d3cacf79d53d3d61300a9cce1d72fdd0d064dbd09fa5b402d633c600b421bc1e",
-      "status": "DOI_OAI_PROVENANCE_METADATA_AVAILABLE",
-      "successful_route_count": 3,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_additional_range_probe_current",
-      "relative_path": "phase0/audits/figshare_file_64021168_range_probe_20260801T214209Z.json",
-      "exists": true,
-      "size_bytes": 2613,
-      "sha256": "a37ba543ca49c5ff6076e7f9e7f974aad9e28efb8a59d754b602bd4b7282ef55",
-      "status": "BLOCKED_HTTP_403_RANGE_PROBE",
-      "requested_range": {
-        "end": 134217727,
-        "requested_bytes": 134217728,
-        "start": 0
-      },
-      "observed_body_bytes": 0,
-      "observed_total_bytes": null,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_additional_range_probe_current",
-      "relative_path": "phase0/audits/figshare_file_66482831_range_probe_20260801T214209Z.json",
-      "exists": true,
-      "size_bytes": 2613,
-      "sha256": "65b473298e6a10f8cce0fbe8c45971e97c0d6e0252eba18ed5fd9ae5dc2a7368",
-      "status": "BLOCKED_HTTP_403_RANGE_PROBE",
-      "requested_range": {
-        "end": 134217727,
-        "requested_bytes": 134217728,
-        "start": 0
-      },
-      "observed_body_bytes": 0,
-      "observed_total_bytes": null,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1160,7 +1076,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T21:45:28.726814+00:00",
+  "last_refresh_utc": "2026-08-01T21:30:39.810422+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

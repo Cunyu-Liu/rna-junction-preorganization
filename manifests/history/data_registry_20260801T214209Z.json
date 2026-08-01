@@ -119,11 +119,11 @@
       "dms_phase0_dependency_ledger_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "processed_dms_payload_latest_readme_route_reprobe_current": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "processed_dms_payload_latest_readme_route_reprobe_current_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T214209Z.json",
+      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T212722Z.json",
       "dms_phase0_dependency_ledger_current_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "public_source_repository_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
       "public_source_repository_tree_status": "GITHUB_TREE_METADATA_COMPLETE",
-      "public_source_repository_tree_audit": "phase0/audits/dms_github_tree_payload_audit_20260801T214209Z.json",
+      "public_source_repository_tree_audit": "phase0/audits/dms_github_tree_payload_audit_20260801T212722Z.json",
       "public_source_repository_tree_audit_status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
       "zenodo_code_record_route_audit_current": "phase0/audits/zenodo_code_record_16884333_route_audit_20260801T205218Z.json",
       "zenodo_code_record_route_audit_current_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000",
@@ -132,17 +132,7 @@
       "processed_dms_payload_file_metadata_probe_current": "phase0/audits/figshare_file_66482813_metadata_probe_20260801T210534Z.json",
       "processed_dms_payload_file_metadata_probe_current_status": "BLOCKED_HTTP_403_FILE_METADATA_PROBE",
       "processed_dms_payload_provenance_route_audit_current": "phase0/audits/figshare_provenance_route_audit_20260801T212722Z.json",
-      "processed_dms_payload_provenance_route_audit_current_status": "BLOCKED_NO_2XX_PROVENANCE_ROUTE",
-      "processed_dms_payload_doi_oai_provenance_audit_current": "phase0/audits/doi_oai_provenance_route_audit_20260801T213706Z.json",
-      "processed_dms_payload_doi_oai_provenance_audit_current_status": "DOI_OAI_PROVENANCE_METADATA_AVAILABLE",
-      "processed_dms_payload_additional_range_probes_current": [
-        "phase0/audits/figshare_file_64021168_range_probe_20260801T214209Z.json",
-        "phase0/audits/figshare_file_66482831_range_probe_20260801T214209Z.json"
-      ],
-      "processed_dms_payload_additional_range_probes_current_status": [
-        "BLOCKED_HTTP_403_RANGE_PROBE",
-        "BLOCKED_HTTP_403_RANGE_PROBE"
-      ]
+      "processed_dms_payload_provenance_route_audit_current_status": "BLOCKED_NO_2XX_PROVENANCE_ROUTE"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -546,12 +536,6 @@
       "run_id": "20260801T212722Z",
       "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T212722Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T214209Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T214209Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ]
