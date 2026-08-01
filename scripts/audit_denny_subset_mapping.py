@@ -86,9 +86,6 @@ def main() -> int:
         {"annotation": key, "distinct_candidate_id_count": len(value)}
         for key, value in sorted(ids_by_annotation.items())
     ]
-    observed_targets = {
-        str(target): target in candidate_ids for target in EXPECTED_TARGETS
-    }
     result = {
         "schema_version": "phase0-denny-subset-mapping-v1",
         "status": "SUBSET_MAPPING_AGGREGATE_AUDIT_COMPLETE",
@@ -105,8 +102,11 @@ def main() -> int:
         "distinct_candidate_identifier_count_by_annotation": group_summary,
         "distinct_candidate_identifier_count_with_measured_nonempty": len(measured_ids),
         "distinct_candidate_identifier_count_with_interpolated_nonempty": len(interpolated_ids),
-        "contract_target_counts_observed_as_candidate_identifiers": observed_targets,
-        "contract_target_mapping_status": "UNRESOLVED_1687_AND_1636_NOT_ESTABLISHED_BY_THIS_FIELD",
+        "contract_target_integer_values_present_as_identifiers": {
+            str(target): target in candidate_ids for target in EXPECTED_TARGETS
+        },
+        "target_integer_presence_is_not_count_evidence": True,
+        "contract_target_mapping_status": "UNRESOLVED_NO_ACCEPTED_COUNT_MAPPING",
         "raw_sequence_content_emitted": False,
         "primary_labels_admitted": False,
         "scientific_gate_effect": "NO_PHASE_0_PASS",
