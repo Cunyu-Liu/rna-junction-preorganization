@@ -51,5 +51,16 @@
     "log_sha256": "65e037ee8c53d5f1073fd1f1a3d4bb8086501d296a77627620d914e1b63410bd",
     "scientific_gate_effect": "NO_UNLOCK_PHASE_0_OR_LATER"
   },
+  "phase_gate_verifier": {
+    "status": "BLOCKED_FAIL_CLOSED",
+    "timestamp_utc": "2026-08-01T05:43:53.724514+00:00",
+    "exit_code": 2,
+    "violations": [
+      "CONTRACT_SOURCE_ABSENT"
+    ],
+    "log": "logs/phase_gate_verifier_20260801T054353Z.log",
+    "log_sha256": "6ab82282e40abf9ce999190f02636277a15abbcc9aa3bab053cb841ec669610f",
+    "scientific_gate_effect": "NO_UNLOCK"
+  },
   "status": "REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED"
 }
