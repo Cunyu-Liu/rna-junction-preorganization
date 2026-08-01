@@ -24,6 +24,7 @@
     "A shallow /mnt/cunyuliu directory-name scan found no dedicated Denny/DMS/tectoRNA/junction root; this is not a data availability conclusion.",
     "The deeper name scan was stopped after entering NFS D-state to avoid sustained IO impact.",
     "Denny exact count reconciliation, censor direction, raw/interpolated semantics, and replicate/covariance semantics remain unresolved.",
+    "The Denny aggregate audit recorded a 24,073 sublibrary-variant sum and a 1,713 distinct-count candidate, but did not establish the contract's 1,687/1,713/1,636 subset mapping.",
     "The DMS Figshare payload endpoint returned HTTP 403; only public metadata and code-reference evidence is currently registered.",
     "No matched/ambiguous/rejected table, manual audit of at least 50 matched and 30 rejected_or_ambiguous cases, or matching-accuracy result has been accepted."
   ],

@@ -33,6 +33,22 @@
           "covariance": false,
           "replicate": false
         }
+      },
+      "semantics_audit": {
+        "path": "phase0/audits/denny_semantics_20260801T065000Z.json",
+        "sha256": "ee434df573ea76879404bb084854033ec82b3b26038c06270da466791756a32f",
+        "log_path": "phase0/audits/denny_semantics_20260801T065000Z.log",
+        "log_sha256": "03edcd7f029b9e5cda9814e900d892bb6d6c5ec076eb00452b55499cda5035e9",
+        "status": "AGGREGATE_SEMANTICS_COMPLETE_EXACT_COUNT_MAPPING_OPEN",
+        "observations": {
+          "measured_and_interpolated_headers_present": true,
+          "raw_censor_replicate_covariance_headers_not_confirmed": true,
+          "minus_7_1_is_upper_boundary_candidate": true,
+          "sublibrary_variant_count_sum": 24073,
+          "sublibrary_variant_count_values": [256, 1120, 3280, 3601, 3792, 12024],
+          "distinct_count_1713_candidate_column_observed": true
+        },
+        "gate_effect": "NO_PHASE_0_PASS"
       }
     },
     {
@@ -82,7 +98,8 @@
     }
   ],
   "required_next_evidence": [
-    "Denny exact count reconciliation, censor direction, units, and raw/interpolated semantics",
+    "Denny exact count reconciliation for 1687/1713/1636 with source-defined subset mapping",
+    "Denny censor direction, units, and raw/interpolated semantics",
     "Denny replicate/bootstrap/covariance semantics",
     "DMS JSON supplement and Figshare payload or documented access failure path",
     "DMS treated/background/read-depth hierarchy and construct group mapping",

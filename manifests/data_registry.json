@@ -25,7 +25,9 @@
       "raw_file_path": "phase0/source_payloads/denny/261_SI.xlsx",
       "sha256": "f68ed6049b31750ad044a303fdb157ec64fb1e565cbf56fad247e0bbc1deda20",
       "license_status": "DATA_LICENSE_NOT_VERIFIED",
-      "metadata_audit_path": "phase0/audits/denny_workbook_metadata.json"
+      "metadata_audit_path": "phase0/audits/denny_workbook_metadata.json",
+      "semantics_audit_path": "phase0/audits/denny_semantics_20260801T065000Z.json",
+      "semantics_audit_status": "AGGREGATE_COMPLETE_EXACT_COUNT_MAPPING_OPEN"
     },
     {
       "source_id": "deenalattha_2026_dms",
@@ -38,7 +40,8 @@
         "JSON_supplement_sequence_and_construct_mapping",
         "treated_count/background/read_depth_hierarchy",
         "QC/outlier/contamination_semantics",
-        "construct_and_connected_component_split_groups"
+        "construct_and_connected_component_split_groups",
+        "official_article_and_public_code_data_layout"
       ],
       "download_status": "METADATA_DOWNLOADED_FIGSHARE_PAYLOAD_BLOCKED_HTTP_403",
       "metadata_paths": [

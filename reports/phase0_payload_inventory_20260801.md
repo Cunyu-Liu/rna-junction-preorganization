@@ -39,6 +39,35 @@ Metadata audit JSON:
 
 `/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/denny_workbook_metadata.json`
 
+### Aggregate semantics audit
+
+The protected aggregate audit was run against the hash-verified workbook. It
+reported the following evidence without exporting row-level sequences, labels,
+or effect values:
+
+- the header row contains measured ΔG, measurement error, and measured-plus-
+  interpolated ΔG fields;
+- raw/censor/replicate/covariance fields were not confirmed by the header
+  audit;
+- the value used by the contract as the censoring boundary appears as an upper
+  numeric-boundary candidate in the measured and measured-plus-interpolated
+  columns, but the censoring mechanism and direction are not yet accepted;
+- the `Number of variants` sublibrary values sum to 24,073, with six reported
+  sublibrary counts; this is not the same unit as the contract's 1,687/1,713/
+  1,636 reconciliation target;
+- one anonymous library column has 1,713 distinct integer values, but its
+  source-defined meaning and relationship to 1,687 and 1,636 are not proven.
+
+Evidence:
+
+`/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/denny_semantics_20260801T065000Z.json`
+
+SHA-256: `ee434df573ea76879404bb084854033ec82b3b26038c06270da466791756a32f`
+
+The audit log contains the openpyxl warning that an unknown workbook
+extension was removed while reading in read-only mode. The warning is
+preserved and does not count as a scientific pass.
+
 ## Deenalattha / DMS
 
 Downloaded metadata:
@@ -52,6 +81,14 @@ remote host. No Figshare payload was downloaded. The 403 response is retained
 as an access-probe artifact; it is not treated as a license denial or as proof
 that the dataset is unavailable. An approved alternate public route may be
 used later, but access controls will not be bypassed.
+
+The official article and its public code identify additional provenance that
+must be reconciled before payload admission: 7,500 constructs; a standard
+quality filter requiring more than 2,000 aligned reads and signal-to-noise
+ratio above 4; a separate 37°C/2-minute protocol with its own exclusions; raw
+FASTQ files in SRA project `PRJNA1188187`; and code-produced directories for
+mutation histograms, construct JSON, motif JSON, and residue JSON. These are
+registered as source-level facts, not as downloaded primary payloads.
 
 ## Gate status
 
