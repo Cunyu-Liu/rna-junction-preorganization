@@ -53,11 +53,11 @@
   },
   "phase_gate_verifier": {
     "status": "PASS_GOVERNANCE_INVARIANTS",
-    "timestamp_utc": "2026-08-01T07:50:31.959673+00:00",
+    "timestamp_utc": "2026-08-01T07:43:21.021682+00:00",
     "exit_code": 0,
     "violations": [],
-    "log": "logs/phase_gate_verifier_20260801T175000Z.log",
-    "log_sha256": "9ef58fa0405254bedbaae1fe7cb01236a2ebae6f2c678c875314b684789d51db",
+    "log": "logs/phase_gate_verifier_20260801T151000Z.log",
+    "log_sha256": "f029044dc483fcea1dc18de0e95738f67560339328599e692b3f8638a88b328e",
     "scientific_gate_effect": "NO_UNLOCK"
   },
   "contract_deployment": {
