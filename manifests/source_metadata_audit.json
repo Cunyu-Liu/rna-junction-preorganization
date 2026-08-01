@@ -1,0 +1,71 @@
+{
+  "audit_id": "PHASE0_SOURCE_METADATA_AUDIT_20260801",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "audited_at_utc": "2026-08-01T06:10:00Z",
+  "status": "PARTIAL_METADATA_ONLY_NOT_PHASE0_PASS",
+  "method": "Official article, repository, and archive metadata pages were checked without downloading source payloads.",
+  "source_checks": [
+    {
+      "source_id": "denny_2018_tectorna",
+      "status": "ARTICLE_AND_ARCHIVE_METADATA_LOCATED_NOT_DOWNLOADED",
+      "official_evidence": [
+        "https://doi.org/10.1016/j.cell.2018.05.038",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC6053692/",
+        "https://herschlaglab.stanford.edu/publications"
+      ],
+      "observed_metadata": [
+        "The article is High-Throughput Investigation of Diverse Junction Elements in RNA Tertiary Folding.",
+        "The public article record identifies a tectoRNA high-throughput measurement system.",
+        "The reported design includes 1328 junction sequences and 359 sequences characterized by X-ray crystallography.",
+        "The paper uses 1x1 and 2x2 nomenclature within a broader junction library and provides supporting information links."
+      ],
+      "payload_sha256": null,
+      "license_status": "NOT_VERIFIED",
+      "required_next_checks": [
+        "download exact supplementary/workbook payload",
+        "record payload SHA-256 and license/terms",
+        "reconcile raw/interpolated/censored values and reported counts",
+        "audit replicate/bootstrap/covariance semantics"
+      ]
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
+      "status": "ARTICLE_AND_ARCHIVE_METADATA_LOCATED_NOT_DOWNLOADED",
+      "official_evidence": [
+        "https://academic.oup.com/nar/article/54/14/gkag672/8736262",
+        "https://doi.org/10.6084/m9.figshare.27880434",
+        "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1188187",
+        "https://github.com/YesselmanLabPublications/2025_char_3d_struct_features"
+      ],
+      "observed_metadata": [
+        "The article reports 7500 RNA constructs containing two-way junctions with known 3D structures.",
+        "The article identifies PDB files on Figshare and demultiplexed FASTQ files under SRA BioProject PRJNA1188187.",
+        "The reported quality filtering removes sequences with fewer than 2000 reads or signal-to-noise ratio below 4, and excludes individual measurements with z-scores above 3.",
+        "The reported motif canonicalization puts the longer strand first and alphabetically orders equal-length strands.",
+        "The article reports four reactivity normalization strategies, including no-modification, denatured, construct-average, and common-hairpin references."
+      ],
+      "payload_sha256": null,
+      "license_status": "NOT_VERIFIED",
+      "required_next_checks": [
+        "download JSON supplement, Figshare files, and metadata only through the approved data route",
+        "record payload SHA-256, version, and license/terms",
+        "reconcile treated/background/read-depth hierarchy and construct IDs",
+        "verify connected-component and construct split groups before any model use"
+      ]
+    }
+  ],
+  "deferred_sources": [
+    "rna3db_and_codnas_rna",
+    "operator_mechanism_priors",
+    "second_system_tlr_qmapseq"
+  ],
+  "not_done": [
+    "No source payload was downloaded.",
+    "No checksum was computed for a source payload.",
+    "No license was treated as verified.",
+    "No motif matching, manual 50/30 audit, or matching accuracy estimate was run.",
+    "No primary label was admitted to a modeling table."
+  ],
+  "phase0_gate_effect": "NO_UNLOCK_PHASE_0_OR_LATER",
+  "blocking_condition": "REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED"
+}
