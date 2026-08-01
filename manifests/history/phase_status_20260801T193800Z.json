@@ -51,9 +51,8 @@
     "The selected-run FASTQ batch audit is ONE_SELECTED_RUN_PAIR_AUDIT_COMPLETE_BATCH_PENDING; pending or failed payload integrity must be resolved before any Phase 0 consideration, and this audit cannot unlock the gate.",
     "The selected-run FASTQ batch audit is TWO_SELECTED_RUN_PAIR_AUDITS_COMPLETE_BATCH_PENDING; pending or failed payload integrity must be resolved before any Phase 0 consideration, and this audit cannot unlock the gate.",
     "The selected-run FASTQ batch audit is BATCH_PARTIAL_PENDING_OR_BLOCKED; pending or failed payload integrity must be resolved before any Phase 0 consideration, and this audit cannot unlock the gate.",
-    "Five official Figshare-equivalent processed-DMS routes were probed and all returned HTTP 403; the processed payload was not admitted, so construct-level count/background/read-depth hierarchy and raw/interpolated reconciliation remain blocked.",
-    "The public Zenodo code-record API route returned connection refused/HTTP 000; the code record was not downloaded from this host and cannot substitute for the processed-DMS payload."
+    "Five official Figshare-equivalent processed-DMS routes were probed and all returned HTTP 403; the processed payload was not admitted, so construct-level count/background/read-depth hierarchy and raw/interpolated reconciliation remain blocked."
   ],
-  "last_transition": "2026-08-01T19:31:16.965979+00:00",
+  "last_transition": "2026-08-01T19:21:16.694893+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
