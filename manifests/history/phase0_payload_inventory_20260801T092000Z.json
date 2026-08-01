@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T092000Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T084500Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_AUDIT",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -256,26 +256,6 @@
       "size_bytes": 1588,
       "sha256": "8a43252f14f4187e5df9ed2f2f0f4ffbaf2eb89800e4a7785fb3a9aba56e71e9",
       "status": "SOURCE_LICENSE_AND_PUBLIC_ACCESS_AUDIT_REGISTERED"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Figshare_direct_GET_headers_probe",
-      "relative_path": "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.headers",
-      "exists": true,
-      "size_bytes": 118,
-      "sha256": "0aec8c3da3672185b985cd9b139997bf260a53826d0d6ce21474cee319d2afae",
-      "status": "BLOCKED_HTTP_403",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Figshare_direct_GET_body_probe",
-      "relative_path": "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.probe",
-      "exists": true,
-      "size_bytes": 118,
-      "sha256": "58bf2215b395dcac74c009aa98701854e43cbe54a1cd3a95fee6a647ca9910d4",
-      "status": "BLOCKED_HTTP_403",
-      "payload_downloaded": false
     }
   ],
   "required_next_evidence": [
@@ -293,6 +273,6 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T07:20:22.780997+00:00",
+  "last_refresh_utc": "2026-08-01T07:17:40.675227+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS"
 }

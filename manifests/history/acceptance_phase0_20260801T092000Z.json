@@ -43,9 +43,7 @@
     "phase0/audits/denny_pmc_semantics_20260801T082000Z.log",
     "phase0/source_metadata/license_registry_20260801.json",
     "phase0/source_metadata/pmc_oa_manifest_PMC11601540.xml",
-    "phase0/source_metadata/pmc_oa_package_PMC11601540.probe",
-    "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.headers",
-    "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.probe"
+    "phase0/source_metadata/pmc_oa_package_PMC11601540.probe"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",
