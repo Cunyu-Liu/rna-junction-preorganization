@@ -1402,37 +1402,6 @@
       "scientific_labels_admitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T223854Z.json",
-      "exists": true,
-      "size_bytes": 23436,
-      "sha256": "59f7c4bdd6ac4913614a5ede6f97e0761f8b35104bf485557c9d42c963ee788b",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_raw_fastq_partial_size_regression_audit_current",
-      "relative_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T223854Z.json",
-      "exists": true,
-      "size_bytes": 2584,
-      "sha256": "4778e2623191e90ca177e4df817053494a2b41e34f0e7277436b285ae318c03a",
-      "status": "PARTIAL_SIZE_REGRESSION_AFTER_SAFE_CONTINUE_FROZEN",
-      "expected_compressed_bytes": 15190134766,
-      "observed_compressed_bytes": 2003124224,
-      "prior_observed_compressed_bytes": 2361352192,
-      "partial_file_deleted": false,
-      "final_file_overwritten": false,
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1454,7 +1423,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T22:51:43.844130+00:00",
+  "last_refresh_utc": "2026-08-01T22:47:26.693525+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

@@ -127,17 +127,9 @@
     "The current FASTQ partial-state audit returned BATCH_PARTIAL_PENDING_OR_BLOCKED at 20260801T224037Z; preserved partial files remain and no recovery or final integrity PASS is accepted while the guarded downloader process exists.",
     "The ENA raw FASTQ Range probe returned RANGE_PROBE_206_EXACT at 20260801T224037Z; this transport result is not processed-DMS evidence and cannot unlock Phase 0.",
     "The guarded downloader control audit recorded SIGSTOP at 20260801T224037Z; the preserved partial remains evidence-only until a terminal final integrity audit passes.",
-    "The isolated 128 MiB chunked raw FASTQ recovery audit is CHUNKED_DOWNLOAD_IN_PROGRESS at 20260801T224037Z; raw FASTQ cannot substitute for processed-DMS hierarchy or primary labels.",
-    "The latest official processed-DMS route re-probe (20260801T223854Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "Figshare OAI-PMH METS/QDC/RDF/CERIF metadata was available at 20260801T223854Z, but metadata-only evidence cannot substitute for a verified processed-DMS payload or unlock the 128 MiB transfer gate.",
-    "Official GitHub release/tree metadata returned GITHUB_PUBLIC_METADATA_AVAILABLE at 20260801T223854Z; code-repository metadata cannot substitute for the external processed-DMS payload or primary labels.",
-    "The current FASTQ partial-state audit returned BATCH_PARTIAL_PENDING_OR_BLOCKED at 20260801T223854Z; preserved partial files remain and no recovery or final integrity PASS is accepted while the guarded downloader process exists.",
-    "The ENA raw FASTQ Range probe returned RANGE_PROBE_206_EXACT at 20260801T223854Z; this transport result is not processed-DMS evidence and cannot unlock Phase 0.",
-    "The guarded downloader control audit recorded SIGSTOP at 20260801T223854Z; the preserved partial remains evidence-only until a terminal final integrity audit passes.",
-    "The isolated 128 MiB chunked raw FASTQ recovery audit is CHUNKED_DOWNLOAD_IN_PROGRESS at 20260801T223854Z; raw FASTQ cannot substitute for processed-DMS hierarchy or primary labels.",
-    "A preserved partial-size regression was frozen at 20260801T223854Z (2003124224 vs prior 2361352192 bytes); final integrity and recovery remain unresolved."
+    "The isolated 128 MiB chunked raw FASTQ recovery audit is CHUNKED_DOWNLOAD_IN_PROGRESS at 20260801T224037Z; raw FASTQ cannot substitute for processed-DMS hierarchy or primary labels."
   ],
-  "last_transition": "2026-08-01T22:51:43.844130+00:00",
+  "last_transition": "2026-08-01T22:47:26.693525+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json",
   "scientific_gate_effect": "NO_UNLOCK"
 }

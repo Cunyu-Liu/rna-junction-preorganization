@@ -71,6 +71,7 @@ def main() -> int:
     parser.add_argument("--raw-fastq-range-probe", type=Path)
     parser.add_argument("--downloader-control-audit", type=Path)
     parser.add_argument("--chunked-fastq-audit", type=Path)
+    parser.add_argument("--partial-size-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
@@ -88,6 +89,7 @@ def main() -> int:
     raw_fastq_range_path = args.raw_fastq_range_probe.resolve() if args.raw_fastq_range_probe else None
     downloader_control_path = args.downloader_control_audit.resolve() if args.downloader_control_audit else None
     chunked_fastq_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
+    partial_size_path = args.partial_size_audit.resolve() if args.partial_size_audit else None
     additional_range_paths = [path.resolve() for path in args.additional_range_audit]
     output = args.output.resolve()
     if output.exists():
@@ -204,6 +206,14 @@ def main() -> int:
             raise SystemExit("chunked FASTQ audit has an unexpected status")
         if chunked_fastq_audit.get("scientific_labels_admitted") is not False or chunked_fastq_audit.get("raw_sequence_content_emitted") is not False:
             raise SystemExit("chunked FASTQ audit is not fail-closed")
+    partial_size_audit = None
+    if partial_size_path is not None:
+        partial_size_audit = load_json(partial_size_path)
+        if partial_size_audit.get("status") not in {"PARTIAL_SIZE_REGRESSION_AFTER_SAFE_CONTINUE_FROZEN", "PARTIAL_SIZE_OBSERVATION_FROZEN"}:
+            raise SystemExit("partial-size audit has an unexpected status")
+        for field in ("partial_file_deleted", "final_file_overwritten", "raw_sequence_content_emitted", "scientific_labels_admitted"):
+            if partial_size_audit.get(field) is not False:
+                raise SystemExit(f"partial-size audit is not fail-closed: {field}")
     additional_range_audits = []
     for additional_range_path in additional_range_paths:
         additional_range = load_json(additional_range_path)
@@ -322,6 +332,14 @@ def main() -> int:
         ledger["latest_chunked_fastq_audit"] = file_record(chunked_fastq_path)
         ledger["latest_chunked_fastq_audit_status"] = chunked_fastq_audit.get("status")
         ledger["latest_chunked_fastq_chunk_bytes"] = chunked_fastq_audit.get("chunk_bytes")
+    if partial_size_path is not None and partial_size_audit is not None:
+        route_evidence["latest_partial_size_audit"] = file_record(partial_size_path)
+        route_evidence["latest_partial_size_audit_status"] = partial_size_audit.get("status")
+        route_evidence["latest_partial_observed_bytes"] = partial_size_audit.get("observed_compressed_bytes")
+        route_evidence["latest_partial_prior_observed_bytes"] = partial_size_audit.get("prior_observation", {}).get("observed_compressed_bytes")
+        ledger["latest_partial_size_audit"] = file_record(partial_size_path)
+        ledger["latest_partial_size_audit_status"] = partial_size_audit.get("status")
+        ledger["latest_partial_observed_bytes"] = partial_size_audit.get("observed_compressed_bytes")
     if additional_range_paths:
         route_evidence["latest_additional_range_probes"] = [file_record(path) for path in additional_range_paths]
         route_evidence["latest_additional_range_probe_statuses"] = [audit.get("status") for audit in additional_range_audits]
@@ -367,6 +385,10 @@ def main() -> int:
                     requirement.setdefault("additional_evidence", [])
                     if str(extra_path) not in requirement["additional_evidence"]:
                         requirement["additional_evidence"].append(str(extra_path))
+            if partial_size_path is not None and partial_size_audit is not None:
+                requirement.setdefault("additional_evidence", [])
+                if str(partial_size_path) not in requirement["additional_evidence"]:
+                    requirement["additional_evidence"].append(str(partial_size_path))
             for additional_range_path in additional_range_paths:
                 requirement.setdefault("additional_evidence", [])
                 if str(additional_range_path) not in requirement["additional_evidence"]:

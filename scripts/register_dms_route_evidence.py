@@ -79,6 +79,7 @@ def main() -> int:
     parser.add_argument("--raw-fastq-range-probe", type=Path)
     parser.add_argument("--downloader-control-audit", type=Path)
     parser.add_argument("--chunked-fastq-audit", type=Path)
+    parser.add_argument("--partial-size-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
@@ -100,6 +101,7 @@ def main() -> int:
     raw_fastq_range_probe_path = args.raw_fastq_range_probe.resolve() if args.raw_fastq_range_probe else None
     downloader_control_audit_path = args.downloader_control_audit.resolve() if args.downloader_control_audit else None
     chunked_fastq_audit_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
+    partial_size_audit_path = args.partial_size_audit.resolve() if args.partial_size_audit else None
     additional_range_audit_paths = [path.resolve() for path in args.additional_range_audit]
     route = load(route_path)
     ledger = load(ledger_path)
@@ -201,6 +203,14 @@ def main() -> int:
             raise SystemExit("chunked FASTQ audit has an unexpected status")
         if chunked_fastq_audit.get("scientific_labels_admitted") is not False or chunked_fastq_audit.get("raw_sequence_content_emitted") is not False:
             raise SystemExit("chunked FASTQ audit is not fail-closed")
+    partial_size_audit = None
+    if partial_size_audit_path is not None:
+        partial_size_audit = load(partial_size_audit_path)
+        if partial_size_audit.get("status") not in {"PARTIAL_SIZE_REGRESSION_AFTER_SAFE_CONTINUE_FROZEN", "PARTIAL_SIZE_OBSERVATION_FROZEN"}:
+            raise SystemExit("partial-size audit has an unexpected status")
+        for field in ("partial_file_deleted", "final_file_overwritten", "raw_sequence_content_emitted", "scientific_labels_admitted"):
+            if partial_size_audit.get(field) is not False:
+                raise SystemExit(f"partial-size audit is not fail-closed: {field}")
     additional_range_audits = []
     for additional_range_audit_path in additional_range_audit_paths:
         additional_range_audit = load(additional_range_audit_path)
@@ -237,6 +247,7 @@ def main() -> int:
     raw_fastq_range_rel = str(raw_fastq_range_probe_path.relative_to(artifact_root)) if raw_fastq_range_probe_path is not None else None
     downloader_control_rel = str(downloader_control_audit_path.relative_to(artifact_root)) if downloader_control_audit_path is not None else None
     chunked_fastq_rel = str(chunked_fastq_audit_path.relative_to(artifact_root)) if chunked_fastq_audit_path is not None else None
+    partial_size_rel = str(partial_size_audit_path.relative_to(artifact_root)) if partial_size_audit_path is not None else None
     additional_range_rels = [str(path.relative_to(artifact_root)) for path in additional_range_audit_paths]
     now = datetime.now(timezone.utc).isoformat()
 
@@ -360,6 +371,12 @@ def main() -> int:
             "kind": "public_raw_fastq_chunked_download_audit_current",
             **relative_artifact(artifact_root, chunked_fastq_audit_path, status=chunked_fastq_audit["status"], chunk_bytes=chunked_fastq_audit.get("chunk_bytes"), expected_bytes=chunked_fastq_audit.get("expected_bytes"), payload_downloaded=chunked_fastq_audit.get("status") != "CHUNKED_DOWNLOAD_IN_PROGRESS", processed_payload_admitted=False, raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if partial_size_audit_path is not None and partial_size_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_raw_fastq_partial_size_regression_audit_current",
+            **relative_artifact(artifact_root, partial_size_audit_path, status=partial_size_audit["status"], expected_compressed_bytes=partial_size_audit.get("expected_compressed_bytes"), observed_compressed_bytes=partial_size_audit.get("observed_compressed_bytes"), prior_observed_compressed_bytes=partial_size_audit.get("prior_observation", {}).get("observed_compressed_bytes"), partial_file_deleted=False, final_file_overwritten=False, raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
@@ -425,6 +442,9 @@ def main() -> int:
             if chunked_fastq_audit_path is not None and chunked_fastq_audit is not None:
                 source["public_raw_fastq_chunked_download_audit_current"] = chunked_fastq_rel
                 source["public_raw_fastq_chunked_download_audit_current_status"] = chunked_fastq_audit["status"]
+            if partial_size_audit_path is not None and partial_size_audit is not None:
+                source["public_raw_fastq_partial_size_audit_current"] = partial_size_rel
+                source["public_raw_fastq_partial_size_audit_current_status"] = partial_size_audit["status"]
             if additional_range_audit_paths:
                 source["processed_dms_payload_additional_range_probes_current"] = additional_range_rels
                 source["processed_dms_payload_additional_range_probes_current_status"] = [audit["status"] for audit in additional_range_audits]
@@ -465,6 +485,8 @@ def main() -> int:
     for extra_rel in (raw_fastq_range_rel, downloader_control_rel, chunked_fastq_rel):
         if extra_rel is not None and extra_rel not in evidence:
             evidence.append(extra_rel)
+    if partial_size_audit_path is not None and partial_size_audit is not None and partial_size_rel not in evidence:
+        evidence.append(partial_size_rel)
     for additional_range_rel in additional_range_rels:
         if additional_range_rel not in evidence:
             evidence.append(additional_range_rel)
@@ -495,6 +517,8 @@ def main() -> int:
         acceptance["note"] += f" A guarded downloader control audit at {args.run_id} recorded {downloader_control_audit.get('signal')} for exact project PIDs; no process was killed, no new job was started, and no file was deleted or overwritten."
     if chunked_fastq_audit_path is not None and chunked_fastq_audit is not None:
         acceptance["note"] += f" The isolated 128 MiB chunked raw FASTQ recovery audit at {args.run_id} is currently {chunked_fastq_audit.get('status')}; it remains raw-source evidence only until every chunk and final integrity check passes."
+    if partial_size_audit_path is not None and partial_size_audit is not None:
+        acceptance["note"] += f" A metadata-only partial-size regression audit at {args.run_id} recorded {partial_size_audit.get('observed_compressed_bytes')} bytes versus prior {partial_size_audit.get('prior_observation', {}).get('observed_compressed_bytes')} bytes; cause and scientific meaning remain unassigned."
     if additional_range_audit_paths:
         acceptance["note"] += f" Newly discovered Figshare file IDs were each subjected to one exact 128 MiB Range probe at {args.run_id}; all recorded results remain fail-closed and no complete payload was admitted."
     dump_atomic(acceptance_path, acceptance)
@@ -558,6 +582,10 @@ def main() -> int:
             blockers.append(blocker)
     if chunked_fastq_audit_path is not None and chunked_fastq_audit is not None:
         blocker = f"The isolated 128 MiB chunked raw FASTQ recovery audit is {chunked_fastq_audit.get('status')} at {args.run_id}; raw FASTQ cannot substitute for processed-DMS hierarchy or primary labels."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if partial_size_audit_path is not None and partial_size_audit is not None:
+        blocker = f"A preserved partial-size regression was frozen at {args.run_id} ({partial_size_audit.get('observed_compressed_bytes')} vs prior {partial_size_audit.get('prior_observation', {}).get('observed_compressed_bytes')} bytes); final integrity and recovery remain unresolved."
         if blocker not in blockers:
             blockers.append(blocker)
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
