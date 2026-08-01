@@ -91,6 +91,7 @@ def main() -> int:
     allowed_registry_statuses = {
         "NOT_EXECUTED",
         "PHASE_0_METADATA_PARTIAL_PAYLOAD_AUDIT_IN_PROGRESS",
+        "PHASE_0_PUBLIC_FASTQ_PAYLOAD_AUDIT_IN_PROGRESS",
     }
     if registry.get("status") not in allowed_registry_statuses:
         violations.append("SOURCE_REGISTRY_STATUS_UNEXPECTED")
