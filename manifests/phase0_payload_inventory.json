@@ -1,0 +1,95 @@
+{
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T060605Z",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "status": "IN_PROGRESS_PARTIAL_PUBLIC_PAYLOADS",
+  "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
+  "metadata_collection_log": {
+    "path": "phase0/source_metadata/source_metadata_20260801T060605Z.log",
+    "sha256": "83790363eb842880ab5b5669fdf07cc03d8391342d282b973b3997396e5a71c7"
+  },
+  "artifacts": [
+    {
+      "source_id": "denny_2018_tectorna",
+      "kind": "supplementary_workbook",
+      "relative_path": "phase0/source_payloads/denny/261_SI.xlsx",
+      "provenance_path": "phase0/source_payloads/denny/261_SI.xlsx.provenance",
+      "size_bytes": 5692851,
+      "sha256": "f68ed6049b31750ad044a303fdb157ec64fb1e565cbf56fad247e0bbc1deda20",
+      "status": "DOWNLOADED_METADATA_AUDITED",
+      "license_status": "DATA_LICENSE_NOT_VERIFIED",
+      "metadata_audit": {
+        "path": "phase0/audits/denny_workbook_metadata.json",
+        "sha256": "c00f1e178d1a5046ff26a9693178fca1de88c676c2905447461eb27233997fac",
+        "sheet_count": 2,
+        "library_annotations_nonempty_rows": 28938,
+        "library_annotations_max_columns": 27,
+        "sublibrary_descriptions_nonempty_rows": 8,
+        "raw_values_emitted": false,
+        "candidate_terms": {
+          "measured_delta_g": true,
+          "measured_and_interpolated_delta_g": true,
+          "raw": false,
+          "censor": false,
+          "covariance": false,
+          "replicate": false
+        }
+      }
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
+      "kind": "NCBI_BioProject_metadata",
+      "relative_path": "phase0/source_metadata/ncbi_bioproject_1188187.json",
+      "size_bytes": 2578,
+      "sha256": "40ad0b1d3a9ca388ad50f147a3c5f67ac590f2d23db62c88aa7efbaa94850dfb",
+      "status": "DOWNLOADED_METADATA_ONLY",
+      "license_status": "NOT_APPLICABLE_TO_RAW_DATA_TERMS"
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
+      "kind": "Crossref_article_metadata",
+      "relative_path": "phase0/source_metadata/crossref_dms_2026.json",
+      "size_bytes": 27209,
+      "sha256": "55d3bf303f7354983d7e7f7ee17d7e7414effc880d1c3d351e16a038febe2e5c",
+      "status": "DOWNLOADED_METADATA_ONLY",
+      "article_license": "CC BY 4.0",
+      "data_license_status": "NOT_VERIFIED"
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
+      "kind": "Figshare_endpoint_probe",
+      "relative_path": "phase0/source_metadata/figshare_api_27880434.probe",
+      "status": "BLOCKED_HTTP_403",
+      "http_code": 403,
+      "payload_downloaded": false,
+      "next_action": "preserve failure and use an approved alternative public route only"
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
+      "kind": "public_code_refs",
+      "relative_path": "phase0/source_metadata/yesselman_dms_code_refs.txt",
+      "relative_sha256_path": "phase0/source_metadata/yesselman_dms_code_refs.sha256",
+      "head_ref": "ed75e36bb36dc2f32c866c436c437d88a4743cf8",
+      "status": "REF_METADATA_ONLY"
+    },
+    {
+      "source_id": "denny_2018_tectorna",
+      "kind": "Crossref_article_metadata",
+      "relative_path": "phase0/source_metadata/crossref_denny_2018.json",
+      "size_bytes": 16860,
+      "sha256": "0e3a74f3f13616e3b471fcda6c4af221b5287a2b28531dde5b8ee5891171df0b",
+      "status": "DOWNLOADED_METADATA_ONLY",
+      "data_license_status": "NOT_VERIFIED"
+    }
+  ],
+  "required_next_evidence": [
+    "Denny exact count reconciliation, censor direction, units, and raw/interpolated semantics",
+    "Denny replicate/bootstrap/covariance semantics",
+    "DMS JSON supplement and Figshare payload or documented access failure path",
+    "DMS treated/background/read-depth hierarchy and construct group mapping",
+    "matched/ambiguous/rejected motif table",
+    "manual audit of at least 50 matched and 30 rejected_or_ambiguous cases",
+    "matching accuracy at least 0.95 and no fatal ambiguity"
+  ],
+  "phase0_gate_effect": "NO_PHASE_0_PASS",
+  "primary_labels_admitted": false
+}

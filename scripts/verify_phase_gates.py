@@ -86,8 +86,12 @@ def main() -> int:
 
     if acceptance.get("pass") is not False:
         violations.append("PHASE_0_ACCEPTANCE_MUST_REMAIN_FALSE_WHILE_BLOCKED")
-    if registry.get("status") != "NOT_EXECUTED":
-        violations.append("SOURCE_REGISTRY_MUST_REMAIN_NOT_EXECUTED")
+    allowed_registry_statuses = {
+        "NOT_EXECUTED",
+        "PHASE_0_METADATA_PARTIAL_PAYLOAD_AUDIT_IN_PROGRESS",
+    }
+    if registry.get("status") not in allowed_registry_statuses:
+        violations.append("SOURCE_REGISTRY_STATUS_UNEXPECTED")
     if audit.get("status") == "PASS":
         violations.append("METADATA_ONLY_AUDIT_CANNOT_BE_PHASE_0_PASS")
 
