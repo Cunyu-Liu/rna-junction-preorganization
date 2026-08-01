@@ -91,6 +91,19 @@ def main() -> int:
     inventory["scientific_gate_effect"] = "NO_PHASE_0_PASS"
     inventory["primary_labels_admitted"] = False
     inventory.setdefault("artifacts", [])
+    allowed_fastq_batch_statuses = {
+        "BATCH_COMPLETE",
+        "BATCH_PARTIAL_PENDING_OR_BLOCKED",
+        "ONE_SELECTED_RUN_PAIR_AUDIT_COMPLETE_BATCH_PENDING",
+    }
+    for artifact in inventory["artifacts"]:
+        if (
+            artifact.get("kind") == "FASTQ_batch_payload_audit"
+            and artifact.get("status") not in allowed_fastq_batch_statuses
+        ):
+            artifact["kind"] = "FASTQ_batch_scope_diagnostic"
+            artifact["diagnostic_reason"] = "historical_scope_status_not_in_verifier_enum"
+            artifact["scientific_gate_effect"] = "NO_PHASE_0_PASS"
     # Preserve historical failure evidence even when the current downloader
     # log is empty or belongs to a later recovery run. This keeps a successful
     # recovery from erasing the evidence of the earlier partial failure.
