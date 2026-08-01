@@ -62,6 +62,7 @@ def main() -> int:
     parser.add_argument("--route-audit", required=True, type=Path)
     parser.add_argument("--range-audit", type=Path)
     parser.add_argument("--metadata-audit", type=Path)
+    parser.add_argument("--provenance-audit", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
 
@@ -69,6 +70,7 @@ def main() -> int:
     route_path = args.route_audit.resolve()
     range_path = args.range_audit.resolve() if args.range_audit else None
     metadata_path = args.metadata_audit.resolve() if args.metadata_audit else None
+    provenance_path = args.provenance_audit.resolve() if args.provenance_audit else None
     output = args.output.resolve()
     if output.exists():
         raise SystemExit(f"refusing to overwrite existing ledger: {output}")
@@ -99,6 +101,17 @@ def main() -> int:
             raise SystemExit("metadata audit is not a blocked no-payload result")
         if metadata_audit.get("observed_body_bytes") != 0:
             raise SystemExit("metadata audit does not prove zero observed body bytes")
+    provenance_audit = None
+    if provenance_path is not None:
+        provenance_audit = load_json(provenance_path)
+        allowed_statuses = {
+            "BLOCKED_NO_2XX_PROVENANCE_ROUTE",
+            "PROVENANCE_HEAD_ONLY_METADATA_BLOCKED",
+        }
+        if provenance_audit.get("status") not in allowed_statuses:
+            raise SystemExit("provenance audit is not a blocked no-payload result")
+        if provenance_audit.get("payload_downloaded") is not False or provenance_audit.get("processed_payload_admitted") is not False:
+            raise SystemExit("provenance audit does not prove that no processed payload was admitted")
 
     ledger = copy.deepcopy(old)
     ledger["created_at_utc"] = datetime.now(timezone.utc).isoformat()
@@ -137,6 +150,15 @@ def main() -> int:
         ledger["latest_metadata_probe"] = file_record(metadata_path)
         ledger["latest_metadata_probe_status"] = metadata_audit.get("status")
         ledger["latest_metadata_probe_payload_downloaded"] = False
+    if provenance_path is not None and provenance_audit is not None:
+        route_evidence["latest_provenance_audit"] = file_record(provenance_path)
+        route_evidence["latest_provenance_audit_status"] = provenance_audit.get("status")
+        route_evidence["latest_provenance_successful_route_count"] = provenance_audit.get("successful_route_count")
+        route_evidence["latest_provenance_successful_metadata_route_count"] = provenance_audit.get("successful_metadata_route_count")
+        route_evidence["latest_provenance_payload_downloaded"] = False
+        ledger["latest_provenance_audit"] = file_record(provenance_path)
+        ledger["latest_provenance_audit_status"] = provenance_audit.get("status")
+        ledger["latest_provenance_payload_downloaded"] = False
 
     for requirement in ledger.get("required_evidence", []):
         if isinstance(requirement, dict) and requirement.get("requirement") == "official processed-DMS payload or verified public route":
@@ -146,6 +168,10 @@ def main() -> int:
             if range_path is not None and range_audit is not None:
                 requirement["status"] = "BLOCKED_HTTP_403_RANGE_PROBE"
                 requirement["evidence"] = str(range_path)
+            if provenance_path is not None and provenance_audit is not None:
+                requirement.setdefault("additional_evidence", [])
+                if str(provenance_path) not in requirement["additional_evidence"]:
+                    requirement["additional_evidence"].append(str(provenance_path))
 
     ledger["status"] = "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE"
     ledger["primary_labels_admitted"] = False

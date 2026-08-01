@@ -1012,49 +1012,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T212722Z.json",
-      "exists": true,
-      "size_bytes": 9370,
-      "sha256": "dcd2f25ad06dfc225f62dd8383b56656071a85c7996c2d7817ddb5c31ab00852",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_source_repository_tree_audit",
-      "relative_path": "phase0/audits/dms_github_tree_payload_audit_20260801T212722Z.json",
-      "exists": true,
-      "size_bytes": 944,
-      "sha256": "af587231eca963a1324244dbc357cd739144d8eb14a04b1ee3f70fc8c2e9090b",
-      "status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
-      "source_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_provenance_route_audit_current",
-      "relative_path": "phase0/audits/figshare_provenance_route_audit_20260801T212722Z.json",
-      "exists": true,
-      "size_bytes": 7832,
-      "sha256": "941090e27966e39bd91b84ca9e4c61504aab976eb42479884d51b6f10702d4bd",
-      "status": "BLOCKED_NO_2XX_PROVENANCE_ROUTE",
-      "successful_route_count": 0,
-      "successful_metadata_route_count": 0,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1076,7 +1033,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T21:30:39.810422+00:00",
+  "last_refresh_utc": "2026-08-01T21:08:34.294808+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
