@@ -67,5 +67,5 @@
     "No primary label was admitted to a modeling table."
   ],
   "phase0_gate_effect": "NO_UNLOCK_PHASE_0_OR_LATER",
-  "blocking_condition": "REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED"
+  "blocking_condition": "PHASE_0_EVIDENCE_INCOMPLETE"
 }

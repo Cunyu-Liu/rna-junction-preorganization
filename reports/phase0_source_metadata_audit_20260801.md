@@ -72,10 +72,8 @@ The following contract-required evidence is still absent:
 - traceability of all primary labels;
 - terminal Phase 0 pass/failure marker.
 
-The project therefore remains:
-
-`REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED`
-
-This metadata pass has no effect on the gate. Phase 0.5 and all later phases
-remain locked, no primary labels were admitted to modeling, and no GPU training
-was started.
+The contract-source deployment prerequisite is now satisfied by the exact
+hash-matched remote copy. The metadata pass itself still has no effect on the
+Phase 0 acceptance gate. Phase 0 remains `IN_PROGRESS`, Phase 0.5 and all later
+phases remain locked, no primary labels were admitted to modeling, and no GPU
+training was started.

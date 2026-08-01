@@ -11,3 +11,7 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .venv/
+
+# The authoritative contract is non-public and must stay on the protected
+# remote project path; never publish the source document to public GitHub.
+contract/1.1.docx

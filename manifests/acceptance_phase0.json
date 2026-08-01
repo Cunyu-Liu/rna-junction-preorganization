@@ -1,8 +1,8 @@
 {
   "gate_id": "PHASE_0",
-  "status": "BLOCKED_CONTRACT_SOURCE_DEPLOYMENT",
+  "status": "IN_PROGRESS_CONTRACT_SOURCE_VERIFIED",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "note": "The local source document was read and hashed as 218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9; the remote project does not contain the source bytes because payload-and-destination-specific egress authorization is pending.",
+  "note": "The source document is now present on the remote project and its SHA-256 matches 218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9. Phase 0 remains incomplete until the required source provenance, schema, matching, manual-audit, and terminal acceptance evidence is collected.",
   "required_evidence": [
     "source_file_sha256_and_license_registry",
     "Denny_schema_and_count_reconciliation",
@@ -15,11 +15,16 @@
     "phase0_terminal_status_and_failure_or_pass_marker"
   ],
   "pass": false,
-  "evidence_paths": [],
+  "evidence_paths": [
+    "contract/1.1.docx",
+    "contract/CONTRACT_TRANSFER_STATUS.md",
+    "manifests/source_metadata_audit.json",
+    "reports/phase0_source_metadata_audit_20260801.md"
+  ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",
     "logs/preflight_20260801T051420Z.log",
     "reports/remote_preflight_20260801.md"
   ],
-  "next_authorized_action": "resolve_contract_source_deployment_authorization_then_run_phase0_source_registry"
+  "next_authorized_action": "run_phase0_source_registry_with_exact_payload_hash_license_schema_and_matching_audit"
 }

@@ -1,8 +1,8 @@
 {
   "current_phase": "PHASE_0",
-  "overall_status": "BLOCKED_CONTRACT_SOURCE_DEPLOYMENT",
+  "overall_status": "PHASE_0_IN_PROGRESS_CONTRACT_VERIFIED",
   "gates": {
-    "phase_0_data_semantics": "BLOCKED_CONTRACT_SOURCE_DEPLOYMENT",
+    "phase_0_data_semantics": "IN_PROGRESS",
     "phase_0_5_four_specs": "LOCKED_UNTIL_PHASE_0_PASS",
     "phase_1_registry_qc_benchmark": "LOCKED",
     "phase_2_synthetic_robust_identification": "LOCKED",
@@ -21,10 +21,9 @@
     "missing complete acceptance evidence"
   ],
   "blocking_conditions": [
-    "The full contract source 1.1.docx is verified locally but is not present on the remote host because payload-and-destination-specific egress authorization is pending.",
     "A shallow /mnt/cunyuliu directory-name scan found no dedicated Denny/DMS/tectoRNA/junction root; this is not a data availability conclusion.",
     "The deeper name scan was stopped after entering NFS D-state to avoid sustained IO impact."
   ],
-  "last_transition": "2026-08-01T13:14:20+08:00",
-  "transition_evidence": "logs/preflight_20260801T051420Z.log"
+  "last_transition": "2026-08-01T13:53:44+08:00",
+  "transition_evidence": "contract/CONTRACT_TRANSFER_STATUS.md"
 }

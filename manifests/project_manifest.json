@@ -6,7 +6,7 @@
     "source_relative_path": "contract/1.1.docx",
     "sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
     "date": "2026-08-01",
-    "remote_source_status": "NOT_DEPLOYED_EGRESS_AUTHORIZATION_REQUIRED"
+    "remote_source_status": "DEPLOYED_HASH_MATCH"
   },
   "roots": {
     "code_root": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -36,8 +36,8 @@
     "proxy_or_smoke": "NOT_A_SCIENTIFIC_GATE"
   },
   "created_at": "2026-08-01T13:06:28+08:00",
-  "last_preflight_log": "logs/preflight_20260801T051420Z.log",
-  "last_preflight_log_sha256": "30252385b81e254a5df3a5377c346b39fff51ffc6d68e43659de05bc5f8ca7c8",
+  "last_preflight_log": "logs/preflight_20260801T055713Z.log",
+  "last_preflight_log_sha256": "4873009878c8c7b7b0072e2d226aa186d7acb366f54aa4faec28f4d8337c3848",
   "gpu_preflight": {
     "status": "PASS_HARDWARE_ENVIRONMENT_ONLY",
     "timestamp_utc": "2026-08-01T05:29:25Z",
@@ -52,15 +52,21 @@
     "scientific_gate_effect": "NO_UNLOCK_PHASE_0_OR_LATER"
   },
   "phase_gate_verifier": {
-    "status": "BLOCKED_FAIL_CLOSED",
-    "timestamp_utc": "2026-08-01T05:43:53.724514+00:00",
-    "exit_code": 2,
-    "violations": [
-      "CONTRACT_SOURCE_ABSENT"
-    ],
-    "log": "logs/phase_gate_verifier_20260801T054353Z.log",
-    "log_sha256": "6ab82282e40abf9ce999190f02636277a15abbcc9aa3bab053cb841ec669610f",
+    "status": "PASS_GOVERNANCE_INVARIANTS",
+    "timestamp_utc": "2026-08-01T05:55:46.512346+00:00",
+    "exit_code": 0,
+    "violations": [],
+    "log": "logs/phase_gate_verifier_20260801T055546Z.log",
+    "log_sha256": "65aced97c08607d8cca72388a7c0d8c27c6a7148176b5fa7bcdccc6dfaa55797",
     "scientific_gate_effect": "NO_UNLOCK"
   },
-  "status": "REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED"
+  "contract_deployment": {
+    "status": "DEPLOYED_HASH_MATCH",
+    "timestamp_utc": "2026-08-01T05:53:44Z",
+    "remote_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/contract/1.1.docx",
+    "sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+    "size_bytes": 678936,
+    "mode": "600"
+  },
+  "status": "PHASE_0_IN_PROGRESS_CONTRACT_VERIFIED"
 }
