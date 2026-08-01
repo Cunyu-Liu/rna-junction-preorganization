@@ -34,6 +34,6 @@
     "A PMC OA manifest was available, but the advertised OA package URL returned HTTP 404; no supplement was substituted or bypassed.",
     "The Denny subset audit confirms aggregate counts only and explicitly does not accept a 1687/1713/1636 count mapping."
   ],
-  "last_transition": "2026-08-01T07:34:19.489681+00:00",
+  "last_transition": "2026-08-01T07:32:46.810008+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
