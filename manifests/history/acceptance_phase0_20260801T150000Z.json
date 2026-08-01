@@ -45,16 +45,7 @@
     "phase0/source_metadata/pmc_oa_manifest_PMC11601540.xml",
     "phase0/source_metadata/pmc_oa_package_PMC11601540.probe",
     "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.headers",
-    "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.probe",
-    "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html",
-    "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv",
-    "phase0/source_metadata/pmc_media-1_20260801T113000Z.body",
-    "phase0/source_metadata/pmc_media-1_20260801T113000Z.headers",
-    "phase0/source_metadata/pmc_media-1_20260801T113000Z.status",
-    "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.body",
-    "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.headers",
-    "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.status",
-    "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr"
+    "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.probe"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",

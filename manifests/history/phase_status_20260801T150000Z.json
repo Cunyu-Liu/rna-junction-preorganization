@@ -32,10 +32,8 @@
     "Public ENA file-level metadata is registered and one small paired FASTQ run passes integrity audit, but the selected main DMS FASTQ payload remains in progress.",
     "Raw FASTQ availability does not by itself establish construct-level DMS counts, treated/background hierarchy, read-depth QC, or primary labels.",
     "A PMC OA manifest was available, but the advertised OA package URL returned HTTP 404; no supplement was substituted or bypassed.",
-    "The Denny subset audit confirms aggregate counts only and explicitly does not accept a 1687/1713/1636 count mapping.",
-    "The official PMC media-1.docx link returned HTTP 200 text/html with a Preparing to download/POW challenge rather than a DOCX; no challenge was bypassed.",
-    "The official Zenodo code-archive route probe exited 7 with HTTP status 000 due connection refusal; record contents remain unverified and this is not treated as evidence that data are absent."
+    "The Denny subset audit confirms aggregate counts only and explicitly does not accept a 1687/1713/1636 count mapping."
   ],
-  "last_transition": "2026-08-01T07:42:59.722465+00:00",
+  "last_transition": "2026-08-01T07:34:19.489681+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }

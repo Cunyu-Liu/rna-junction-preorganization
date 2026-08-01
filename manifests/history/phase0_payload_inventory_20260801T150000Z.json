@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T150000Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T123000Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_AUDIT",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -276,95 +276,6 @@
       "sha256": "58bf2215b395dcac74c009aa98701854e43cbe54a1cd3a95fee6a647ca9910d4",
       "status": "BLOCKED_HTTP_403",
       "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_article_page",
-      "relative_path": "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html",
-      "exists": true,
-      "size_bytes": 219388,
-      "sha256": "2c3da4123b44e95534910c9982fcd119f8e8b0ec1d45b93ae30a53152b1ae8fb",
-      "status": "PUBLIC_ARTICLE_PAGE_METADATA_COMPLETE",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_supplement_link_inventory",
-      "relative_path": "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv",
-      "exists": true,
-      "size_bytes": 1213,
-      "sha256": "60bd4eed97b3b0fac4db8503f47a262a84db1bd977a83a9bfeaa255d0964748d",
-      "status": "PUBLIC_SUPPLEMENT_LINK_INVENTORY_COMPLETE",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_supplement_download_body_probe",
-      "relative_path": "phase0/source_metadata/pmc_media-1_20260801T113000Z.body",
-      "exists": true,
-      "size_bytes": 1817,
-      "sha256": "f5a6e0591d651d35f1562a914d3397362b6b8904fd252d0a1af9e7ffa53c9e7e",
-      "status": "BLOCKED_HTML_POW_CHALLENGE_NOT_DOCX",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_supplement_download_headers_probe",
-      "relative_path": "phase0/source_metadata/pmc_media-1_20260801T113000Z.headers",
-      "exists": true,
-      "size_bytes": 646,
-      "sha256": "a2c63f12824c792e6518cf9ec4092cf8f2dbb5ea367cb9d5c146a4d771cccf36",
-      "status": "BLOCKED_HTTP_200_HTML_CHALLENGE",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_supplement_download_status_probe",
-      "relative_path": "phase0/source_metadata/pmc_media-1_20260801T113000Z.status",
-      "exists": true,
-      "size_bytes": 4,
-      "sha256": "c11e3f4837efde2441e23a7b9da02131f53bf59fddeb7147c4ab81afe400460f",
-      "status": "BLOCKED_HTTP_200_HTML_CHALLENGE",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Zenodo_code_archive_route_body_probe",
-      "relative_path": "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.body",
-      "exists": false,
-      "size_bytes": null,
-      "status": "BLOCKED_CONNECTION_REFUSED_HTTP_000",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Zenodo_code_archive_route_headers_probe",
-      "relative_path": "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.headers",
-      "exists": true,
-      "size_bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "status": "BLOCKED_CONNECTION_REFUSED_HTTP_000",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Zenodo_code_archive_route_status_probe",
-      "relative_path": "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.status",
-      "exists": true,
-      "size_bytes": 4,
-      "sha256": "945e4893567554e68f6f28d5652917269341a5f3d295a16b7c708c9bfd95dc5d",
-      "status": "BLOCKED_CONNECTION_REFUSED_HTTP_000",
-      "payload_downloaded": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "Zenodo_code_archive_route_stderr_probe",
-      "relative_path": "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr",
-      "exists": true,
-      "size_bytes": 82,
-      "sha256": "faf4fc5f07622c9f9c9c63aecc7d1179c527ffaebd64f94ae2dbc7b702966cd1",
-      "status": "BLOCKED_CONNECTION_REFUSED_HTTP_000",
-      "payload_downloaded": false
     }
   ],
   "required_next_evidence": [
@@ -382,6 +293,6 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T07:42:59.518622+00:00",
+  "last_refresh_utc": "2026-08-01T07:34:19.374467+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS"
 }
