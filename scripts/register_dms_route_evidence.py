@@ -66,6 +66,7 @@ def main() -> int:
     parser.add_argument("--artifact-root", required=True, type=Path)
     parser.add_argument("--route-audit", required=True, type=Path)
     parser.add_argument("--ledger", required=True, type=Path)
+    parser.add_argument("--github-tree", type=Path)
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
 
@@ -73,12 +74,18 @@ def main() -> int:
     artifact_root = args.artifact_root.resolve()
     route_path = args.route_audit.resolve()
     ledger_path = args.ledger.resolve()
+    github_tree_path = args.github_tree.resolve() if args.github_tree else None
     route = load(route_path)
     ledger = load(ledger_path)
     if route.get("status") != "ROUTE_REPROBE_BLOCKED_NO_2XX" or route.get("payload_downloaded") is not False:
         raise SystemExit("route audit is not a blocked no-payload result")
     if ledger.get("status") != "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE" or ledger.get("primary_labels_admitted") is not False:
         raise SystemExit("ledger is not fail-closed")
+    github_tree = None
+    if github_tree_path is not None:
+        github_tree = load(github_tree_path)
+        if github_tree.get("truncated") is not False or not isinstance(github_tree.get("tree"), list):
+            raise SystemExit("GitHub tree metadata is incomplete or malformed")
 
     manifests = code_root / "manifests"
     history = manifests / "history"
@@ -93,6 +100,8 @@ def main() -> int:
     route_rel = str(route_path.relative_to(artifact_root))
     route_tsv_rel = str((artifact_root / "phase0/source_metadata" / f"figshare_readme_reprobe_{args.run_id}.tsv").relative_to(artifact_root))
     ledger_rel = str(ledger_path.relative_to(artifact_root))
+    tree_rel = str(github_tree_path.relative_to(artifact_root)) if github_tree_path is not None else None
+    tree_audit_rel = f"phase0/audits/dms_github_tree_payload_audit_{args.run_id}.json"
     now = datetime.now(timezone.utc).isoformat()
 
     inventory_path = manifests / "phase0_payload_inventory.json"
@@ -111,6 +120,38 @@ def main() -> int:
         "kind": "DMS_phase0_dependency_ledger_current",
         **relative_artifact(artifact_root, ledger_path, status=ledger.get("status"), payload_downloaded=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
     })
+    if github_tree_path is not None and github_tree is not None:
+        tree_paths = [item.get("path") for item in github_tree["tree"] if isinstance(item, dict)]
+        tree_audit_path = artifact_root / tree_audit_rel
+        if tree_audit_path.exists():
+            raise SystemExit(f"refusing to overwrite existing GitHub tree audit: {tree_audit_path}")
+        tree_audit = {
+            "schema_version": "phase0-public-source-tree-audit-v1",
+            "status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
+            "created_at_utc": now,
+            "source_tree": relative_artifact(artifact_root, github_tree_path),
+            "tree_truncated": False,
+            "tree_entry_count": len(github_tree["tree"]),
+            "file_path_count": len(tree_paths),
+            "data_zip_path_present": "data.zip" in tree_paths,
+            "data_directory_path_present": any(str(path).startswith("data/") for path in tree_paths),
+            "processed_payload_admitted": False,
+            "raw_sequence_content_emitted": False,
+            "primary_labels_admitted": False,
+            "scientific_gate_effect": "NO_PHASE_0_PASS",
+            "interpretation_boundary": "Repository tree metadata inventories public source paths only; absence of a data path is not proof that the official external payload is absent.",
+        }
+        dump_atomic(tree_audit_path, tree_audit)
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_source_repository_tree_audit",
+            **relative_artifact(artifact_root, tree_audit_path, status=tree_audit["status"], source_tree=tree_rel, processed_payload_admitted=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_source_repository_tree_metadata",
+            **relative_artifact(artifact_root, github_tree_path, status="GITHUB_TREE_METADATA_COMPLETE", tree_truncated=False, processed_payload_admitted=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     inventory.setdefault("required_next_evidence", [])
     inventory["required_next_evidence"] = sorted(set(inventory["required_next_evidence"]) | {
         "verified official processed-DMS 2xx route with expected payload size, then 128 MiB range download and hash/gzip/provenance audit",
@@ -127,6 +168,11 @@ def main() -> int:
             source["processed_dms_payload_latest_readme_route_reprobe_current_status"] = route.get("status")
             source["dms_phase0_dependency_ledger_current"] = ledger_rel
             source["dms_phase0_dependency_ledger_current_status"] = ledger.get("status")
+            if github_tree_path is not None and github_tree is not None:
+                source["public_source_repository_tree"] = tree_rel
+                source["public_source_repository_tree_status"] = "GITHUB_TREE_METADATA_COMPLETE"
+                source["public_source_repository_tree_audit"] = tree_audit_rel
+                source["public_source_repository_tree_audit_status"] = "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED"
             source["processed_dms_payload_status"] = "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403"
             source["dms_reconstruction_status"] = "BLOCKED_RECONSTRUCTION_INPUTS_MISSING"
     dump_atomic(registry_path, registry)
@@ -139,7 +185,13 @@ def main() -> int:
     for value in (route_rel, route_tsv_rel, ledger_rel):
         if value not in evidence:
             evidence.append(value)
+    if github_tree_path is not None and github_tree is not None:
+        for value in (tree_rel, tree_audit_rel):
+            if value not in evidence:
+                evidence.append(value)
     acceptance["note"] = str(acceptance.get("note", "")) + f" A low-frequency official processed-DMS route re-probe at {args.run_id} returned {route.get('status')} for {len(route.get('routes', [])) if isinstance(route.get('routes'), list) else 'unknown'} routes; no payload was downloaded, no access control was bypassed, and the updated dependency ledger remains fail-closed."
+    if github_tree_path is not None and github_tree is not None:
+        acceptance["note"] += f" Public GitHub v1.0.0 tree metadata was recorded with {len(github_tree['tree'])} entries; it inventories source paths only and does not establish that the external official data payload is absent or available."
     dump_atomic(acceptance_path, acceptance)
 
     phase_path = manifests / "phase_status.json"
@@ -151,6 +203,10 @@ def main() -> int:
     blocker = f"The latest official processed-DMS route re-probe ({args.run_id}) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active."
     if blocker not in blockers:
         blockers.append(blocker)
+    if github_tree_path is not None and github_tree is not None:
+        blocker = f"Public GitHub v1.0.0 tree metadata was audited at {args.run_id}; it is source-path evidence only and cannot substitute for the external processed-DMS payload or primary labels."
+        if blocker not in blockers:
+            blockers.append(blocker)
     dump_atomic(phase_path, phase)
     print(json.dumps({"status": "PHASE0_DMS_EVIDENCE_REGISTERED_FAIL_CLOSED", "route": route_rel, "ledger": ledger_rel, "run_id": args.run_id}, ensure_ascii=False))
     return 0

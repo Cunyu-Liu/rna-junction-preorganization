@@ -867,34 +867,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_source_repository_tree_audit",
-      "relative_path": "phase0/audits/dms_github_tree_payload_audit_20260801T204700Z.json",
-      "exists": true,
-      "size_bytes": 944,
-      "sha256": "14cffbe0eb1d13687962c0849ff9e94a560335b9312d8c563e855d92c3643df6",
-      "status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
-      "source_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_source_repository_tree_metadata",
-      "relative_path": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
-      "exists": true,
-      "size_bytes": 10688,
-      "sha256": "cb1179516bfe85116c290dbc7c484a560c949e720bf0a9fcf981bc3ec7f5093b",
-      "status": "GITHUB_TREE_METADATA_COMPLETE",
-      "tree_truncated": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -916,7 +888,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T20:50:04.497131+00:00",
+  "last_refresh_utc": "2026-08-01T20:43:17.516084+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
