@@ -197,6 +197,7 @@ def main() -> int:
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "Figshare_ndownloader_HEAD_headers_probe", **rel_artifact(args.artifact_root, "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.headers", status="BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "Figshare_ndownloader_HEAD_status_probe", **rel_artifact(args.artifact_root, "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status", status="BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "Figshare_ndownloader_HEAD_stderr_probe", **rel_artifact(args.artifact_root, "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.stderr", status="BLOCKED_HTTP_403_PUBLIC_ROUTE_PRESERVED", payload_downloaded=False)})
+    append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_route_audit", **rel_artifact(args.artifact_root, "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json", route_probe_tsv="phase0/source_metadata/figshare_route_probe_20260801T192200Z.tsv", status="BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_article_page", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html", status="PUBLIC_ARTICLE_PAGE_METADATA_COMPLETE", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_supplement_link_inventory", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv", status="PUBLIC_SUPPLEMENT_LINK_INVENTORY_COMPLETE", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_supplement_download_body_probe", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc_media-1_20260801T113000Z.body", status="BLOCKED_HTML_POW_CHALLENGE_NOT_DOCX", payload_downloaded=False)})
@@ -236,6 +237,8 @@ def main() -> int:
             source["raw_fastq_status"] = "PUBLIC_PAYLOAD_DOWNLOAD_IN_PROGRESS_CONSTRUCT_LEVEL_RECONCILIATION_PENDING"
             source["figshare_status"] = "BLOCKED_HTTP_403_DIRECT_AND_NDOWNLOADER_ROUTES_PRESERVED"
             source["figshare_ndownloader_probe"] = "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status"
+            source["processed_dms_payload_route_audit"] = "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json"
+            source["processed_dms_payload_status"] = "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403"
             source["license_status"] = "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED"
             source["download_failure_status"] = "PRESERVED_PARTIAL_FAILURES" if download_failures else "NO_PRESERVED_FAILURES_OBSERVED"
             source["download_failure_events"] = download_failures
@@ -273,6 +276,9 @@ def main() -> int:
         acceptance["evidence_paths"].append("phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json")
     if "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json" not in acceptance["evidence_paths"]:
         acceptance["evidence_paths"].append("phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json")
+    for path in ("phase0/source_metadata/figshare_route_probe_20260801T192200Z.tsv", "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json"):
+        if path not in acceptance["evidence_paths"]:
+            acceptance["evidence_paths"].append(path)
     acceptance["note"] = "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed."
     if download_failures:
         acceptance["note"] += " At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion."
@@ -281,6 +287,7 @@ def main() -> int:
     acceptance["note"] += " A read-only size anomaly was observed for an active SRR31402664 partial; no repair was attempted and final size/hash/gzip/pair audit remains required."
     acceptance["note"] += " The manual matching acceptance component is explicitly tracked fail-closed; no opaque matching table or manually adjudicated rows are admitted until evidence-linked records are available."
     acceptance["note"] += " The official processing README Figshare ndownloader HEAD probe returned HTTP 403; no data payload was downloaded and no access control was bypassed."
+    acceptance["note"] += " Five official Figshare-equivalent processed-DMS routes were probed at the recorded timestamp and all returned HTTP 403; the route audit is preserved, no payload was downloaded, and construct-level DMS hierarchy remains blocked."
     acceptance["note"] += " A stable SRR31402664_2 single-file integrity audit was started with immutable run provenance; its final result is recorded separately and does not unlock Phase 0."
     acceptance["note"] += " The stable SRR31402664_2 single-file audit completed with size/hash/gzip/FASTQ structural checks and zero malformed records; no paired-read audit was performed for this single mate, so Phase 0 remains fail-closed."
     acceptance["note"] += " An unresolved SRR38259812_2 partial-size regression was observed after an earlier larger read-only observation; the partial remains preserved and requires final size/hash/gzip/pair audit, with no inference of cause."
@@ -325,6 +332,9 @@ def main() -> int:
     if blocker not in blockers:
         blockers.append(blocker)
     blocker = "The official processing README Figshare ndownloader route returned HTTP 403; the data.zip payload remains unavailable through the recorded public route and no bypass was attempted."
+    if blocker not in blockers:
+        blockers.append(blocker)
+    blocker = "Five official Figshare-equivalent processed-DMS routes were probed and all returned HTTP 403; the processed payload was not admitted, so construct-level count/background/read-depth hierarchy and raw/interpolated reconciliation remain blocked."
     if blocker not in blockers:
         blockers.append(blocker)
     blocker = "SRR31402664_2 passed a single-file size/hash/gzip/FASTQ structural audit with zero malformed records, but it is one mate only; paired-read and all-selected-run audits remain pending, so this evidence cannot unlock Phase 0."
