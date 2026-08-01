@@ -28,9 +28,7 @@
       "license_status": "DATA_LICENSE_NOT_VERIFIED",
       "metadata_audit_path": "phase0/audits/denny_workbook_metadata.json",
       "semantics_audit_path": "phase0/audits/denny_semantics_20260801T065000Z.json",
-      "semantics_audit_status": "AGGREGATE_COMPLETE_EXACT_COUNT_MAPPING_OPEN",
-      "semantic_evidence_path": "phase0/audits/denny_xlsx_semantic_evidence_20260801T165000Z.json",
-      "semantic_evidence_status": "EXTRACTED_24073_VARIANT_SUM_AND_1713_NUMERIC_CARDINALITY_MAPPING_UNRESOLVED"
+      "semantics_audit_status": "AGGREGATE_COMPLETE_EXACT_COUNT_MAPPING_OPEN"
     },
     {
       "source_id": "deenalattha_2026_dms",
@@ -68,15 +66,6 @@
           "run": "SRR31402663",
           "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz.partial",
           "expected_bytes": null,
-          "observed_bytes": null,
-          "returncode": 56,
-          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
-        },
-        {
-          "run": "SRR31402664",
-          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402664/SRR31402664_1.fastq.gz.partial",
-          "expected_bytes": null,
-          "observed_bytes": null,
           "returncode": 56,
           "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
         }
@@ -235,13 +224,6 @@
     },
     {
       "run_id": "20260801T232800Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T165500Z",
       "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
       "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
       "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",

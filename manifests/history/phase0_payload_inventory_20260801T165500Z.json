@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T165500Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T232800Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -425,19 +425,6 @@
       "partial_files_deleted": false,
       "raw_sequence_content_emitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "denny_2018_tectorna",
-      "kind": "XLSX_semantic_evidence_audit",
-      "relative_path": "phase0/audits/denny_xlsx_semantic_evidence_20260801T165000Z.json",
-      "exists": true,
-      "size_bytes": 30663,
-      "sha256": "2cf48c74b500c698096484cfefef10ec903b70ffb265bbfeefa4925ae9b69e13",
-      "status": "SEMANTIC_EVIDENCE_EXTRACTED_REQUIRES_MANUAL_ACCEPTANCE",
-      "raw_values_emitted": false,
-      "sequence_values_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -456,22 +443,13 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T08:43:52.847576+00:00",
+  "last_refresh_utc": "2026-08-01T08:22:34.227576+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
       "run": "SRR31402663",
       "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz.partial",
       "expected_bytes": null,
-      "observed_bytes": null,
-      "returncode": 56,
-      "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
-    },
-    {
-      "run": "SRR31402664",
-      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402664/SRR31402664_1.fastq.gz.partial",
-      "expected_bytes": null,
-      "observed_bytes": null,
       "returncode": 56,
       "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
     }
