@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T194000Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T193800Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -704,22 +704,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_reconstruction_feasibility_audit",
-      "relative_path": "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json",
-      "exists": true,
-      "size_bytes": 3980,
-      "sha256": "00489738a8fb699727a2cba84a5202c147006296d96cb8650f0e5fa4e265ba08",
-      "status": "BLOCKED_RECONSTRUCTION_INPUTS_MISSING",
-      "public_fastq_pair_audits_available": true,
-      "source_defined_mutation_histograms_available": false,
-      "construct_reference_fasta_available": false,
-      "processed_construct_json_available": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -740,7 +724,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T19:39:20.228804+00:00",
+  "last_refresh_utc": "2026-08-01T19:31:16.777591+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
