@@ -57,9 +57,7 @@
     "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr",
     "phase0/audits/denny_xlsx_ooxml_structure_20260801T170000Z.json",
     "phase0/source_metadata/dms_processing_source_registry_20260801T190000Z.json",
-    "phase0/source_metadata/dms_github_main_commit_20260801T190000Z.txt",
-    "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.json",
-    "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.log"
+    "phase0/source_metadata/dms_github_main_commit_20260801T190000Z.txt"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",
