@@ -57,10 +57,8 @@
     "A low-frequency re-probe of the five recorded official processed-DMS routes again returned HTTP 403 with no 2xx response; the payload remains unavailable through the tested public routes and no access-control bypass is permitted.",
     "The official README's documented User-Agent/Referer request was reproduced for all five recorded Figshare routes and still returned HTTP 403 with no 2xx response; data.zip remains unavailable and no access-control bypass is permitted.",
     "The pinned official processing README confirms data.zip/file 66482813 as the processed-data route, but the README snapshot is metadata/source semantics only; the payload itself remains unavailable and cannot unlock construct-level DMS reconciliation.",
-    "The Phase 0 DMS dependency ledger is BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE: processed payload, mutation histograms, rna-map environment, construct reference/mapping, processed JSON hierarchy, and manual matching prerequisites are not all present; no modeling or primary labels may proceed.",
-    "The selected-run FASTQ batch audit is COMPLETE_PUBLIC_FASTQ_FILE_RECONCILIATION; pending or failed payload integrity must be resolved before any Phase 0 consideration, and this audit cannot unlock the gate.",
-    "The selected-run FASTQ batch audit completed file-integrity checks, but this evidence does not establish construct-level DMS semantics, source-defined background/read-depth hierarchy, or manual matching acceptance; Phase 0 remains locked."
+    "The Phase 0 DMS dependency ledger is BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE: processed payload, mutation histograms, rna-map environment, construct reference/mapping, processed JSON hierarchy, and manual matching prerequisites are not all present; no modeling or primary labels may proceed."
   ],
-  "last_transition": "2026-08-01T20:32:49.578170+00:00",
+  "last_transition": "2026-08-01T20:11:01.635675+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }

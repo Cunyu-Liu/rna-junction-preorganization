@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T203216Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T201911Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -798,34 +798,12 @@
     },
     {
       "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_batch_scope_diagnostic",
+      "kind": "FASTQ_batch_payload_audit",
       "relative_path": "phase0/audits/full_selected_ena_fastq_reconciliation_20260801T201911Z.json",
       "exists": true,
       "size_bytes": 7580,
       "sha256": "17eabfd3e07ac986561281aebe20239995b5311e6f5a61f16f6905ebdc735c8a",
       "status": "COMPLETE_PUBLIC_FASTQ_FILE_RECONCILIATION",
-      "selected_runs": [
-        "SRR31402663",
-        "SRR31402664",
-        "SRR35766784",
-        "SRR35766785",
-        "SRR38259812"
-      ],
-      "pending_run_count": null,
-      "failed_run_count": null,
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "diagnostic_reason": "historical_scope_status_not_in_verifier_enum"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_batch_payload_audit",
-      "relative_path": "phase0/audits/full_selected_ena_fastq_reconciliation_20260801T203216Z.json",
-      "exists": true,
-      "size_bytes": 7931,
-      "sha256": "ae002c0af519bbcbc3d85333e1e4b46f27aff8700df0a834ef02e8a6a946451b",
-      "status": "BATCH_COMPLETE",
       "selected_runs": [
         "SRR31402663",
         "SRR31402664",
@@ -858,7 +836,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T20:32:48.818741+00:00",
+  "last_refresh_utc": "2026-08-01T20:29:51.474095+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
