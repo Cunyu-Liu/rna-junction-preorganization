@@ -22,6 +22,7 @@
     "reports/phase0_source_metadata_audit_20260801.md",
     "manifests/phase0_payload_inventory.json",
     "reports/phase0_payload_inventory_20260801.md",
+    "manifests/matching_audit.json",
     "phase0/source_metadata/source_metadata_20260801T060605Z.log",
     "phase0/audits/denny_semantics_20260801T065000Z.json",
     "phase0/audits/denny_semantics_20260801T065000Z.log",

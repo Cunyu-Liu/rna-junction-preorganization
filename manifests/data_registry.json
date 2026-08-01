@@ -6,6 +6,7 @@
   "metadata_audit_manifest": "manifests/source_metadata_audit.json",
   "metadata_audit_report": "reports/phase0_source_metadata_audit_20260801.md",
   "payload_inventory_manifest": "manifests/phase0_payload_inventory.json",
+  "matching_audit_manifest": "manifests/matching_audit.json",
   "metadata_collection_log": "phase0/source_metadata/source_metadata_20260801T060605Z.log",
   "source_content_policy": "metadata_only_until_provenance_and_contract_gates_pass",
   "sources": [

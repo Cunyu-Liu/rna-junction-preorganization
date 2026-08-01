@@ -3,6 +3,7 @@
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PARTIAL_PUBLIC_PAYLOADS",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
+  "matching_audit_manifest": "manifests/matching_audit.json",
   "metadata_collection_log": {
     "path": "phase0/source_metadata/source_metadata_20260801T060605Z.log",
     "sha256": "83790363eb842880ab5b5669fdf07cc03d8391342d282b973b3997396e5a71c7"

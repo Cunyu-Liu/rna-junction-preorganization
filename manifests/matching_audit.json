@@ -1,0 +1,60 @@
+{
+  "schema_version": "phase0-matching-audit-v0",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "status": "BLOCKED_PENDING_PRIMARY_PAYLOADS",
+  "evidence_class": "AUDIT_SCHEMA_ONLY_NO_MATCHING_ROWS",
+  "primary_labels_admitted": false,
+  "matching_scope": {
+    "source_a": "denny_2018_tectorna",
+    "source_b": "deenalattha_2026_dms",
+    "canonical_unit": "motif_or_construct_as_defined_by_contract_after_semantic_freeze",
+    "allowed_outcomes": [
+      "matched",
+      "ambiguous",
+      "rejected",
+      "unreviewed"
+    ],
+    "row_level_fields_required": [
+      "source_a_record_id",
+      "source_b_record_id",
+      "canonical_motif_id",
+      "matching_rule_version",
+      "match_outcome",
+      "ambiguity_reason",
+      "rejection_reason",
+      "provenance_a",
+      "provenance_b",
+      "reviewer_id",
+      "review_timestamp_utc"
+    ]
+  },
+  "counts": {
+    "matched": null,
+    "ambiguous": null,
+    "rejected": null,
+    "unreviewed": null,
+    "rows_collected": 0
+  },
+  "manual_audit": {
+    "required_matched_cases": 50,
+    "required_rejected_or_ambiguous_cases": 30,
+    "observed_matched_cases": null,
+    "observed_rejected_or_ambiguous_cases": null,
+    "matching_accuracy": null,
+    "fatal_ambiguity": null,
+    "status": "NOT_STARTED_PRIMARY_PAYLOADS_UNAVAILABLE"
+  },
+  "blocking_reasons": [
+    "DMS JSON/supplementary payload has not been obtained or validated.",
+    "Denny exact 1687/1713/1636 subset mapping is unresolved.",
+    "The contract-required canonical motif and split-group semantics are not frozen.",
+    "No manual matched/rejected_or_ambiguous review has been performed."
+  ],
+  "failure_preservation": {
+    "figshare_probe": "phase0/source_metadata/figshare_api_27880434.probe",
+    "oup_probe": "phase0/source_metadata/oup_supplement_endpoint.probe",
+    "source_registry": "manifests/data_registry.json",
+    "phase_status": "manifests/phase_status.json"
+  },
+  "gate_effect": "NO_PHASE_0_PASS"
+}

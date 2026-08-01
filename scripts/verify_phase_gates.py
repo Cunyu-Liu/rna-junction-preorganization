@@ -49,6 +49,7 @@ def main() -> int:
     acceptance = load_json(manifest_dir / "acceptance_phase0.json")
     registry = load_json(manifest_dir / "data_registry.json")
     audit = load_json(manifest_dir / "source_metadata_audit.json")
+    matching = load_json(manifest_dir / "matching_audit.json")
 
     observed_contract_sha256 = None
     if contract_path.is_file():
@@ -63,6 +64,7 @@ def main() -> int:
         "acceptance_phase0": acceptance.get("contract_sha256"),
         "data_registry": registry.get("contract_sha256"),
         "source_metadata_audit": audit.get("contract_sha256"),
+        "matching_audit": matching.get("contract_sha256"),
     }
     for name, value in expected_hash_locations.items():
         if value != EXPECTED_CONTRACT_SHA256:
@@ -94,6 +96,10 @@ def main() -> int:
         violations.append("SOURCE_REGISTRY_STATUS_UNEXPECTED")
     if audit.get("status") == "PASS":
         violations.append("METADATA_ONLY_AUDIT_CANNOT_BE_PHASE_0_PASS")
+    if matching.get("primary_labels_admitted") is not False:
+        violations.append("MATCHING_AUDIT_MUST_NOT_ADMIT_PRIMARY_LABELS_WHILE_BLOCKED")
+    if matching.get("status") != "BLOCKED_PENDING_PRIMARY_PAYLOADS":
+        violations.append("MATCHING_AUDIT_STATUS_MUST_REMAIN_BLOCKED_WHILE_PHASE_0_INCOMPLETE")
 
     status = "PASS_GOVERNANCE_INVARIANTS" if not violations else "BLOCKED_FAIL_CLOSED"
     result = {
@@ -111,6 +117,7 @@ def main() -> int:
         "phase_0_acceptance": acceptance.get("status"),
         "source_registry_status": registry.get("status"),
         "metadata_audit_status": audit.get("status"),
+        "matching_audit_status": matching.get("status"),
         "scientific_gate_effect": "NO_UNLOCK",
     }
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))

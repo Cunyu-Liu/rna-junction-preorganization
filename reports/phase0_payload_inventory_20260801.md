@@ -4,6 +4,10 @@ Date: 2026-08-01 (Asia/Shanghai)
 
 Contract SHA-256: `218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9`
 
+Matching audit schema: `manifests/matching_audit.json` —
+`BLOCKED_PENDING_PRIMARY_PAYLOADS`; it contains no matching rows and admits no
+primary labels.
+
 ## Current evidence class
 
 This is an interim Phase 0 inventory, not an acceptance record. It records
