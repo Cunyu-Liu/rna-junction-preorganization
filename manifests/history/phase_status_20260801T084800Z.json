@@ -37,9 +37,8 @@
     "The official Zenodo code-archive route probe exited 7 with HTTP status 000 due connection refusal; record contents remain unverified and this is not treated as evidence that data are absent.",
     "A selected ENA transfer logged DOWNLOAD_FAILED_PARTIAL_PRESERVED; the partial file was retained and requires safe resume plus final hash/gzip/pair audit.",
     "A preserved wrapper incident affected one partial-transfer provenance; the partial remains unverified until a post-download isolated integrity re-audit passes.",
-    "Denny semantic workbook evidence extracted an explicit 24,073 variant-count sum and a 1,713 numeric cardinality candidate, but it does not establish the contract's 1,687/1,713/1,636 mapping or censor/raw-interpolated semantics.",
-    "A read-only metadata anomaly showed materially different observed sizes for the active SRR31402664 partial; its final payload must pass size/hash/gzip/pair audit before any acceptance."
+    "Denny semantic workbook evidence extracted an explicit 24,073 variant-count sum and a 1,713 numeric cardinality candidate, but it does not establish the contract's 1,687/1,713/1,636 mapping or censor/raw-interpolated semantics."
   ],
-  "last_transition": "2026-08-01T08:50:11.187719+00:00",
+  "last_transition": "2026-08-01T08:43:53.117786+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
