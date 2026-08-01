@@ -1,0 +1,111 @@
+{
+  "registry_version": "phase0-source-registry-v0",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "status": "NOT_EXECUTED",
+  "source_content_policy": "metadata_only_until_provenance_and_contract_gates_pass",
+  "sources": [
+    {
+      "source_id": "denny_2018_tectorna",
+      "role": "primary_A_tectoRNA_observation",
+      "locator": "https://doi.org/10.1016/j.cell.2018.05.038",
+      "full_text_locator": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6053692/",
+      "required_audit": [
+        "workbook/schema/units",
+        "raw_vs_interpolated_vs_censored",
+        "-7.1_kcal_per_mol_censor_direction",
+        "replicate/bootstrap/covariance",
+        "1687_1713_1636_count_reconciliation"
+      ],
+      "download_status": "NOT_DOWNLOADED",
+      "sha256": null,
+      "license_status": "NOT_VERIFIED"
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
+      "role": "primary_B_cross_assay_complementary_observation",
+      "locator": "https://doi.org/10.1093/nar/gkag672",
+      "data_locator": "https://doi.org/10.6084/m9.figshare.27880434",
+      "code_locator": "https://github.com/YesselmanLabPublications/2025_char_3d_struct_features",
+      "sra_locator": "PRJNA1188187",
+      "required_audit": [
+        "JSON_supplement_sequence_and_construct_mapping",
+        "treated_count/background/read_depth_hierarchy",
+        "QC/outlier/contamination_semantics",
+        "construct_and_connected_component_split_groups"
+      ],
+      "download_status": "NOT_DOWNLOADED",
+      "sha256": null,
+      "license_status": "NOT_VERIFIED"
+    },
+    {
+      "source_id": "rna3db_and_codnas_rna",
+      "role": "weak_geometry_and_time_family_validation",
+      "locator": "https://pubmed.ncbi.nlm.nih.gov/38552946/",
+      "secondary_locator": "https://academic.oup.com/bioinformatics/article/38/6/1745/6483078",
+      "required_audit": [
+        "structure_id_chain_resolution_method_release_date",
+        "family_and_cluster_split_provenance"
+      ],
+      "download_status": "NOT_DOWNLOADED",
+      "sha256": null,
+      "license_status": "NOT_VERIFIED"
+    },
+    {
+      "source_id": "operator_mechanism_priors",
+      "role": "registered_operator_uncertainty_prior_only",
+      "locators": [
+        "https://doi.org/10.1021/acs.jctc.7b00061",
+        "https://doi.org/10.1021/acs.jcim.5c00576"
+      ],
+      "required_audit": [
+        "operator_source_and_evidence_level",
+        "parameter_range_or_discrete_ensemble",
+        "F_U_G_contact_G_elec_gauge_reference"
+      ],
+      "download_status": "NOT_DOWNLOADED",
+      "sha256": null,
+      "license_status": "NOT_VERIFIED"
+    },
+    {
+      "source_id": "second_system_tlr_qmapseq",
+      "role": "conditional_phase7_second_measurement_system",
+      "locators": [
+        "https://doi.org/10.1073/pnas.2109085118",
+        "https://rnajournal.cshlp.org/content/early/2024/10/03/rna.080039.124.full.pdf",
+        "https://doi.org/10.1093/nar/gkae633"
+      ],
+      "required_audit": [
+        "new_estimand_spec",
+        "new_operator_transport_symmetry_specs",
+        "not_a_junction_mechanics_label_by_default"
+      ],
+      "download_status": "LOCKED_UNTIL_PHASE7",
+      "sha256": null,
+      "license_status": "NOT_VERIFIED"
+    }
+  ],
+  "required_registry_fields": [
+    "dataset",
+    "DOI_or_URL",
+    "download_date",
+    "raw_file_path",
+    "SHA-256",
+    "license",
+    "processing_script_commit",
+    "canonical_motif_id",
+    "source_id",
+    "split_group",
+    "exclusion_reason"
+  ],
+  "phase0_acceptance": {
+    "status": "BLOCKED_CONTRACT_SOURCE_DEPLOYMENT",
+    "minimum_manual_audit": {
+      "matched": 50,
+      "rejected_or_ambiguous": 30
+    },
+    "minimum_matching_accuracy": 0.95,
+    "required_outcome": "all_primary_labels_traceable_and_no_fatal_field_ambiguity",
+    "pass_record": null,
+    "failure_record": null
+  }
+}
