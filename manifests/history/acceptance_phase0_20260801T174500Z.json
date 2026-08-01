@@ -54,8 +54,7 @@
     "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.body",
     "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.headers",
     "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.status",
-    "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr",
-    "phase0/audits/denny_xlsx_ooxml_structure_20260801T170000Z.json"
+    "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",

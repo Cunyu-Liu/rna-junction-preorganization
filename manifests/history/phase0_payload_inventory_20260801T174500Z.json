@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T174500Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T150000Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_AUDIT",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -365,18 +365,6 @@
       "sha256": "faf4fc5f07622c9f9c9c63aecc7d1179c527ffaebd64f94ae2dbc7b702966cd1",
       "status": "BLOCKED_CONNECTION_REFUSED_HTTP_000",
       "payload_downloaded": false
-    },
-    {
-      "source_id": "denny_2018_tectorna",
-      "kind": "XLSX_OOXML_structure_audit",
-      "relative_path": "phase0/audits/denny_xlsx_ooxml_structure_20260801T170000Z.json",
-      "exists": true,
-      "size_bytes": 1311,
-      "sha256": "a5f91fc12589ea5aea230880d5ec3bf23741f55b3b8e307b5b782f95750904c1",
-      "status": "STRUCTURAL_AUDIT_COMPLETE_SEMANTICS_UNRESOLVED",
-      "raw_cell_values_read": false,
-      "raw_values_emitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -394,6 +382,6 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T07:50:13.022285+00:00",
+  "last_refresh_utc": "2026-08-01T07:42:59.518622+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS"
 }
