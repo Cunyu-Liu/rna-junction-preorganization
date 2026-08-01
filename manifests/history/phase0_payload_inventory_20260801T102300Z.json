@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T102300Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T095700Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -528,30 +528,6 @@
       "raw_sequence_content_emitted": false,
       "scientific_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_payload_audit_complete_selected_run",
-      "relative_path": "phase0/audits/SRR35766785_fastq_audit_20260801T095400Z.json",
-      "exists": true,
-      "size_bytes": 2459,
-      "sha256": "a4f004858c8185dd53ba817d98ba1e35b6fba0176850d32be2f6767a43326cd6",
-      "status": "COMPLETE_SELECTED_RUN_PAIR_AUDIT",
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_paired_audit_run_provenance",
-      "relative_path": "phase0/audits/SRR35766785_fastq_audit_20260801T095400Z.run.json",
-      "exists": true,
-      "size_bytes": 2124,
-      "sha256": "4f0e695f76d7e303c0b323eb14bb26910e769b4fb76e77be2f9dcf122c00f6ef",
-      "status": "COMPLETE_POSTHOC_PROVENANCE_START_TIME_APPROXIMATE",
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -572,7 +548,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T10:25:21.894964+00:00",
+  "last_refresh_utc": "2026-08-01T09:50:09.114685+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

@@ -42,9 +42,8 @@
     "Denny semantic workbook evidence extracted a 24,073 variant-count sum, a 1,713 numeric cardinality candidate, and -7.1 distributions consistent with an upper-bound cap in seven ΔG columns, but this is not directional proof and does not establish the contract's 1,687/1,713/1,636 mapping or censor/raw-interpolated semantics.",
     "The manual matching acceptance component is missing or blocked; no candidate correspondence may be treated as accepted until an evidence-linked opaque table has at least 50 manually matched and 30 rejected-or-ambiguous cases with agreement at least 0.95.",
     "The official processing README Figshare ndownloader route returned HTTP 403; the data.zip payload remains unavailable through the recorded public route and no bypass was attempted.",
-    "SRR31402664_2 passed a single-file size/hash/gzip/FASTQ structural audit with zero malformed records, but it is one mate only; paired-read and all-selected-run audits remain pending, so this evidence cannot unlock Phase 0.",
-    "SRR35766785 paired FASTQ audit, when present, covers only one selected run; all selected payloads, raw/background/read-depth reconciliation, and manual matching remain required before Phase 0 can pass."
+    "SRR31402664_2 passed a single-file size/hash/gzip/FASTQ structural audit with zero malformed records, but it is one mate only; paired-read and all-selected-run audits remain pending, so this evidence cannot unlock Phase 0."
   ],
-  "last_transition": "2026-08-01T10:25:22.246721+00:00",
+  "last_transition": "2026-08-01T09:50:09.345157+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
