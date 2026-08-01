@@ -67,6 +67,7 @@ def main() -> int:
     parser.add_argument("--route-audit", required=True, type=Path)
     parser.add_argument("--ledger", required=True, type=Path)
     parser.add_argument("--github-tree", type=Path)
+    parser.add_argument("--zenodo-audit", type=Path)
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
 
@@ -75,6 +76,7 @@ def main() -> int:
     route_path = args.route_audit.resolve()
     ledger_path = args.ledger.resolve()
     github_tree_path = args.github_tree.resolve() if args.github_tree else None
+    zenodo_audit_path = args.zenodo_audit.resolve() if args.zenodo_audit else None
     route = load(route_path)
     ledger = load(ledger_path)
     if route.get("status") != "ROUTE_REPROBE_BLOCKED_NO_2XX" or route.get("payload_downloaded") is not False:
@@ -86,6 +88,11 @@ def main() -> int:
         github_tree = load(github_tree_path)
         if github_tree.get("truncated") is not False or not isinstance(github_tree.get("tree"), list):
             raise SystemExit("GitHub tree metadata is incomplete or malformed")
+    zenodo_audit = None
+    if zenodo_audit_path is not None:
+        zenodo_audit = load(zenodo_audit_path)
+        if zenodo_audit.get("status") != "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000" or zenodo_audit.get("payload_downloaded") is not False:
+            raise SystemExit("Zenodo audit is not a blocked no-payload result")
 
     manifests = code_root / "manifests"
     history = manifests / "history"
@@ -102,6 +109,7 @@ def main() -> int:
     ledger_rel = str(ledger_path.relative_to(artifact_root))
     tree_rel = str(github_tree_path.relative_to(artifact_root)) if github_tree_path is not None else None
     tree_audit_rel = f"phase0/audits/dms_github_tree_payload_audit_{args.run_id}.json"
+    zenodo_rel = str(zenodo_audit_path.relative_to(artifact_root)) if zenodo_audit_path is not None else None
     now = datetime.now(timezone.utc).isoformat()
 
     inventory_path = manifests / "phase0_payload_inventory.json"
@@ -152,6 +160,12 @@ def main() -> int:
             "kind": "public_source_repository_tree_metadata",
             **relative_artifact(artifact_root, github_tree_path, status="GITHUB_TREE_METADATA_COMPLETE", tree_truncated=False, processed_payload_admitted=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if zenodo_audit_path is not None and zenodo_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_zenodo_code_route_audit_current",
+            **relative_artifact(artifact_root, zenodo_audit_path, status=zenodo_audit["status"], payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     inventory.setdefault("required_next_evidence", [])
     inventory["required_next_evidence"] = sorted(set(inventory["required_next_evidence"]) | {
         "verified official processed-DMS 2xx route with expected payload size, then 128 MiB range download and hash/gzip/provenance audit",
@@ -173,6 +187,9 @@ def main() -> int:
                 source["public_source_repository_tree_status"] = "GITHUB_TREE_METADATA_COMPLETE"
                 source["public_source_repository_tree_audit"] = tree_audit_rel
                 source["public_source_repository_tree_audit_status"] = "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED"
+            if zenodo_audit_path is not None and zenodo_audit is not None:
+                source["zenodo_code_record_route_audit_current"] = zenodo_rel
+                source["zenodo_code_record_route_audit_current_status"] = zenodo_audit["status"]
             source["processed_dms_payload_status"] = "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403"
             source["dms_reconstruction_status"] = "BLOCKED_RECONSTRUCTION_INPUTS_MISSING"
     dump_atomic(registry_path, registry)
@@ -189,9 +206,13 @@ def main() -> int:
         for value in (tree_rel, tree_audit_rel):
             if value not in evidence:
                 evidence.append(value)
+    if zenodo_audit_path is not None and zenodo_audit is not None and zenodo_rel not in evidence:
+        evidence.append(zenodo_rel)
     acceptance["note"] = str(acceptance.get("note", "")) + f" A low-frequency official processed-DMS route re-probe at {args.run_id} returned {route.get('status')} for {len(route.get('routes', [])) if isinstance(route.get('routes'), list) else 'unknown'} routes; no payload was downloaded, no access control was bypassed, and the updated dependency ledger remains fail-closed."
     if github_tree_path is not None and github_tree is not None:
         acceptance["note"] += f" Public GitHub v1.0.0 tree metadata was recorded with {len(github_tree['tree'])} entries; it inventories source paths only and does not establish that the external official data payload is absent or available."
+    if zenodo_audit_path is not None and zenodo_audit is not None:
+        acceptance["note"] += f" The official Zenodo API route for code record {zenodo_audit.get('zenodo_record_id')} returned connection refused/HTTP 000 at {args.run_id}; this is network-route evidence only and does not establish data absence or admit the code archive as processed-DMS payload."
     dump_atomic(acceptance_path, acceptance)
 
     phase_path = manifests / "phase_status.json"
@@ -205,6 +226,10 @@ def main() -> int:
         blockers.append(blocker)
     if github_tree_path is not None and github_tree is not None:
         blocker = f"Public GitHub v1.0.0 tree metadata was audited at {args.run_id}; it is source-path evidence only and cannot substitute for the external processed-DMS payload or primary labels."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if zenodo_audit_path is not None and zenodo_audit is not None:
+        blocker = f"The official Zenodo API code-record route returned connection refused/HTTP 000 at {args.run_id}; this route failure does not establish data absence and does not admit the code archive as processed-DMS payload."
         if blocker not in blockers:
             blockers.append(blocker)
     dump_atomic(phase_path, phase)

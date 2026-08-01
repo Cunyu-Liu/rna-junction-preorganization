@@ -123,10 +123,8 @@
       "dms_phase0_dependency_ledger_current_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "public_source_repository_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
       "public_source_repository_tree_status": "GITHUB_TREE_METADATA_COMPLETE",
-      "public_source_repository_tree_audit": "phase0/audits/dms_github_tree_payload_audit_20260801T205218Z.json",
-      "public_source_repository_tree_audit_status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
-      "zenodo_code_record_route_audit_current": "phase0/audits/zenodo_code_record_16884333_route_audit_20260801T205218Z.json",
-      "zenodo_code_record_route_audit_current_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000"
+      "public_source_repository_tree_audit": "phase0/audits/dms_github_tree_payload_audit_20260801T204700Z.json",
+      "public_source_repository_tree_audit_status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -504,12 +502,6 @@
     },
     {
       "run_id": "20260801T204700Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T205218Z",
       "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS"
