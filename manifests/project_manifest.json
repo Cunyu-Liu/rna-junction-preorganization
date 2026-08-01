@@ -38,5 +38,18 @@
   "created_at": "2026-08-01T13:06:28+08:00",
   "last_preflight_log": "logs/preflight_20260801T051420Z.log",
   "last_preflight_log_sha256": "30252385b81e254a5df3a5377c346b39fff51ffc6d68e43659de05bc5f8ca7c8",
+  "gpu_preflight": {
+    "status": "PASS_HARDWARE_ENVIRONMENT_ONLY",
+    "timestamp_utc": "2026-08-01T05:29:25Z",
+    "visible_physical_gpu": 0,
+    "device_name": "NVIDIA A100-PCIE-40GB",
+    "torch_version": "2.5.1+cu121",
+    "torch_cuda_version": "12.1",
+    "logical_device": "cuda:0",
+    "probe_tensor_device": "cuda:0",
+    "log": "logs/cuda_probe_20260801T052925Z.log",
+    "log_sha256": "65e037ee8c53d5f1073fd1f1a3d4bb8086501d296a77627620d914e1b63410bd",
+    "scientific_gate_effect": "NO_UNLOCK_PHASE_0_OR_LATER"
+  },
   "status": "REMOTE_CONTRACT_SOURCE_NOT_DEPLOYED_EGRESS_BLOCKED"
 }
