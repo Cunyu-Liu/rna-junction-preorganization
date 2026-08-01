@@ -53,6 +53,7 @@ def main() -> int:
     registry = load_json(manifest_dir / "data_registry.json")
     audit = load_json(manifest_dir / "source_metadata_audit.json")
     matching = load_json(manifest_dir / "matching_audit.json")
+    payload_inventory = load_json(manifest_dir / "phase0_payload_inventory.json")
     manual_matching = None
     if MANUAL_MATCHING_COMPONENT_PATH.is_file():
         try:
@@ -123,6 +124,18 @@ def main() -> int:
         violations.append("MATCHING_AUDIT_MUST_NOT_ADMIT_PRIMARY_LABELS_WHILE_BLOCKED")
     if matching.get("status") != "BLOCKED_PENDING_PRIMARY_PAYLOADS":
         violations.append("MATCHING_AUDIT_STATUS_MUST_REMAIN_BLOCKED_WHILE_PHASE_0_INCOMPLETE")
+
+    for artifact in payload_inventory.get("artifacts", []):
+        if artifact.get("kind") != "FASTQ_batch_payload_audit":
+            continue
+        if artifact.get("raw_sequence_content_emitted") is not False:
+            violations.append("FASTQ_BATCH_AUDIT_MUST_NOT_EMIT_RAW_SEQUENCE")
+        if artifact.get("scientific_labels_admitted") is not False:
+            violations.append("FASTQ_BATCH_AUDIT_MUST_NOT_ADMIT_SCIENTIFIC_LABELS")
+        if artifact.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+            violations.append("FASTQ_BATCH_AUDIT_MUST_NOT_UNLOCK_PHASE_0")
+        if artifact.get("status") not in {"BATCH_COMPLETE", "BATCH_PARTIAL_PENDING_OR_BLOCKED"}:
+            violations.append("FASTQ_BATCH_AUDIT_STATUS_UNEXPECTED")
 
     status = "PASS_GOVERNANCE_INVARIANTS" if not violations else "BLOCKED_FAIL_CLOSED"
     result = {
