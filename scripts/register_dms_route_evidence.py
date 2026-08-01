@@ -72,6 +72,7 @@ def main() -> int:
     parser.add_argument("--metadata-audit", type=Path)
     parser.add_argument("--provenance-audit", type=Path)
     parser.add_argument("--doi-provenance-audit", type=Path)
+    parser.add_argument("--v8-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
@@ -86,6 +87,7 @@ def main() -> int:
     metadata_audit_path = args.metadata_audit.resolve() if args.metadata_audit else None
     provenance_audit_path = args.provenance_audit.resolve() if args.provenance_audit else None
     doi_provenance_audit_path = args.doi_provenance_audit.resolve() if args.doi_provenance_audit else None
+    v8_audit_path = args.v8_audit.resolve() if args.v8_audit else None
     additional_range_audit_paths = [path.resolve() for path in args.additional_range_audit]
     route = load(route_path)
     ledger = load(ledger_path)
@@ -127,6 +129,13 @@ def main() -> int:
             raise SystemExit("DOI/OAI provenance audit has an unexpected status")
         if doi_provenance_audit.get("payload_downloaded") is not False or doi_provenance_audit.get("processed_payload_admitted") is not False:
             raise SystemExit("DOI/OAI provenance audit is not fail-closed")
+    v8_audit = None
+    if v8_audit_path is not None:
+        v8_audit = load(v8_audit_path)
+        if v8_audit.get("status") not in {"FIGSHARE_V8_ROUTE_METADATA_AVAILABLE", "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE"}:
+            raise SystemExit("Figshare v8 audit has an unexpected status")
+        if v8_audit.get("payload_downloaded") is not False or v8_audit.get("processed_payload_admitted") is not False:
+            raise SystemExit("Figshare v8 audit is not fail-closed")
     additional_range_audits = []
     for additional_range_audit_path in additional_range_audit_paths:
         additional_range_audit = load(additional_range_audit_path)
@@ -156,6 +165,7 @@ def main() -> int:
     metadata_rel = str(metadata_audit_path.relative_to(artifact_root)) if metadata_audit_path is not None else None
     provenance_rel = str(provenance_audit_path.relative_to(artifact_root)) if provenance_audit_path is not None else None
     doi_provenance_rel = str(doi_provenance_audit_path.relative_to(artifact_root)) if doi_provenance_audit_path is not None else None
+    v8_rel = str(v8_audit_path.relative_to(artifact_root)) if v8_audit_path is not None else None
     additional_range_rels = [str(path.relative_to(artifact_root)) for path in additional_range_audit_paths]
     now = datetime.now(timezone.utc).isoformat()
 
@@ -237,6 +247,12 @@ def main() -> int:
             "kind": "processed_dms_payload_doi_oai_provenance_audit_current",
             **relative_artifact(artifact_root, doi_provenance_audit_path, status=doi_provenance_audit["status"], successful_route_count=doi_provenance_audit.get("successful_route_count"), payload_downloaded=False, processed_payload_admitted=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if v8_audit_path is not None and v8_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "processed_dms_payload_figshare_v8_route_audit_current",
+            **relative_artifact(artifact_root, v8_audit_path, status=v8_audit["status"], successful_route_count=v8_audit.get("successful_route_count"), payload_downloaded=False, processed_payload_admitted=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
@@ -279,6 +295,9 @@ def main() -> int:
             if doi_provenance_audit_path is not None and doi_provenance_audit is not None:
                 source["processed_dms_payload_doi_oai_provenance_audit_current"] = doi_provenance_rel
                 source["processed_dms_payload_doi_oai_provenance_audit_current_status"] = doi_provenance_audit["status"]
+            if v8_audit_path is not None and v8_audit is not None:
+                source["processed_dms_payload_figshare_v8_route_audit_current"] = v8_rel
+                source["processed_dms_payload_figshare_v8_route_audit_current_status"] = v8_audit["status"]
             if additional_range_audit_paths:
                 source["processed_dms_payload_additional_range_probes_current"] = additional_range_rels
                 source["processed_dms_payload_additional_range_probes_current_status"] = [audit["status"] for audit in additional_range_audits]
@@ -308,6 +327,8 @@ def main() -> int:
         evidence.append(provenance_rel)
     if doi_provenance_audit_path is not None and doi_provenance_audit is not None and doi_provenance_rel not in evidence:
         evidence.append(doi_provenance_rel)
+    if v8_audit_path is not None and v8_audit is not None and v8_rel not in evidence:
+        evidence.append(v8_rel)
     for additional_range_rel in additional_range_rels:
         if additional_range_rel not in evidence:
             evidence.append(additional_range_rel)
@@ -324,6 +345,8 @@ def main() -> int:
         acceptance["note"] += f" A new metadata-only Figshare provenance audit at {args.run_id} returned {provenance_audit.get('status')} across {len(provenance_audit.get('routes', [])) if isinstance(provenance_audit.get('routes'), list) else 'unknown'} DOI/landing-page/article/files/versions routes; no processed payload was downloaded or admitted."
     if doi_provenance_audit_path is not None and doi_provenance_audit is not None:
         acceptance["note"] += f" DataCite DOI and Figshare OAI-PMH metadata at {args.run_id} returned {doi_provenance_audit.get('status')}; metadata exposed provenance relationships only, and no processed payload was admitted."
+    if v8_audit_path is not None and v8_audit is not None:
+        acceptance["note"] += f" The newly identified Figshare v8 landing/download/API routes at {args.run_id} returned {v8_audit.get('status')}; no payload was downloaded or admitted."
     if additional_range_audit_paths:
         acceptance["note"] += f" Newly discovered Figshare file IDs were each subjected to one exact 128 MiB Range probe at {args.run_id}; all recorded results remain fail-closed and no complete payload was admitted."
     dump_atomic(acceptance_path, acceptance)
@@ -359,6 +382,10 @@ def main() -> int:
             blockers.append(blocker)
     if doi_provenance_audit_path is not None and doi_provenance_audit is not None:
         blocker = f"The DataCite/OAI provenance audit returned {doi_provenance_audit.get('status')} at {args.run_id}; metadata relationships do not substitute for a verified processed-DMS payload."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if v8_audit_path is not None and v8_audit is not None:
+        blocker = f"The Figshare v8 route audit returned {v8_audit.get('status')} at {args.run_id}; no v8-specific 2xx payload route is available."
         if blocker not in blockers:
             blockers.append(blocker)
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):

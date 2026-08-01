@@ -1139,111 +1139,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T215150Z.json",
-      "exists": true,
-      "size_bytes": 15919,
-      "sha256": "cdf34b139f2a4a27b975c150fe5351ca37949d1722d2cf00a4ddeb23f412994f",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_source_repository_tree_audit",
-      "relative_path": "phase0/audits/dms_github_tree_payload_audit_20260801T215150Z.json",
-      "exists": true,
-      "size_bytes": 944,
-      "sha256": "04ae63fda8651dfa9be06d81e17e160dd200f1087f29f120ff83c0d51485ad14",
-      "status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
-      "source_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_figshare_v8_route_audit_current",
-      "relative_path": "phase0/audits/figshare_v8_route_audit_20260801T215150Z.json",
-      "exists": true,
-      "size_bytes": 6285,
-      "sha256": "13ee77cef0aabd4d7108ae920f846cb4bf9091ca87afb60dd3ebcee99c53a0dd",
-      "status": "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE",
-      "successful_route_count": 0,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_additional_range_probe_current",
-      "relative_path": "phase0/audits/figshare_file_64021168_alt_host_range_probe_20260801T215150Z.json",
-      "exists": true,
-      "size_bytes": 2653,
-      "sha256": "66c782f751a853655dea5f0b6955fd8a0b71f034dc8f71b4b7e5c2771017dbb0",
-      "status": "BLOCKED_HTTP_403_RANGE_PROBE",
-      "requested_range": {
-        "end": 134217727,
-        "requested_bytes": 134217728,
-        "start": 0
-      },
-      "observed_body_bytes": 0,
-      "observed_total_bytes": null,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_additional_range_probe_current",
-      "relative_path": "phase0/audits/figshare_file_66482831_alt_host_range_probe_20260801T215150Z.json",
-      "exists": true,
-      "size_bytes": 2653,
-      "sha256": "164836c420cae26bfa3755b3feb60bd04733922d2190daae5df5ebab760532f0",
-      "status": "BLOCKED_HTTP_403_RANGE_PROBE",
-      "requested_range": {
-        "end": 134217727,
-        "requested_bytes": 134217728,
-        "start": 0
-      },
-      "observed_body_bytes": 0,
-      "observed_total_bytes": null,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_additional_range_probe_current",
-      "relative_path": "phase0/audits/figshare_article_27880434_v8_alt_download_range_probe_20260801T215150Z.json",
-      "exists": true,
-      "size_bytes": 2678,
-      "sha256": "84b43685750353dbbca15568626b3cbe0bd957bc9139cca387aac66d6e7092cc",
-      "status": "BLOCKED_HTTP_403_RANGE_PROBE",
-      "requested_range": {
-        "end": 134217727,
-        "requested_bytes": 134217728,
-        "start": 0
-      },
-      "observed_body_bytes": 0,
-      "observed_total_bytes": null,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1265,7 +1160,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T21:55:26.639001+00:00",
+  "last_refresh_utc": "2026-08-01T21:45:28.726814+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

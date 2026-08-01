@@ -64,6 +64,7 @@ def main() -> int:
     parser.add_argument("--metadata-audit", type=Path)
     parser.add_argument("--provenance-audit", type=Path)
     parser.add_argument("--doi-provenance-audit", type=Path)
+    parser.add_argument("--v8-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
@@ -74,6 +75,7 @@ def main() -> int:
     metadata_path = args.metadata_audit.resolve() if args.metadata_audit else None
     provenance_path = args.provenance_audit.resolve() if args.provenance_audit else None
     doi_provenance_path = args.doi_provenance_audit.resolve() if args.doi_provenance_audit else None
+    v8_path = args.v8_audit.resolve() if args.v8_audit else None
     additional_range_paths = [path.resolve() for path in args.additional_range_audit]
     output = args.output.resolve()
     if output.exists():
@@ -123,6 +125,13 @@ def main() -> int:
             raise SystemExit("DOI/OAI provenance audit has an unexpected status")
         if doi_provenance_audit.get("payload_downloaded") is not False or doi_provenance_audit.get("processed_payload_admitted") is not False:
             raise SystemExit("DOI/OAI provenance audit does not prove that no processed payload was admitted")
+    v8_audit = None
+    if v8_path is not None:
+        v8_audit = load_json(v8_path)
+        if v8_audit.get("status") not in {"FIGSHARE_V8_ROUTE_METADATA_AVAILABLE", "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE"}:
+            raise SystemExit("Figshare v8 audit has an unexpected status")
+        if v8_audit.get("payload_downloaded") is not False or v8_audit.get("processed_payload_admitted") is not False:
+            raise SystemExit("Figshare v8 audit does not prove that no processed payload was admitted")
     additional_range_audits = []
     for additional_range_path in additional_range_paths:
         additional_range = load_json(additional_range_path)
@@ -186,6 +195,14 @@ def main() -> int:
         ledger["latest_doi_oai_provenance_audit"] = file_record(doi_provenance_path)
         ledger["latest_doi_oai_provenance_audit_status"] = doi_provenance_audit.get("status")
         ledger["latest_doi_oai_payload_downloaded"] = False
+    if v8_path is not None and v8_audit is not None:
+        route_evidence["latest_figshare_v8_audit"] = file_record(v8_path)
+        route_evidence["latest_figshare_v8_audit_status"] = v8_audit.get("status")
+        route_evidence["latest_figshare_v8_successful_route_count"] = v8_audit.get("successful_route_count")
+        route_evidence["latest_figshare_v8_payload_downloaded"] = False
+        ledger["latest_figshare_v8_audit"] = file_record(v8_path)
+        ledger["latest_figshare_v8_audit_status"] = v8_audit.get("status")
+        ledger["latest_figshare_v8_payload_downloaded"] = False
     if additional_range_paths:
         route_evidence["latest_additional_range_probes"] = [file_record(path) for path in additional_range_paths]
         route_evidence["latest_additional_range_probe_statuses"] = [audit.get("status") for audit in additional_range_audits]
@@ -210,6 +227,10 @@ def main() -> int:
                 requirement.setdefault("additional_evidence", [])
                 if str(doi_provenance_path) not in requirement["additional_evidence"]:
                     requirement["additional_evidence"].append(str(doi_provenance_path))
+            if v8_path is not None and v8_audit is not None:
+                requirement.setdefault("additional_evidence", [])
+                if str(v8_path) not in requirement["additional_evidence"]:
+                    requirement["additional_evidence"].append(str(v8_path))
             for additional_range_path in additional_range_paths:
                 requirement.setdefault("additional_evidence", [])
                 if str(additional_range_path) not in requirement["additional_evidence"]:
