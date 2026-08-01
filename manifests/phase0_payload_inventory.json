@@ -88,6 +88,24 @@
       "status": "REF_METADATA_ONLY"
     },
     {
+      "source_id": "deenalattha_2026_dms",
+      "kind": "SRA_run_level_metadata",
+      "relative_path": "phase0/source_metadata/sra_runinfo_PRJNA1188187.csv",
+      "provenance_path": "phase0/source_metadata/sra_runinfo_PRJNA1188187.csv.provenance",
+      "size_bytes": 8431,
+      "sha256": "026ecfda5c90ff034648249fe8eba9ab569a701c9a30a9da7c77088140c49f5e",
+      "status": "RUN_LEVEL_METADATA_AUDITED_FASTQ_NOT_DOWNLOADED",
+      "license_status": "RAW_FASTQ_TERMS_NOT_VERIFIED",
+      "audit_path": "phase0/audits/sra_runinfo_20260801T071500Z.json",
+      "audit_sha256": "434cd95329db1a85720dda32f4a90a341bdaaaaccc483d87bb6505917c693606",
+      "audit_log_path": "phase0/audits/sra_runinfo_20260801T071500Z.log",
+      "audit_log_sha256": "b7e776920b4e78643e06cb47042508005074bdd94bceba919ee0e9b62780be8b",
+      "row_count": 15,
+      "field_count": 47,
+      "read_depth_semantics": "RUN_LEVEL_SPOTS_AND_BASES_ONLY_CONSTRUCT_LEVEL_HIERARCHY_UNRESOLVED",
+      "treated_background_hierarchy": "NOT_ESTABLISHED_FROM_RUNINFO_ALONE"
+    },
+    {
       "source_id": "denny_2018_tectorna",
       "kind": "Crossref_article_metadata",
       "relative_path": "phase0/source_metadata/crossref_denny_2018.json",
@@ -102,7 +120,7 @@
     "Denny censor direction, units, and raw/interpolated semantics",
     "Denny replicate/bootstrap/covariance semantics",
     "DMS JSON supplement and Figshare payload or documented access failure path",
-    "DMS treated/background/read-depth hierarchy and construct group mapping",
+    "DMS treated/background/read-depth hierarchy and construct group mapping beyond run-level metadata",
     "matched/ambiguous/rejected motif table",
     "manual audit of at least 50 matched and 30 rejected_or_ambiguous cases",
     "matching accuracy at least 0.95 and no fatal ambiguity"

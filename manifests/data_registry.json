@@ -47,8 +47,11 @@
       "metadata_paths": [
         "phase0/source_metadata/ncbi_bioproject_1188187.json",
         "phase0/source_metadata/crossref_dms_2026.json",
-        "phase0/source_metadata/yesselman_dms_code_refs.txt"
+        "phase0/source_metadata/yesselman_dms_code_refs.txt",
+        "phase0/source_metadata/sra_runinfo_PRJNA1188187.csv"
       ],
+      "sra_runinfo_audit_path": "phase0/audits/sra_runinfo_20260801T071500Z.json",
+      "sra_runinfo_audit_status": "RUN_LEVEL_ONLY_CONSTRUCT_LEVEL_HIERARCHY_UNRESOLVED",
       "sha256": null,
       "license_status": "ARTICLE_CC_BY_4_0_DATA_RECORD_TERMS_NOT_VERIFIED"
     },

@@ -26,6 +26,7 @@
     "Denny exact count reconciliation, censor direction, raw/interpolated semantics, and replicate/covariance semantics remain unresolved.",
     "The Denny aggregate audit recorded a 24,073 sublibrary-variant sum and a 1,713 distinct-count candidate, but did not establish the contract's 1,687/1,713/1,636 subset mapping.",
     "The DMS Figshare payload endpoint returned HTTP 403; only public metadata and code-reference evidence is currently registered.",
+    "SRA run-level metadata has 15 rows with spots/bases fields, but it does not establish construct-level treated/background/read-depth hierarchy.",
     "No matched/ambiguous/rejected table, manual audit of at least 50 matched and 30 rejected_or_ambiguous cases, or matching-accuracy result has been accepted."
   ],
   "last_transition": "2026-08-01T13:53:44+08:00",

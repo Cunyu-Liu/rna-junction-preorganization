@@ -90,6 +90,31 @@ FASTQ files in SRA project `PRJNA1188187`; and code-produced directories for
 mutation histograms, construct JSON, motif JSON, and residue JSON. These are
 registered as source-level facts, not as downloaded primary payloads.
 
+### SRA run-level metadata
+
+The public SRA runinfo endpoint was queried without downloading FASTQ:
+
+`https://trace.ncbi.nlm.nih.gov/Traces/sra-db-be/runinfo?acc=PRJNA1188187`
+
+The saved CSV contains 15 run-level records and 47 fields. It exposes run-level
+spots, bases, paired-spot counts, average length, and archive size, with one
+library-selection/source/layout/platform category and 15 library-name groups.
+This is useful provenance, but it is not the contract-required construct-level
+treated/background/read-depth hierarchy. The corresponding audit therefore
+remains metadata-only and cannot admit DMS labels.
+
+Artifact:
+
+`/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_runinfo_PRJNA1188187.csv`
+
+SHA-256: `026ecfda5c90ff034648249fe8eba9ab569a701c9a30a9da7c77088140c49f5e`
+
+Aggregate audit:
+
+`/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/sra_runinfo_20260801T071500Z.json`
+
+SHA-256: `434cd95329db1a85720dda32f4a90a341bdaaaaccc483d87bb6505917c693606`
+
 ## Gate status
 
 The inventory is `IN_PROGRESS_PARTIAL_PUBLIC_PAYLOADS`. Phase 0 remains
