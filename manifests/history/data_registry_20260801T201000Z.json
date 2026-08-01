@@ -112,11 +112,7 @@
       "processed_dms_payload_readme_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json",
       "processed_dms_payload_readme_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
       "processing_readme_snapshot": "phase0/source_metadata/dms_official_readme_ed75e36_20260802.md",
-      "processing_readme_snapshot_status": "PUBLIC_PROCESSING_README_SNAPSHOT_PINNED",
-      "processed_dms_payload_latest_readme_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T200800Z.json",
-      "processed_dms_payload_latest_readme_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "dms_phase0_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802.json",
-      "dms_phase0_dependency_ledger_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE"
+      "processing_readme_snapshot_status": "PUBLIC_PROCESSING_README_SNAPSHOT_PINNED"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -456,14 +452,6 @@
     },
     {
       "run_id": "20260801T200500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T201000Z",
       "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
       "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
       "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",

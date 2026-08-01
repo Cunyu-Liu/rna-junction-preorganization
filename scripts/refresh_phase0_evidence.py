@@ -201,6 +201,8 @@ def main() -> int:
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_route_audit", **rel_artifact(args.artifact_root, "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json", route_probe_tsv="phase0/source_metadata/figshare_route_probe_20260801T192200Z.tsv", status="BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_route_reprobe", **rel_artifact(args.artifact_root, "phase0/audits/figshare_route_reprobe_20260801T194600Z.json", route_probe_tsv="phase0/source_metadata/figshare_route_reprobe_20260801T194600Z.tsv", status="ROUTE_REPROBE_BLOCKED_NO_2XX", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_readme_route_reprobe", **rel_artifact(args.artifact_root, "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json", route_probe_tsv="phase0/source_metadata/figshare_readme_reprobe_20260801T195800Z.tsv", status="ROUTE_REPROBE_BLOCKED_NO_2XX", request_referer="https://figshare.com/", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
+    append_unique({"source_id": "deenalattha_2026_dms", "kind": "processed_dms_payload_latest_readme_route_reprobe", **rel_artifact(args.artifact_root, "phase0/audits/figshare_readme_reprobe_20260801T200800Z.json", route_probe_tsv="phase0/source_metadata/figshare_readme_reprobe_20260801T200800Z.tsv", status="ROUTE_REPROBE_BLOCKED_NO_2XX", request_referer="https://figshare.com/", payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
+    append_unique({"source_id": "deenalattha_2026_dms", "kind": "DMS_phase0_dependency_ledger", **rel_artifact(args.artifact_root, "phase0/audits/dms_phase0_dependency_ledger_20260802.json", status="BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE", payload_downloaded=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_article_page", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html", status="PUBLIC_ARTICLE_PAGE_METADATA_COMPLETE", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_supplement_link_inventory", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv", status="PUBLIC_SUPPLEMENT_LINK_INVENTORY_COMPLETE", payload_downloaded=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "PMC_supplement_download_body_probe", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc_media-1_20260801T113000Z.body", status="BLOCKED_HTML_POW_CHALLENGE_NOT_DOCX", payload_downloaded=False)})
@@ -250,6 +252,10 @@ def main() -> int:
             source["processed_dms_payload_readme_route_reprobe_status"] = "ROUTE_REPROBE_BLOCKED_NO_2XX"
             source["processing_readme_snapshot"] = "phase0/source_metadata/dms_official_readme_ed75e36_20260802.md"
             source["processing_readme_snapshot_status"] = "PUBLIC_PROCESSING_README_SNAPSHOT_PINNED"
+            source["processed_dms_payload_latest_readme_route_reprobe"] = "phase0/audits/figshare_readme_reprobe_20260801T200800Z.json"
+            source["processed_dms_payload_latest_readme_route_reprobe_status"] = "ROUTE_REPROBE_BLOCKED_NO_2XX"
+            source["dms_phase0_dependency_ledger"] = "phase0/audits/dms_phase0_dependency_ledger_20260802.json"
+            source["dms_phase0_dependency_ledger_status"] = "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE"
             source["zenodo_code_record_route_audit"] = "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json"
             source["zenodo_code_record_route_status"] = "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000"
             source["dms_reconstruction_feasibility_audit"] = "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json"
@@ -302,6 +308,9 @@ def main() -> int:
             acceptance["evidence_paths"].append(path)
     if "phase0/source_metadata/dms_official_readme_ed75e36_20260802.md" not in acceptance["evidence_paths"]:
         acceptance["evidence_paths"].append("phase0/source_metadata/dms_official_readme_ed75e36_20260802.md")
+    for path in ("phase0/source_metadata/figshare_readme_reprobe_20260801T200800Z.tsv", "phase0/audits/figshare_readme_reprobe_20260801T200800Z.json", "phase0/audits/dms_phase0_dependency_ledger_20260802.json"):
+        if path not in acceptance["evidence_paths"]:
+            acceptance["evidence_paths"].append(path)
     if "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json" not in acceptance["evidence_paths"]:
         acceptance["evidence_paths"].append("phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json")
     if "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json" not in acceptance["evidence_paths"]:
@@ -318,6 +327,7 @@ def main() -> int:
     acceptance["note"] += " A low-frequency re-probe of the same five official routes at 2026-08-01T19:51:25Z again returned HTTP 403 with 118-byte text/html responses; no payload was downloaded and no access control was bypassed."
     acceptance["note"] += " A strict reproduction of the official README curl headers, including Referer https://figshare.com/, at 2026-08-01T19:58:01Z again returned HTTP 403 for all five recorded routes; the official data.zip payload remains not downloaded and no access control was bypassed."
     acceptance["note"] += " The official processing README at pinned source commit ed75e36 was snapshotted with SHA-256 provenance; it identifies data.zip/file 66482813 and remains source semantics only, not an admitted payload."
+    acceptance["note"] += " A later strict README-route re-probe at 2026-08-01T20:07:37Z again returned no 2xx response; the DMS Phase 0 dependency ledger records each missing prerequisite and preserves the no-label/no-modeling stop rules."
     acceptance["note"] += " The public Zenodo code-record API route was separately probed and returned connection refused/HTTP 000; this is a network-route failure and does not establish data absence or admit the code record as processed-DMS payload."
     acceptance["note"] += " A source-defined DMS reconstruction feasibility audit found public FASTQ pair evidence but no rna-map executable/environment, construct reference FASTA/sequence-structure CSV, mutation histograms, or processed construct JSON; no reconstruction or primary labels were admitted."
     acceptance["note"] += " A stable SRR31402664_2 single-file integrity audit was started with immutable run provenance; its final result is recorded separately and does not unlock Phase 0."
@@ -376,6 +386,9 @@ def main() -> int:
     if blocker not in blockers:
         blockers.append(blocker)
     blocker = "The pinned official processing README confirms data.zip/file 66482813 as the processed-data route, but the README snapshot is metadata/source semantics only; the payload itself remains unavailable and cannot unlock construct-level DMS reconciliation."
+    if blocker not in blockers:
+        blockers.append(blocker)
+    blocker = "The Phase 0 DMS dependency ledger is BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE: processed payload, mutation histograms, rna-map environment, construct reference/mapping, processed JSON hierarchy, and manual matching prerequisites are not all present; no modeling or primary labels may proceed."
     if blocker not in blockers:
         blockers.append(blocker)
     blocker = "The public Zenodo code-record API route returned connection refused/HTTP 000; the code record was not downloaded from this host and cannot substitute for the processed-DMS payload."
