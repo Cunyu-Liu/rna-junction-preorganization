@@ -87,9 +87,7 @@
       "download_partial_size_anomaly_status": "OBSERVED_REQUIRES_FINAL_INTEGRITY_AUDIT",
       "figshare_ndownloader_probe": "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status",
       "download_partial_size_regression_reobserved_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T113210Z.json",
-      "download_partial_size_regression_reobserved_status": "REOBSERVED_UNRESOLVED_REQUIRES_FINAL_INTEGRITY_AUDIT",
-      "download_resume_diagnostic_path": "phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json",
-      "download_resume_diagnostic_status": "ACTIVE_TRANSPORT_INSTABILITY_UNRESOLVED"
+      "download_partial_size_regression_reobserved_status": "REOBSERVED_UNRESOLVED_REQUIRES_FINAL_INTEGRITY_AUDIT"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -312,13 +310,6 @@
     },
     {
       "run_id": "20260801T113505Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T114659Z",
       "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
       "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
       "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
