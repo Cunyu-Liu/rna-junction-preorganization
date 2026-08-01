@@ -1333,75 +1333,6 @@
       "scientific_labels_admitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260801T224037Z.json",
-      "exists": true,
-      "size_bytes": 22300,
-      "sha256": "dc61baa48b64e7a35296421832d149dbf9cb03a893b47ccf6928eff341e40e07",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_raw_fastq_range_probe_current",
-      "relative_path": "phase0/audits/ena_SRR38259812_2_range_probe_20260801T224037Z.json",
-      "exists": true,
-      "size_bytes": 2785,
-      "sha256": "89dc8027ea7a67f7b8b72ebe10b5b6e7a70183477d20d455edbf1b8e4b2a0579",
-      "status": "RANGE_PROBE_206_EXACT",
-      "requested_range": {
-        "end": 134217727,
-        "requested_bytes": 134217728,
-        "start": 0
-      },
-      "observed_body_bytes": 134217728,
-      "observed_total_bytes": 15190134766,
-      "payload_downloaded": true,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_raw_fastq_downloader_control_audit_current",
-      "relative_path": "phase0/audits/control_downloader_pause_20260801T223854Z.json",
-      "exists": true,
-      "size_bytes": 3991,
-      "sha256": "2ad8749b3f1b13cd3494d0dd17e6851341debede44d542f45177bba0e3c2f7ee",
-      "status": "SIGSTOP_SENT",
-      "signal": "SIGSTOP",
-      "signal_sent": true,
-      "new_process_started": false,
-      "final_files_overwritten": false,
-      "partial_files_deleted": false,
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_raw_fastq_chunked_download_audit_current",
-      "relative_path": "phase0/audits/ena_SRR38259812_2_chunked_download_20260801T224037Z.json",
-      "exists": true,
-      "size_bytes": 11113,
-      "sha256": "2b0a52fdac33ff3489f3e7a34cae89f6c42fe462eae3784f25585e6a0284ad7c",
-      "status": "CHUNKED_DOWNLOAD_IN_PROGRESS",
-      "chunk_bytes": 134217728,
-      "expected_bytes": 15190134766,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1423,7 +1354,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T22:47:26.693525+00:00",
+  "last_refresh_utc": "2026-08-01T22:23:41.810430+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

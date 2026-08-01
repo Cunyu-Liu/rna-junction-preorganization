@@ -119,7 +119,7 @@
       "dms_phase0_dependency_ledger_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "processed_dms_payload_latest_readme_route_reprobe_current": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "processed_dms_payload_latest_readme_route_reprobe_current_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T224037Z.json",
+      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260801T222125Z.json",
       "dms_phase0_dependency_ledger_current_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
       "public_source_repository_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
       "public_source_repository_tree_status": "GITHUB_TREE_METADATA_COMPLETE",
@@ -154,14 +154,7 @@
       "processed_dms_payload_oai_format_audit_current": "phase0/audits/figshare_oai_format_audit_20260801T220235Z.json",
       "processed_dms_payload_oai_format_audit_current_status": "FIGSHARE_OAI_FORMAT_METADATA_AVAILABLE",
       "public_github_release_tree_metadata_audit_current": "phase0/audits/github_public_metadata_audit_20260801T221809Z.json",
-      "public_github_release_tree_metadata_audit_current_status": "GITHUB_PUBLIC_METADATA_AVAILABLE",
-      "public_raw_fastq_range_probe_current": "phase0/audits/ena_SRR38259812_2_range_probe_20260801T224037Z.json",
-      "public_raw_fastq_range_probe_current_status": "RANGE_PROBE_206_EXACT",
-      "public_raw_fastq_downloader_control_audit_current": "phase0/audits/control_downloader_pause_20260801T223854Z.json",
-      "public_raw_fastq_downloader_control_audit_current_status": "SIGSTOP_SENT",
-      "public_raw_fastq_downloader_last_signal": "SIGSTOP",
-      "public_raw_fastq_chunked_download_audit_current": "phase0/audits/ena_SRR38259812_2_chunked_download_20260801T224037Z.json",
-      "public_raw_fastq_chunked_download_audit_current_status": "CHUNKED_DOWNLOAD_IN_PROGRESS"
+      "public_github_release_tree_metadata_audit_current_status": "GITHUB_PUBLIC_METADATA_AVAILABLE"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -595,12 +588,6 @@
       "run_id": "20260801T222125Z",
       "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T222125Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T224037Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T224037Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ]
