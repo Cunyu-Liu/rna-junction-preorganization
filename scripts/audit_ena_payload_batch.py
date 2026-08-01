@@ -60,6 +60,17 @@ def main() -> int:
             continue
         r1 = args.input_root / run / r1_row["file_name"]
         r2 = args.input_root / run / r2_row["file_name"]
+        partial_files = sorted((args.input_root / run).glob("*.partial"))
+        if partial_files:
+            run_results.append(
+                {
+                    "run_accession": run,
+                    "status": "BLOCKED_PARTIAL_FILES_PRESENT",
+                    "partial_files": [str(path) for path in partial_files],
+                }
+            )
+            failed += 1
+            continue
         if not r1.is_file() or not r2.is_file():
             run_results.append({"run_accession": run, "status": "PENDING_PAYLOAD_FILES", "r1_exists": r1.is_file(), "r2_exists": r2.is_file()})
             pending += 1
