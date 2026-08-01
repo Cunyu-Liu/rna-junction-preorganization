@@ -1,5 +1,5 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T232800Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T220000Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
   "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_WITH_PRESERVED_FAILURES",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
@@ -412,19 +412,6 @@
       "raw_sequence_content_emitted": false,
       "scientific_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_resume_wrapper_incident",
-      "relative_path": "phase0/audits/resume_wrapper_incident_20260801T161500Z.json",
-      "exists": true,
-      "size_bytes": 2893,
-      "sha256": "2aa1e62e4c716212af54053c9e5356967c81ad35b5d251dd3061244e059332a5",
-      "status": "CORRECTED_PRESERVED_PARTIAL_REQUIRES_INTEGRITY_REAUDIT",
-      "final_files_overwritten": false,
-      "partial_files_deleted": false,
-      "raw_sequence_content_emitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -443,7 +430,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T08:22:34.227576+00:00",
+  "last_refresh_utc": "2026-08-01T08:06:49.576054+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

@@ -135,6 +135,7 @@ def main() -> int:
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_payload_audit", **rel_artifact(args.artifact_root, "phase0/audits/junction_design_1_fastq_20260801T064900Z.json", log_path="phase0/audits/junction_design_1_fastq_20260801T064900Z.log", status="COMPLETE_ONE_PUBLIC_PAIRED_RUN", raw_sequence_content_emitted=False, scientific_labels_admitted=False)})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_payload_audit_complete_selected_run", **rel_artifact(args.artifact_root, "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.json", log_path="phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.log", status="COMPLETE_SELECTED_RUN_PAIR_AUDIT", raw_sequence_content_emitted=False, scientific_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_download_task", "status": "IN_PROGRESS", "download_pid": args.download_pid, "download_log": args.download_log, "output_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library", "selected_runs": ["SRR31402664", "SRR31402663", "SRR35766784", "SRR35766785", "SRR38259812"], "raw_sequence_content_emitted": False, "scientific_gate_effect": "NO_PHASE_0_PASS"})
+    append_unique({"source_id": "deenalattha_2026_dms", "kind": "FASTQ_resume_wrapper_incident", **rel_artifact(args.artifact_root, "phase0/audits/resume_wrapper_incident_20260801T161500Z.json", status="CORRECTED_PRESERVED_PARTIAL_REQUIRES_INTEGRITY_REAUDIT", final_files_overwritten=False, partial_files_deleted=False, raw_sequence_content_emitted=False, scientific_gate_effect="NO_PHASE_0_PASS")})
     inventory["required_next_evidence"] = sorted(set(inventory.get("required_next_evidence", [])) | {"complete selected ENA FASTQ download and batch hash/gzip/pair audit", "reconcile raw FASTQ to construct-level DMS counts, background, read-depth and QC semantics", "establish source-defined DMS treatment/background hierarchy before any matching"})
     dump(inventory_path, inventory)
 
@@ -152,6 +153,8 @@ def main() -> int:
             source["license_status"] = "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED"
             source["download_failure_status"] = "PRESERVED_PARTIAL_FAILURES" if download_failures else "NO_PRESERVED_FAILURES_OBSERVED"
             source["download_failure_events"] = download_failures
+            source["resume_wrapper_incident"] = "phase0/audits/resume_wrapper_incident_20260801T161500Z.json"
+            source["resume_wrapper_status"] = "CORRECTED_FAIL_CLOSED_TESTED_WHILE_ORIGINAL_DOWNLOADER_ACTIVE"
     dump(registry_path, registry)
 
     acceptance_path = manifests / "acceptance_phase0.json"
@@ -159,12 +162,13 @@ def main() -> int:
     acceptance["status"] = "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_AUDIT"
     acceptance["pass"] = False
     acceptance.setdefault("evidence_paths", [])
-    for path in ("phase0/audits/denny_subset_mapping_20260801T072000Z.json", "phase0/audits/denny_subset_mapping_20260801T072000Z.log", "phase0/source_metadata/pmc_bioc_PMC6053692.json", "phase0/audits/denny_pmc_semantics_20260801T082000Z.json", "phase0/audits/denny_pmc_semantics_20260801T082000Z.log", "phase0/audits/denny_xlsx_ooxml_structure_20260801T170000Z.json", "phase0/source_metadata/ena_filereport_PRJNA1188187.tsv", "phase0/source_metadata/ena_fastq_manifest_PRJNA1188187.tsv", "phase0/source_metadata/ena_fastq_inventory_20260801.json", "phase0/source_metadata/license_registry_20260801.json", "phase0/source_metadata/pmc_bioc_PMC11601540.json", "phase0/source_metadata/pmc_oa_manifest_PMC11601540.xml", "phase0/source_metadata/pmc_oa_package_PMC11601540.probe", "phase0/source_metadata/dms_processing_source_registry_20260801T190000Z.json", "phase0/source_metadata/dms_github_main_commit_20260801T190000Z.txt", "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.headers", "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.probe", "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html", "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv", "phase0/source_metadata/pmc_media-1_20260801T113000Z.body", "phase0/source_metadata/pmc_media-1_20260801T113000Z.headers", "phase0/source_metadata/pmc_media-1_20260801T113000Z.status", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.body", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.headers", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.status", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr", "phase0/audits/junction_design_1_fastq_20260801T064900Z.json", "phase0/audits/junction_design_1_fastq_20260801T064900Z.log", "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.json", "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.log"):
+    for path in ("phase0/audits/denny_subset_mapping_20260801T072000Z.json", "phase0/audits/denny_subset_mapping_20260801T072000Z.log", "phase0/source_metadata/pmc_bioc_PMC6053692.json", "phase0/audits/denny_pmc_semantics_20260801T082000Z.json", "phase0/audits/denny_pmc_semantics_20260801T082000Z.log", "phase0/audits/denny_xlsx_ooxml_structure_20260801T170000Z.json", "phase0/source_metadata/ena_filereport_PRJNA1188187.tsv", "phase0/source_metadata/ena_fastq_manifest_PRJNA1188187.tsv", "phase0/source_metadata/ena_fastq_inventory_20260801.json", "phase0/source_metadata/license_registry_20260801.json", "phase0/source_metadata/pmc_bioc_PMC11601540.json", "phase0/source_metadata/pmc_oa_manifest_PMC11601540.xml", "phase0/source_metadata/pmc_oa_package_PMC11601540.probe", "phase0/source_metadata/dms_processing_source_registry_20260801T190000Z.json", "phase0/source_metadata/dms_github_main_commit_20260801T190000Z.txt", "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.headers", "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.probe", "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html", "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv", "phase0/source_metadata/pmc_media-1_20260801T113000Z.body", "phase0/source_metadata/pmc_media-1_20260801T113000Z.headers", "phase0/source_metadata/pmc_media-1_20260801T113000Z.status", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.body", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.headers", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.status", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr", "phase0/audits/junction_design_1_fastq_20260801T064900Z.json", "phase0/audits/junction_design_1_fastq_20260801T064900Z.log", "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.json", "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.log", "phase0/audits/resume_wrapper_incident_20260801T161500Z.json"):
         if path not in acceptance["evidence_paths"]:
             acceptance["evidence_paths"].append(path)
     acceptance["note"] = "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed."
     if download_failures:
         acceptance["note"] += " At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion."
+    acceptance["note"] += " A wrapper process-detection incident was preserved and corrected; the corrected wrapper was tested to block while the original downloader remained active."
     dump(acceptance_path, acceptance)
 
     phase_path = manifests / "phase_status.json"
@@ -187,6 +191,9 @@ def main() -> int:
         blocker = "A selected ENA transfer logged DOWNLOAD_FAILED_PARTIAL_PRESERVED; the partial file was retained and requires safe resume plus final hash/gzip/pair audit."
         if blocker not in blockers:
             blockers.append(blocker)
+    blocker = "A preserved wrapper incident affected one partial-transfer provenance; the partial remains unverified until a post-download isolated integrity re-audit passes."
+    if blocker not in blockers:
+        blockers.append(blocker)
     dump(phase_path, phase)
 
     report = args.code_root / "reports" / f"phase0_payload_inventory_{args.run_id}.md"
@@ -212,6 +219,7 @@ def main() -> int:
         "- A dependency-free Denny XLSX OOXML structure audit completed without decoding any cell values; semantic count/censor/matching evidence remains unresolved.\n\n"
         "- Official DMS processing source code was pinned to a public Git commit and its field semantics were registered; no source-code field was admitted as a primary label.\n\n"
         "- One selected main-library paired FASTQ run passed hash/gzip/record/pair-ID audit; this is file-integrity evidence only and does not establish construct-level DMS labels or QC hierarchy.\n\n"
+        "- A resume-wrapper process-detection incident was preserved with no final-file overwrite or partial deletion; the corrected wrapper now blocks while the original downloader is active. The affected partial remains unverified.\n\n"
         + failure_note
         + "## Gate\n\n"
         "`PHASE_0 = IN_PROGRESS`; `scientific_gate_effect = NO_PHASE_0_PASS`; `primary_labels_admitted = false`.\n",

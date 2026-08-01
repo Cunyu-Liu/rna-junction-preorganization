@@ -35,9 +35,8 @@
     "The Denny subset audit confirms aggregate counts only and explicitly does not accept a 1687/1713/1636 count mapping.",
     "The official PMC media-1.docx link returned HTTP 200 text/html with a Preparing to download/POW challenge rather than a DOCX; no challenge was bypassed.",
     "The official Zenodo code-archive route probe exited 7 with HTTP status 000 due connection refusal; record contents remain unverified and this is not treated as evidence that data are absent.",
-    "A selected ENA transfer logged DOWNLOAD_FAILED_PARTIAL_PRESERVED; the partial file was retained and requires safe resume plus final hash/gzip/pair audit.",
-    "A preserved wrapper incident affected one partial-transfer provenance; the partial remains unverified until a post-download isolated integrity re-audit passes."
+    "A selected ENA transfer logged DOWNLOAD_FAILED_PARTIAL_PRESERVED; the partial file was retained and requires safe resume plus final hash/gzip/pair audit."
   ],
-  "last_transition": "2026-08-01T08:22:34.514045+00:00",
+  "last_transition": "2026-08-01T08:06:49.871540+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
