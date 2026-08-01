@@ -61,12 +61,14 @@ def main() -> int:
     parser.add_argument("--previous-ledger", required=True, type=Path)
     parser.add_argument("--route-audit", required=True, type=Path)
     parser.add_argument("--range-audit", type=Path)
+    parser.add_argument("--metadata-audit", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
 
     previous = args.previous_ledger.resolve()
     route_path = args.route_audit.resolve()
     range_path = args.range_audit.resolve() if args.range_audit else None
+    metadata_path = args.metadata_audit.resolve() if args.metadata_audit else None
     output = args.output.resolve()
     if output.exists():
         raise SystemExit(f"refusing to overwrite existing ledger: {output}")
@@ -90,6 +92,13 @@ def main() -> int:
             raise SystemExit("range audit is not a blocked no-payload result")
         if range_audit.get("observed_body_bytes") != 0:
             raise SystemExit("range audit does not prove zero observed body bytes")
+    metadata_audit = None
+    if metadata_path is not None:
+        metadata_audit = load_json(metadata_path)
+        if metadata_audit.get("status") != "BLOCKED_HTTP_403_FILE_METADATA_PROBE" or metadata_audit.get("payload_downloaded") is not False:
+            raise SystemExit("metadata audit is not a blocked no-payload result")
+        if metadata_audit.get("observed_body_bytes") != 0:
+            raise SystemExit("metadata audit does not prove zero observed body bytes")
 
     ledger = copy.deepcopy(old)
     ledger["created_at_utc"] = datetime.now(timezone.utc).isoformat()
@@ -121,6 +130,13 @@ def main() -> int:
         ledger["latest_range_probe"] = file_record(range_path)
         ledger["latest_range_probe_status"] = range_audit.get("status")
         ledger["latest_range_probe_payload_downloaded"] = False
+    if metadata_path is not None and metadata_audit is not None:
+        route_evidence["latest_metadata_probe"] = file_record(metadata_path)
+        route_evidence["latest_metadata_probe_status"] = metadata_audit.get("status")
+        route_evidence["latest_metadata_probe_observed_bytes"] = metadata_audit.get("observed_body_bytes")
+        ledger["latest_metadata_probe"] = file_record(metadata_path)
+        ledger["latest_metadata_probe_status"] = metadata_audit.get("status")
+        ledger["latest_metadata_probe_payload_downloaded"] = False
 
     for requirement in ledger.get("required_evidence", []):
         if isinstance(requirement, dict) and requirement.get("requirement") == "official processed-DMS payload or verified public route":

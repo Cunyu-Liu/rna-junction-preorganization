@@ -69,14 +69,9 @@
     "The latest official processed-DMS route re-probe (20260801T205942Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
     "Public GitHub v1.0.0 tree metadata was audited at 20260801T205942Z; it is source-path evidence only and cannot substitute for the external processed-DMS payload or primary labels.",
     "The official Zenodo API code-record route returned connection refused/HTTP 000 at 20260801T205942Z; this route failure does not establish data absence and does not admit the code archive as processed-DMS payload.",
-    "A real 128 MiB Range GET probe at 20260801T205942Z returned HTTP 403 with zero body bytes and no Content-Range; no processed-DMS chunk is admitted and the payload download gate remains closed.",
-    "The latest official processed-DMS route re-probe (20260801T210534Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "Public GitHub v1.0.0 tree metadata was audited at 20260801T210534Z; it is source-path evidence only and cannot substitute for the external processed-DMS payload or primary labels.",
-    "The official Zenodo API code-record route returned connection refused/HTTP 000 at 20260801T210534Z; this route failure does not establish data absence and does not admit the code archive as processed-DMS payload.",
-    "A real 128 MiB Range GET probe at 20260801T210534Z returned HTTP 403 with zero body bytes and no Content-Range; no processed-DMS chunk is admitted and the payload download gate remains closed.",
-    "The official Figshare file metadata endpoint returned HTTP 403 at 20260801T210534Z; expected processed-DMS payload size remains unverified."
+    "A real 128 MiB Range GET probe at 20260801T205942Z returned HTTP 403 with zero body bytes and no Content-Range; no processed-DMS chunk is admitted and the payload download gate remains closed."
   ],
-  "last_transition": "2026-08-01T21:08:34.294808+00:00",
+  "last_transition": "2026-08-01T21:03:18.413549+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json",
   "scientific_gate_effect": "NO_UNLOCK"
 }
