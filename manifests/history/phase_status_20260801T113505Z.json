@@ -44,9 +44,8 @@
     "The official processing README Figshare ndownloader route returned HTTP 403; the data.zip payload remains unavailable through the recorded public route and no bypass was attempted.",
     "SRR31402664_2 passed a single-file size/hash/gzip/FASTQ structural audit with zero malformed records, but it is one mate only; paired-read and all-selected-run audits remain pending, so this evidence cannot unlock Phase 0.",
     "SRR35766785 paired FASTQ audit, when present, covers only one selected run; all selected payloads, raw/background/read-depth reconciliation, and manual matching remain required before Phase 0 can pass.",
-    "SRR38259812_2 showed an unresolved partial-size regression between read-only observations while its downloader remained active; the preserved partial requires final size/hash/gzip/pair audit, and no cause or scientific meaning may be inferred.",
-    "A second read-only SRR38259812_2 observation found the active partial materially smaller than the prior observation; the new anomaly is preserved independently and requires final size/hash/gzip/pair audit, with no cause or scientific meaning inferred."
+    "SRR38259812_2 showed an unresolved partial-size regression between read-only observations while its downloader remained active; the preserved partial requires final size/hash/gzip/pair audit, and no cause or scientific meaning may be inferred."
   ],
-  "last_transition": "2026-08-01T11:35:05.534936+00:00",
+  "last_transition": "2026-08-01T11:13:57.669359+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
