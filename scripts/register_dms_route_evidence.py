@@ -68,6 +68,7 @@ def main() -> int:
     parser.add_argument("--ledger", required=True, type=Path)
     parser.add_argument("--github-tree", type=Path)
     parser.add_argument("--zenodo-audit", type=Path)
+    parser.add_argument("--range-audit", type=Path)
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
 
@@ -77,6 +78,7 @@ def main() -> int:
     ledger_path = args.ledger.resolve()
     github_tree_path = args.github_tree.resolve() if args.github_tree else None
     zenodo_audit_path = args.zenodo_audit.resolve() if args.zenodo_audit else None
+    range_audit_path = args.range_audit.resolve() if args.range_audit else None
     route = load(route_path)
     ledger = load(ledger_path)
     if route.get("status") != "ROUTE_REPROBE_BLOCKED_NO_2XX" or route.get("payload_downloaded") is not False:
@@ -93,6 +95,11 @@ def main() -> int:
         zenodo_audit = load(zenodo_audit_path)
         if zenodo_audit.get("status") != "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000" or zenodo_audit.get("payload_downloaded") is not False:
             raise SystemExit("Zenodo audit is not a blocked no-payload result")
+    range_audit = None
+    if range_audit_path is not None:
+        range_audit = load(range_audit_path)
+        if range_audit.get("status") != "BLOCKED_HTTP_403_RANGE_PROBE" or range_audit.get("payload_downloaded") is not False or range_audit.get("observed_body_bytes") != 0:
+            raise SystemExit("range audit is not a blocked zero-byte result")
 
     manifests = code_root / "manifests"
     history = manifests / "history"
@@ -110,6 +117,7 @@ def main() -> int:
     tree_rel = str(github_tree_path.relative_to(artifact_root)) if github_tree_path is not None else None
     tree_audit_rel = f"phase0/audits/dms_github_tree_payload_audit_{args.run_id}.json"
     zenodo_rel = str(zenodo_audit_path.relative_to(artifact_root)) if zenodo_audit_path is not None else None
+    range_rel = str(range_audit_path.relative_to(artifact_root)) if range_audit_path is not None else None
     now = datetime.now(timezone.utc).isoformat()
 
     inventory_path = manifests / "phase0_payload_inventory.json"
@@ -166,6 +174,12 @@ def main() -> int:
             "kind": "public_zenodo_code_route_audit_current",
             **relative_artifact(artifact_root, zenodo_audit_path, status=zenodo_audit["status"], payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if range_audit_path is not None and range_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "processed_dms_payload_range_probe_current",
+            **relative_artifact(artifact_root, range_audit_path, status=range_audit["status"], requested_range=range_audit.get("requested_range"), observed_body_bytes=range_audit.get("observed_body_bytes"), payload_downloaded=False, access_control_bypassed=False, raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     inventory.setdefault("required_next_evidence", [])
     inventory["required_next_evidence"] = sorted(set(inventory["required_next_evidence"]) | {
         "verified official processed-DMS 2xx route with expected payload size, then 128 MiB range download and hash/gzip/provenance audit",
@@ -190,6 +204,9 @@ def main() -> int:
             if zenodo_audit_path is not None and zenodo_audit is not None:
                 source["zenodo_code_record_route_audit_current"] = zenodo_rel
                 source["zenodo_code_record_route_audit_current_status"] = zenodo_audit["status"]
+            if range_audit_path is not None and range_audit is not None:
+                source["processed_dms_payload_range_probe_current"] = range_rel
+                source["processed_dms_payload_range_probe_current_status"] = range_audit["status"]
             source["processed_dms_payload_status"] = "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403"
             source["dms_reconstruction_status"] = "BLOCKED_RECONSTRUCTION_INPUTS_MISSING"
     dump_atomic(registry_path, registry)
@@ -208,11 +225,15 @@ def main() -> int:
                 evidence.append(value)
     if zenodo_audit_path is not None and zenodo_audit is not None and zenodo_rel not in evidence:
         evidence.append(zenodo_rel)
+    if range_audit_path is not None and range_audit is not None and range_rel not in evidence:
+        evidence.append(range_rel)
     acceptance["note"] = str(acceptance.get("note", "")) + f" A low-frequency official processed-DMS route re-probe at {args.run_id} returned {route.get('status')} for {len(route.get('routes', [])) if isinstance(route.get('routes'), list) else 'unknown'} routes; no payload was downloaded, no access control was bypassed, and the updated dependency ledger remains fail-closed."
     if github_tree_path is not None and github_tree is not None:
         acceptance["note"] += f" Public GitHub v1.0.0 tree metadata was recorded with {len(github_tree['tree'])} entries; it inventories source paths only and does not establish that the external official data payload is absent or available."
     if zenodo_audit_path is not None and zenodo_audit is not None:
         acceptance["note"] += f" The official Zenodo API route for code record {zenodo_audit.get('zenodo_record_id')} returned connection refused/HTTP 000 at {args.run_id}; this is network-route evidence only and does not establish data absence or admit the code archive as processed-DMS payload."
+    if range_audit_path is not None and range_audit is not None:
+        acceptance["note"] += f" A real 128 MiB Range GET probe at {args.run_id} returned HTTP 403 with zero body bytes and no Content-Range; no chunk was downloaded and the 128 MiB transfer gate remains closed."
     dump_atomic(acceptance_path, acceptance)
 
     phase_path = manifests / "phase_status.json"
@@ -230,6 +251,10 @@ def main() -> int:
             blockers.append(blocker)
     if zenodo_audit_path is not None and zenodo_audit is not None:
         blocker = f"The official Zenodo API code-record route returned connection refused/HTTP 000 at {args.run_id}; this route failure does not establish data absence and does not admit the code archive as processed-DMS payload."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if range_audit_path is not None and range_audit is not None:
+        blocker = f"A real 128 MiB Range GET probe at {args.run_id} returned HTTP 403 with zero body bytes and no Content-Range; no processed-DMS chunk is admitted and the payload download gate remains closed."
         if blocker not in blockers:
             blockers.append(blocker)
     dump_atomic(phase_path, phase)

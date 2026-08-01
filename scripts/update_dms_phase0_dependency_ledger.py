@@ -60,11 +60,13 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--previous-ledger", required=True, type=Path)
     parser.add_argument("--route-audit", required=True, type=Path)
+    parser.add_argument("--range-audit", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
 
     previous = args.previous_ledger.resolve()
     route_path = args.route_audit.resolve()
+    range_path = args.range_audit.resolve() if args.range_audit else None
     output = args.output.resolve()
     if output.exists():
         raise SystemExit(f"refusing to overwrite existing ledger: {output}")
@@ -81,6 +83,13 @@ def main() -> int:
         raise SystemExit("route audit does not prove payload_downloaded=false")
     if route.get("access_control_bypassed") is not False:
         raise SystemExit("route audit does not prove access_control_bypassed=false")
+    range_audit = None
+    if range_path is not None:
+        range_audit = load_json(range_path)
+        if range_audit.get("status") != "BLOCKED_HTTP_403_RANGE_PROBE" or range_audit.get("payload_downloaded") is not False:
+            raise SystemExit("range audit is not a blocked no-payload result")
+        if range_audit.get("observed_body_bytes") != 0:
+            raise SystemExit("range audit does not prove zero observed body bytes")
 
     ledger = copy.deepcopy(old)
     ledger["created_at_utc"] = datetime.now(timezone.utc).isoformat()
@@ -105,12 +114,22 @@ def main() -> int:
     )
     route_evidence["latest_payload_downloaded"] = False
     route_evidence["access_control_bypassed"] = False
+    if range_path is not None and range_audit is not None:
+        route_evidence["latest_range_probe"] = file_record(range_path)
+        route_evidence["latest_range_probe_status"] = range_audit.get("status")
+        route_evidence["latest_range_probe_observed_bytes"] = range_audit.get("observed_body_bytes")
+        ledger["latest_range_probe"] = file_record(range_path)
+        ledger["latest_range_probe_status"] = range_audit.get("status")
+        ledger["latest_range_probe_payload_downloaded"] = False
 
     for requirement in ledger.get("required_evidence", []):
         if isinstance(requirement, dict) and requirement.get("requirement") == "official processed-DMS payload or verified public route":
             requirement["status"] = "BLOCKED_HTTP_403_NO_2XX"
             requirement["evidence"] = str(route_path)
             requirement["scientific_gate_effect"] = "NO_PHASE_0_PASS"
+            if range_path is not None and range_audit is not None:
+                requirement["status"] = "BLOCKED_HTTP_403_RANGE_PROBE"
+                requirement["evidence"] = str(range_path)
 
     ledger["status"] = "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE"
     ledger["primary_labels_admitted"] = False
