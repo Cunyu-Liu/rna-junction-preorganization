@@ -52,7 +52,27 @@ def main() -> int:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--download-pid", required=True)
     parser.add_argument("--download-log", required=True)
+    parser.add_argument("--fastq-batch-audit", type=Path)
     args = parser.parse_args()
+
+    batch_audit_data: dict[str, object] | None = None
+    batch_audit_relative: str | None = None
+    if args.fastq_batch_audit:
+        batch_audit_path = args.fastq_batch_audit.resolve()
+        artifact_root_resolved = args.artifact_root.resolve()
+        try:
+            batch_audit_relative = str(batch_audit_path.relative_to(artifact_root_resolved))
+        except ValueError as exc:
+            parser.error("--fastq-batch-audit must be under --artifact-root")
+        if not batch_audit_path.is_file():
+            parser.error(f"FASTQ batch audit does not exist: {batch_audit_path}")
+        try:
+            loaded_batch_audit = load(batch_audit_path)
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            parser.error(f"FASTQ batch audit is not valid JSON: {batch_audit_path}")
+        if not isinstance(loaded_batch_audit, dict):
+            parser.error(f"FASTQ batch audit must be a JSON object: {batch_audit_path}")
+        batch_audit_data = loaded_batch_audit
 
     manifests = args.code_root / "manifests"
     history = manifests / "history"
@@ -109,6 +129,25 @@ def main() -> int:
         if not any((item.get("relative_path"), item.get("kind"), item.get("source_id")) == key for item in inventory["artifacts"]):
             inventory["artifacts"].append(entry)
 
+    if batch_audit_data is not None and batch_audit_relative is not None:
+        append_unique(
+            {
+                "source_id": "deenalattha_2026_dms",
+                "kind": "FASTQ_batch_payload_audit",
+                **rel_artifact(
+                    args.artifact_root,
+                    batch_audit_relative,
+                    status=batch_audit_data.get("status"),
+                    selected_runs=batch_audit_data.get("selected_runs", []),
+                    pending_run_count=batch_audit_data.get("pending_run_count"),
+                    failed_run_count=batch_audit_data.get("failed_run_count"),
+                    raw_sequence_content_emitted=False,
+                    scientific_labels_admitted=False,
+                    scientific_gate_effect="NO_PHASE_0_PASS",
+                ),
+            }
+        )
+
     append_unique({"source_id": "denny_2018_tectorna", "kind": "subset_mapping_aggregate_audit", **rel_artifact(args.artifact_root, "phase0/audits/denny_subset_mapping_20260801T072000Z.json", log_path="phase0/audits/denny_subset_mapping_20260801T072000Z.log", status="AGGREGATE_COMPLETE_NO_ACCEPTED_COUNT_MAPPING", scientific_gate_effect="NO_PHASE_0_PASS")})
     append_unique({"source_id": "denny_2018_tectorna", "kind": "PMC_BioC_article_metadata", **rel_artifact(args.artifact_root, "phase0/source_metadata/pmc_bioc_PMC6053692.json", status="PUBLIC_ARTICLE_METADATA_COMPLETE")})
     append_unique({"source_id": "denny_2018_tectorna", "kind": "PMC_semantics_term_audit", **rel_artifact(args.artifact_root, "phase0/audits/denny_pmc_semantics_20260801T082000Z.json", log_path="phase0/audits/denny_pmc_semantics_20260801T082000Z.log", status="TERM_AUDIT_COMPLETE_CENSOR_DIRECTION_NOT_ESTABLISHED", scientific_gate_effect="NO_PHASE_0_PASS")})
@@ -156,6 +195,8 @@ def main() -> int:
     registry["status"] = "PHASE_0_PUBLIC_FASTQ_PAYLOAD_AUDIT_IN_PROGRESS"
     registry["metadata_audit_status"] = "PARTIAL_METADATA_AND_PUBLIC_FASTQ_INVENTORY_NOT_PHASE0_PASS"
     registry.setdefault("phase0_evidence_updates", []).append({"run_id": args.run_id, "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json", "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json", "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json", "scientific_gate_effect": "NO_PHASE_0_PASS"})
+    if batch_audit_data is not None and batch_audit_relative is not None:
+        registry["phase0_evidence_updates"][-1]["fastq_batch_audit"] = batch_audit_relative
     for source in registry.get("sources", []):
         if source.get("source_id") == "deenalattha_2026_dms":
             source["public_raw_fastq_route"] = "ENA_filereport_and_FASTQ_mirror"
@@ -170,6 +211,9 @@ def main() -> int:
             source["resume_wrapper_status"] = "CORRECTED_FAIL_CLOSED_TESTED_WHILE_ORIGINAL_DOWNLOADER_ACTIVE"
             source["download_partial_size_anomaly_path"] = "phase0/audits/download_partial_size_anomaly_20260801T084716Z.json"
             source["download_partial_size_anomaly_status"] = "OBSERVED_REQUIRES_FINAL_INTEGRITY_AUDIT"
+            if batch_audit_data is not None and batch_audit_relative is not None:
+                source["fastq_batch_audit_path"] = batch_audit_relative
+                source["fastq_batch_audit_status"] = batch_audit_data.get("status")
         if source.get("source_id") == "denny_2018_tectorna":
             source["semantic_evidence_path"] = "phase0/audits/denny_xlsx_semantic_evidence_20260801T090500Z.json"
             source["semantic_evidence_status"] = "EXTRACTED_24073_VARIANT_SUM_1713_CARDINALITY_MINUS7_1_UPPER_BOUND_CONSISTENT_NOT_PROOF"
@@ -183,6 +227,8 @@ def main() -> int:
     for path in ("phase0/audits/denny_subset_mapping_20260801T072000Z.json", "phase0/audits/denny_subset_mapping_20260801T072000Z.log", "phase0/source_metadata/pmc_bioc_PMC6053692.json", "phase0/audits/denny_pmc_semantics_20260801T082000Z.json", "phase0/audits/denny_pmc_semantics_20260801T082000Z.log", "phase0/audits/denny_xlsx_ooxml_structure_20260801T170000Z.json", "phase0/audits/denny_xlsx_semantic_evidence_20260801T090500Z.json", "phase0/audits/manual_matching_acceptance.json", "phase0/source_metadata/ena_filereport_PRJNA1188187.tsv", "phase0/source_metadata/ena_fastq_manifest_PRJNA1188187.tsv", "phase0/source_metadata/ena_fastq_inventory_20260801.json", "phase0/source_metadata/license_registry_20260801.json", "phase0/source_metadata/pmc_bioc_PMC11601540.json", "phase0/source_metadata/pmc_oa_manifest_PMC11601540.xml", "phase0/source_metadata/pmc_oa_package_PMC11601540.probe", "phase0/source_metadata/dms_processing_source_registry_20260801T190000Z.json", "phase0/source_metadata/dms_github_main_commit_20260801T190000Z.txt", "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.headers", "phase0/source_metadata/figshare_data_direct_get_20260801T091500Z.probe", "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.headers", "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status", "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.stderr", "phase0/audits/SRR31402664_2_fastq_audit_20260801T092500Z.run.json", "phase0/audits/SRR31402664_2_fastq_audit_20260801T092500Z.json", "phase0/source_metadata/pmc11601540_article_page_20260801T111500Z.html", "phase0/source_metadata/pmc11601540_supplement_links_20260801T111500Z.tsv", "phase0/source_metadata/pmc_media-1_20260801T113000Z.body", "phase0/source_metadata/pmc_media-1_20260801T113000Z.headers", "phase0/source_metadata/pmc_media-1_20260801T113000Z.status", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.body", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.headers", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.status", "phase0/source_metadata/zenodo_16884332_probe_20260801T122000Z.stderr", "phase0/audits/junction_design_1_fastq_20260801T064900Z.json", "phase0/audits/junction_design_1_fastq_20260801T064900Z.log", "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.json", "phase0/audits/SRR35766784_fastq_audit_20260801T130000Z.log", "phase0/audits/SRR35766785_fastq_audit_20260801T095400Z.json", "phase0/audits/SRR35766785_fastq_audit_20260801T095400Z.run.json", "phase0/audits/resume_wrapper_incident_20260801T161500Z.json", "phase0/audits/download_partial_size_anomaly_20260801T084716Z.json", "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T111109Z.json"):
         if path not in acceptance["evidence_paths"]:
             acceptance["evidence_paths"].append(path)
+    if batch_audit_relative is not None and batch_audit_relative not in acceptance["evidence_paths"]:
+        acceptance["evidence_paths"].append(batch_audit_relative)
     acceptance["note"] = "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed."
     if download_failures:
         acceptance["note"] += " At least one selected ENA transfer has a preserved partial failure; safe resume and re-audit are required before payload completion."
@@ -195,6 +241,8 @@ def main() -> int:
     acceptance["note"] += " The stable SRR31402664_2 single-file audit completed with size/hash/gzip/FASTQ structural checks and zero malformed records; no paired-read audit was performed for this single mate, so Phase 0 remains fail-closed."
     acceptance["note"] += " An unresolved SRR38259812_2 partial-size regression was observed after an earlier larger read-only observation; the partial remains preserved and requires final size/hash/gzip/pair audit, with no inference of cause."
     acceptance["note"] += " SRR35766785 is audited separately as a complete paired run when its batch artifact is present; this remains file-integrity evidence only and does not establish construct-level DMS labels or unlock Phase 0."
+    if batch_audit_data is not None:
+        acceptance["note"] += f" The selected-run FASTQ batch audit was registered with status {batch_audit_data.get('status')}; it is file-integrity evidence only and cannot unlock Phase 0 without construct-level DMS reconciliation and manual matching acceptance."
     dump(acceptance_path, acceptance)
 
     phase_path = manifests / "phase_status.json"
@@ -241,6 +289,14 @@ def main() -> int:
     blocker = "SRR35766785 paired FASTQ audit, when present, covers only one selected run; all selected payloads, raw/background/read-depth reconciliation, and manual matching remain required before Phase 0 can pass."
     if blocker not in blockers:
         blockers.append(blocker)
+    if batch_audit_data is not None:
+        batch_status = batch_audit_data.get("status")
+        if batch_status == "BATCH_COMPLETE":
+            blocker = "The selected-run FASTQ batch audit completed file-integrity checks, but this evidence does not establish construct-level DMS semantics, source-defined background/read-depth hierarchy, or manual matching acceptance; Phase 0 remains locked."
+        else:
+            blocker = f"The selected-run FASTQ batch audit is {batch_status}; pending or failed payload integrity must be resolved before any Phase 0 consideration, and this audit cannot unlock the gate."
+        if blocker not in blockers:
+            blockers.append(blocker)
     dump(phase_path, phase)
 
     report = args.code_root / "reports" / f"phase0_payload_inventory_{args.run_id}.md"
@@ -252,6 +308,11 @@ def main() -> int:
         )
         + ". Safe resume is required.\n"
         if download_failures
+        else ""
+    )
+    batch_note = (
+        f"- Selected-run FASTQ batch audit: `{batch_audit_data.get('status')}`; this is file-integrity evidence only and does not unlock Phase 0.\n\n"
+        if batch_audit_data is not None
         else ""
     )
     report.write_text(
@@ -274,6 +335,7 @@ def main() -> int:
         "- SRR31402664_2 passed a single-file size/hash/gzip/FASTQ structural audit with zero malformed records; paired-read and all-selected-run audits remain pending.\n\n"
         "- An unresolved SRR38259812_2 partial-size regression was preserved as a separate anomaly artifact; no cause or scientific meaning is inferred, and final integrity audit remains mandatory.\n\n"
         "- SRR35766785 is independently audited as a paired run when its batch artifact is present; this remains file-integrity evidence only and does not establish construct-level DMS labels.\n\n"
+        + batch_note
         + failure_note
         + "## Gate\n\n"
         "`PHASE_0 = IN_PROGRESS`; `scientific_gate_effect = NO_PHASE_0_PASS`; `primary_labels_admitted = false`.\n",
