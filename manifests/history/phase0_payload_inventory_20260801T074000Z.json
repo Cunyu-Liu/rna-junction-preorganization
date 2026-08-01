@@ -1,7 +1,7 @@
 {
-  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T074000Z",
+  "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T060605Z",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_DOWNLOAD_AUDIT",
+  "status": "IN_PROGRESS_PARTIAL_PUBLIC_PAYLOADS",
   "artifact_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801",
   "matching_audit_manifest": "manifests/matching_audit.json",
   "metadata_collection_log": {
@@ -46,14 +46,7 @@
           "raw_censor_replicate_covariance_headers_not_confirmed": true,
           "minus_7_1_is_upper_boundary_candidate": true,
           "sublibrary_variant_count_sum": 24073,
-          "sublibrary_variant_count_values": [
-            256,
-            1120,
-            3280,
-            3601,
-            3792,
-            12024
-          ],
+          "sublibrary_variant_count_values": [256, 1120, 3280, 3601, 3792, 12024],
           "distinct_count_1713_candidate_column_observed": true
         },
         "gate_effect": "NO_PHASE_0_PASS"
@@ -130,101 +123,18 @@
       "sha256": "0e3a74f3f13616e3b471fcda6c4af221b5287a2b28531dde5b8ee5891171df0b",
       "status": "DOWNLOADED_METADATA_ONLY",
       "data_license_status": "NOT_VERIFIED"
-    },
-    {
-      "source_id": "denny_2018_tectorna",
-      "kind": "subset_mapping_aggregate_audit",
-      "relative_path": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "exists": true,
-      "size_bytes": 2028,
-      "sha256": "d8ee060ed193673ecbe0b52b9435ca20cc1d5d87dcda3c2aa312a899d0de3ee7",
-      "log_path": "phase0/audits/denny_subset_mapping_20260801T072000Z.log",
-      "status": "AGGREGATE_COMPLETE_NO_ACCEPTED_COUNT_MAPPING",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "ENA_file_report",
-      "relative_path": "phase0/source_metadata/ena_filereport_PRJNA1188187.tsv",
-      "exists": true,
-      "size_bytes": 2746,
-      "sha256": "c4b1b508ccb354c2dc869e7037aa9d2a1c899cfa9382011cb0e68df72b07ac82",
-      "status": "PUBLIC_FILE_LEVEL_METADATA_COMPLETE"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "ENA_FASTQ_manifest",
-      "relative_path": "phase0/source_metadata/ena_fastq_manifest_PRJNA1188187.tsv",
-      "exists": true,
-      "size_bytes": 3864,
-      "sha256": "50c4b05931671b964bd4b7ce4e2a3948862c0ef097b5f9f812b6cbaed2ce8230",
-      "status": "PUBLIC_FILE_LEVEL_MANIFEST_COMPLETE"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "ENA_FASTQ_inventory",
-      "relative_path": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "exists": true,
-      "size_bytes": 780,
-      "sha256": "f83dcb5fceca7402ceb3f9cc0703bd9cc29da3f3f68141426793fe059220c1a6",
-      "status": "PUBLIC_FASTQ_INVENTORY_COMPLETE",
-      "compressed_file_count": 30,
-      "compressed_total_bytes": 95123388656
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "PMC_BioC_article_metadata",
-      "relative_path": "phase0/source_metadata/pmc_bioc_PMC11601540.json",
-      "exists": true,
-      "size_bytes": 93087,
-      "sha256": "5a048b4b4e236426901fb65c357b582979e4e83e1a187025b8cbf91b8c28eb8f",
-      "status": "PUBLIC_ARTICLE_METADATA_COMPLETE"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_payload_audit",
-      "relative_path": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "exists": true,
-      "size_bytes": 2067,
-      "sha256": "e56d057c64349c90a68954bebac32304c3655188ce3c5cd62f3184bc08db70b0",
-      "log_path": "phase0/audits/junction_design_1_fastq_20260801T064900Z.log",
-      "status": "COMPLETE_ONE_PUBLIC_PAIRED_RUN",
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "FASTQ_download_task",
-      "status": "IN_PROGRESS",
-      "download_pid": "1468666",
-      "download_log": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/download_20260801T065300Z.log",
-      "output_root": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library",
-      "selected_runs": [
-        "SRR31402664",
-        "SRR31402663",
-        "SRR35766784",
-        "SRR35766785",
-        "SRR38259812"
-      ],
-      "raw_sequence_content_emitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
+    "Denny exact count reconciliation for 1687/1713/1636 with source-defined subset mapping",
+    "Denny censor direction, units, and raw/interpolated semantics",
+    "Denny replicate/bootstrap/covariance semantics",
     "DMS JSON supplement and Figshare payload or documented access failure path",
     "DMS treated/background/read-depth hierarchy and construct group mapping beyond run-level metadata",
-    "Denny censor direction, units, and raw/interpolated semantics",
-    "Denny exact count reconciliation for 1687/1713/1636 with source-defined subset mapping",
-    "Denny replicate/bootstrap/covariance semantics",
-    "complete selected ENA FASTQ download and batch hash/gzip/pair audit",
-    "establish source-defined DMS treatment/background hierarchy before any matching",
-    "manual audit of at least 50 matched and 30 rejected_or_ambiguous cases",
     "matched/ambiguous/rejected motif table",
-    "matching accuracy at least 0.95 and no fatal ambiguity",
-    "reconcile raw FASTQ to construct-level DMS counts, background, read-depth and QC semantics"
+    "manual audit of at least 50 matched and 30 rejected_or_ambiguous cases",
+    "matching accuracy at least 0.95 and no fatal ambiguity"
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
-  "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-01T07:06:50.004097+00:00",
-  "scientific_gate_effect": "NO_PHASE_0_PASS"
+  "primary_labels_admitted": false
 }

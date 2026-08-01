@@ -1,8 +1,8 @@
 {
   "registry_version": "phase0-source-registry-v0",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "status": "PHASE_0_PUBLIC_FASTQ_PAYLOAD_AUDIT_IN_PROGRESS",
-  "metadata_audit_status": "PARTIAL_METADATA_AND_PUBLIC_FASTQ_INVENTORY_NOT_PHASE0_PASS",
+  "status": "PHASE_0_METADATA_PARTIAL_PAYLOAD_AUDIT_IN_PROGRESS",
+  "metadata_audit_status": "PARTIAL_METADATA_ONLY_NOT_PHASE0_PASS",
   "metadata_audit_manifest": "manifests/source_metadata_audit.json",
   "metadata_audit_report": "reports/phase0_source_metadata_audit_20260801.md",
   "payload_inventory_manifest": "manifests/phase0_payload_inventory.json",
@@ -55,11 +55,7 @@
       "sra_runinfo_audit_path": "phase0/audits/sra_runinfo_20260801T071500Z.json",
       "sra_runinfo_audit_status": "RUN_LEVEL_ONLY_CONSTRUCT_LEVEL_HIERARCHY_UNRESOLVED",
       "sha256": null,
-      "license_status": "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED",
-      "public_raw_fastq_route": "ENA_filereport_and_FASTQ_mirror",
-      "public_raw_fastq_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "raw_fastq_status": "PUBLIC_PAYLOAD_DOWNLOAD_IN_PROGRESS_CONSTRUCT_LEVEL_RECONCILIATION_PENDING",
-      "figshare_status": "BLOCKED_HTTP_403_PRESERVED"
+      "license_status": "ARTICLE_CC_BY_4_0_DATA_RECORD_TERMS_NOT_VERIFIED"
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -131,14 +127,5 @@
     "required_outcome": "all_primary_labels_traceable_and_no_fatal_field_ambiguity",
     "pass_record": null,
     "failure_record": null
-  },
-  "phase0_evidence_updates": [
-    {
-      "run_id": "20260801T074000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    }
-  ]
+  }
 }

@@ -1,8 +1,8 @@
 {
   "gate_id": "PHASE_0",
-  "status": "IN_PROGRESS_PUBLIC_FASTQ_PAYLOAD_AUDIT",
+  "status": "IN_PROGRESS_CONTRACT_SOURCE_VERIFIED",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "note": "Public ENA file-level metadata and one complete paired FASTQ run are now audited. The main DMS payload download and construct-level raw/background/read-depth reconciliation remain incomplete; Phase 0 stays fail-closed.",
+  "note": "The source document is now present on the remote project and its SHA-256 matches 218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9. Phase 0 remains incomplete until the required source provenance, schema, matching, manual-audit, and terminal acceptance evidence is collected.",
   "required_evidence": [
     "source_file_sha256_and_license_registry",
     "Denny_schema_and_count_reconciliation",
@@ -29,15 +29,7 @@
     "phase0/source_metadata/sra_runinfo_PRJNA1188187.csv",
     "phase0/audits/sra_runinfo_20260801T071500Z.json",
     "phase0/audits/sra_runinfo_20260801T071500Z.log",
-    "phase0/source_metadata/oup_supplement_endpoint.probe",
-    "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-    "phase0/audits/denny_subset_mapping_20260801T072000Z.log",
-    "phase0/source_metadata/ena_filereport_PRJNA1188187.tsv",
-    "phase0/source_metadata/ena_fastq_manifest_PRJNA1188187.tsv",
-    "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-    "phase0/source_metadata/pmc_bioc_PMC11601540.json",
-    "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-    "phase0/audits/junction_design_1_fastq_20260801T064900Z.log"
+    "phase0/source_metadata/oup_supplement_endpoint.probe"
   ],
   "failure_paths": [
     "contract/CONTRACT_TRANSFER_STATUS.md",

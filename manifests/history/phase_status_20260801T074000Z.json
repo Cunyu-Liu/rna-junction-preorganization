@@ -28,12 +28,8 @@
     "The DMS Figshare payload endpoint returned HTTP 403; only public metadata and code-reference evidence is currently registered.",
     "The remote OUP article endpoint returned HTTP 403 with a publisher access challenge; no supplement payload was downloaded or bypassed.",
     "SRA run-level metadata has 15 rows with spots/bases fields, but it does not establish construct-level treated/background/read-depth hierarchy.",
-    "No matched/ambiguous/rejected table, manual audit of at least 50 matched and 30 rejected_or_ambiguous cases, or matching-accuracy result has been accepted.",
-    "Public ENA file-level metadata is registered and one small paired FASTQ run passes integrity audit, but the selected main DMS FASTQ payload remains in progress.",
-    "Raw FASTQ availability does not by itself establish construct-level DMS counts, treated/background hierarchy, read-depth QC, or primary labels.",
-    "A PMC OA manifest was available, but the advertised OA package URL returned HTTP 404; no supplement was substituted or bypassed.",
-    "The Denny subset audit confirms aggregate counts only and explicitly does not accept a 1687/1713/1636 count mapping."
+    "No matched/ambiguous/rejected table, manual audit of at least 50 matched and 30 rejected_or_ambiguous cases, or matching-accuracy result has been accepted."
   ],
-  "last_transition": "2026-08-01T07:06:50.104492+00:00",
-  "transition_evidence": "manifests/phase0_payload_inventory.json"
+  "last_transition": "2026-08-01T13:53:44+08:00",
+  "transition_evidence": "contract/CONTRACT_TRANSFER_STATUS.md"
 }
