@@ -55,9 +55,8 @@
     "The public Zenodo code-record API route returned connection refused/HTTP 000; the code record was not downloaded from this host and cannot substitute for the processed-DMS payload.",
     "The raw FASTQ reconstruction prerequisites are incomplete: rna-map and required reference/processed artifacts are absent; FASTQ file-integrity evidence cannot substitute for construct-level DMS hierarchy.",
     "A low-frequency re-probe of the five recorded official processed-DMS routes again returned HTTP 403 with no 2xx response; the payload remains unavailable through the tested public routes and no access-control bypass is permitted.",
-    "The official README's documented User-Agent/Referer request was reproduced for all five recorded Figshare routes and still returned HTTP 403 with no 2xx response; data.zip remains unavailable and no access-control bypass is permitted.",
-    "The pinned official processing README confirms data.zip/file 66482813 as the processed-data route, but the README snapshot is metadata/source semantics only; the payload itself remains unavailable and cannot unlock construct-level DMS reconciliation."
+    "The official README's documented User-Agent/Referer request was reproduced for all five recorded Figshare routes and still returned HTTP 403 with no 2xx response; data.zip remains unavailable and no access-control bypass is permitted."
   ],
-  "last_transition": "2026-08-01T20:04:46.776128+00:00",
+  "last_transition": "2026-08-01T19:59:24.078280+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json"
 }
