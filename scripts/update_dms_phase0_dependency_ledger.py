@@ -72,6 +72,7 @@ def main() -> int:
     parser.add_argument("--downloader-control-audit", type=Path)
     parser.add_argument("--chunked-fastq-audit", type=Path)
     parser.add_argument("--partial-size-audit", type=Path)
+    parser.add_argument("--final-fastq-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
@@ -90,6 +91,7 @@ def main() -> int:
     downloader_control_path = args.downloader_control_audit.resolve() if args.downloader_control_audit else None
     chunked_fastq_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
     partial_size_path = args.partial_size_audit.resolve() if args.partial_size_audit else None
+    final_fastq_path = args.final_fastq_audit.resolve() if args.final_fastq_audit else None
     additional_range_paths = [path.resolve() for path in args.additional_range_audit]
     output = args.output.resolve()
     if output.exists():
@@ -214,6 +216,20 @@ def main() -> int:
         for field in ("partial_file_deleted", "final_file_overwritten", "raw_sequence_content_emitted", "scientific_labels_admitted"):
             if partial_size_audit.get(field) is not False:
                 raise SystemExit(f"partial-size audit is not fail-closed: {field}")
+    final_fastq_audit = None
+    if final_fastq_path is not None:
+        final_fastq_audit = load_json(final_fastq_path)
+        if final_fastq_audit.get("status") not in {
+            "FASTQ_PAYLOAD_AUDIT_COMPLETE",
+            "BLOCKED_HASH_MISMATCH",
+            "BLOCKED_MALFORMED_FASTQ",
+            "BLOCKED_PAIRED_ID_MISMATCH",
+        }:
+            raise SystemExit("final FASTQ audit has an unexpected status")
+        if final_fastq_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+            raise SystemExit("final FASTQ audit does not preserve the scientific stop rule")
+        if final_fastq_audit.get("raw_sequence_content_emitted") is not False or final_fastq_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("final FASTQ audit is not fail-closed")
     additional_range_audits = []
     for additional_range_path in additional_range_paths:
         additional_range = load_json(additional_range_path)
@@ -340,6 +356,12 @@ def main() -> int:
         ledger["latest_partial_size_audit"] = file_record(partial_size_path)
         ledger["latest_partial_size_audit_status"] = partial_size_audit.get("status")
         ledger["latest_partial_observed_bytes"] = partial_size_audit.get("observed_compressed_bytes")
+    if final_fastq_path is not None and final_fastq_audit is not None:
+        route_evidence["latest_final_fastq_audit"] = file_record(final_fastq_path)
+        route_evidence["latest_final_fastq_audit_status"] = final_fastq_audit.get("status")
+        route_evidence["latest_final_fastq_payload_count"] = len(final_fastq_audit.get("payloads", [])) if isinstance(final_fastq_audit.get("payloads"), list) else None
+        ledger["latest_final_fastq_audit"] = file_record(final_fastq_path)
+        ledger["latest_final_fastq_audit_status"] = final_fastq_audit.get("status")
     if additional_range_paths:
         route_evidence["latest_additional_range_probes"] = [file_record(path) for path in additional_range_paths]
         route_evidence["latest_additional_range_probe_statuses"] = [audit.get("status") for audit in additional_range_audits]
@@ -380,7 +402,7 @@ def main() -> int:
                 requirement.setdefault("additional_evidence", [])
                 if str(fastq_batch_path) not in requirement["additional_evidence"]:
                     requirement["additional_evidence"].append(str(fastq_batch_path))
-            for extra_path in (raw_fastq_range_path, downloader_control_path, chunked_fastq_path):
+            for extra_path in (raw_fastq_range_path, downloader_control_path, chunked_fastq_path, final_fastq_path):
                 if extra_path is not None:
                     requirement.setdefault("additional_evidence", [])
                     if str(extra_path) not in requirement["additional_evidence"]:

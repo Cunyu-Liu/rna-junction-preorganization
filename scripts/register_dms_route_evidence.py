@@ -80,6 +80,7 @@ def main() -> int:
     parser.add_argument("--downloader-control-audit", type=Path)
     parser.add_argument("--chunked-fastq-audit", type=Path)
     parser.add_argument("--partial-size-audit", type=Path)
+    parser.add_argument("--final-fastq-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
@@ -102,6 +103,7 @@ def main() -> int:
     downloader_control_audit_path = args.downloader_control_audit.resolve() if args.downloader_control_audit else None
     chunked_fastq_audit_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
     partial_size_audit_path = args.partial_size_audit.resolve() if args.partial_size_audit else None
+    final_fastq_audit_path = args.final_fastq_audit.resolve() if args.final_fastq_audit else None
     additional_range_audit_paths = [path.resolve() for path in args.additional_range_audit]
     route = load(route_path)
     ledger = load(ledger_path)
@@ -211,6 +213,15 @@ def main() -> int:
         for field in ("partial_file_deleted", "final_file_overwritten", "raw_sequence_content_emitted", "scientific_labels_admitted"):
             if partial_size_audit.get(field) is not False:
                 raise SystemExit(f"partial-size audit is not fail-closed: {field}")
+    final_fastq_audit = None
+    if final_fastq_audit_path is not None:
+        final_fastq_audit = load(final_fastq_audit_path)
+        if final_fastq_audit.get("status") not in {"FASTQ_PAYLOAD_AUDIT_COMPLETE", "BLOCKED_HASH_MISMATCH", "BLOCKED_MALFORMED_FASTQ", "BLOCKED_PAIRED_ID_MISMATCH"}:
+            raise SystemExit("final FASTQ audit has an unexpected status")
+        if final_fastq_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+            raise SystemExit("final FASTQ audit does not preserve the scientific stop rule")
+        if final_fastq_audit.get("raw_sequence_content_emitted") is not False or final_fastq_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("final FASTQ audit is not fail-closed")
     additional_range_audits = []
     for additional_range_audit_path in additional_range_audit_paths:
         additional_range_audit = load(additional_range_audit_path)
@@ -248,6 +259,7 @@ def main() -> int:
     downloader_control_rel = str(downloader_control_audit_path.relative_to(artifact_root)) if downloader_control_audit_path is not None else None
     chunked_fastq_rel = str(chunked_fastq_audit_path.relative_to(artifact_root)) if chunked_fastq_audit_path is not None else None
     partial_size_rel = str(partial_size_audit_path.relative_to(artifact_root)) if partial_size_audit_path is not None else None
+    final_fastq_rel = str(final_fastq_audit_path.relative_to(artifact_root)) if final_fastq_audit_path is not None else None
     additional_range_rels = [str(path.relative_to(artifact_root)) for path in additional_range_audit_paths]
     now = datetime.now(timezone.utc).isoformat()
 
@@ -377,6 +389,12 @@ def main() -> int:
             "kind": "public_raw_fastq_partial_size_regression_audit_current",
             **relative_artifact(artifact_root, partial_size_audit_path, status=partial_size_audit["status"], expected_compressed_bytes=partial_size_audit.get("expected_compressed_bytes"), observed_compressed_bytes=partial_size_audit.get("observed_compressed_bytes"), prior_observed_compressed_bytes=partial_size_audit.get("prior_observation", {}).get("observed_compressed_bytes"), partial_file_deleted=False, final_file_overwritten=False, raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if final_fastq_audit_path is not None and final_fastq_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_raw_fastq_final_integrity_audit_current",
+            **relative_artifact(artifact_root, final_fastq_audit_path, status=final_fastq_audit["status"], payload_count=len(final_fastq_audit.get("payloads", [])) if isinstance(final_fastq_audit.get("payloads"), list) else None, pair_audit=final_fastq_audit.get("pair_audit"), raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
@@ -445,6 +463,14 @@ def main() -> int:
             if partial_size_audit_path is not None and partial_size_audit is not None:
                 source["public_raw_fastq_partial_size_audit_current"] = partial_size_rel
                 source["public_raw_fastq_partial_size_audit_current_status"] = partial_size_audit["status"]
+            if final_fastq_audit_path is not None and final_fastq_audit is not None:
+                source["public_raw_fastq_final_integrity_audit_current"] = final_fastq_rel
+                source["public_raw_fastq_final_integrity_audit_current_status"] = final_fastq_audit["status"]
+                source["raw_fastq_status"] = (
+                    "PUBLIC_RAW_FASTQ_ISOLATED_RECOVERY_FINAL_INTEGRITY_COMPLETE_PENDING_SELECTED_BATCH_CLOSURE"
+                    if final_fastq_audit["status"] == "FASTQ_PAYLOAD_AUDIT_COMPLETE"
+                    else "PUBLIC_RAW_FASTQ_FINAL_INTEGRITY_AUDIT_BLOCKED"
+                )
             if additional_range_audit_paths:
                 source["processed_dms_payload_additional_range_probes_current"] = additional_range_rels
                 source["processed_dms_payload_additional_range_probes_current_status"] = [audit["status"] for audit in additional_range_audits]
@@ -485,6 +511,8 @@ def main() -> int:
     for extra_rel in (raw_fastq_range_rel, downloader_control_rel, chunked_fastq_rel):
         if extra_rel is not None and extra_rel not in evidence:
             evidence.append(extra_rel)
+    if final_fastq_audit_path is not None and final_fastq_audit is not None and final_fastq_rel not in evidence:
+        evidence.append(final_fastq_rel)
     if partial_size_audit_path is not None and partial_size_audit is not None and partial_size_rel not in evidence:
         evidence.append(partial_size_rel)
     for additional_range_rel in additional_range_rels:
@@ -519,6 +547,8 @@ def main() -> int:
         acceptance["note"] += f" The isolated 128 MiB chunked raw FASTQ recovery audit at {args.run_id} is currently {chunked_fastq_audit.get('status')}; it remains raw-source evidence only until every chunk and final integrity check passes."
     if partial_size_audit_path is not None and partial_size_audit is not None:
         acceptance["note"] += f" A metadata-only partial-size regression audit at {args.run_id} recorded {partial_size_audit.get('observed_compressed_bytes')} bytes versus prior {partial_size_audit.get('prior_observation', {}).get('observed_compressed_bytes')} bytes; cause and scientific meaning remain unassigned."
+    if final_fastq_audit_path is not None and final_fastq_audit is not None:
+        acceptance["note"] += f" The isolated raw FASTQ final-integrity audit at {args.run_id} returned {final_fastq_audit.get('status')} for {len(final_fastq_audit.get('payloads', [])) if isinstance(final_fastq_audit.get('payloads'), list) else 'unknown'} payload(s); this is raw-source integrity evidence only and does not admit processed-DMS labels or unlock Phase 0."
     if additional_range_audit_paths:
         acceptance["note"] += f" Newly discovered Figshare file IDs were each subjected to one exact 128 MiB Range probe at {args.run_id}; all recorded results remain fail-closed and no complete payload was admitted."
     dump_atomic(acceptance_path, acceptance)
@@ -570,6 +600,10 @@ def main() -> int:
             blockers.append(blocker)
     if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
         blocker = f"The current FASTQ partial-state audit returned {fastq_batch_audit.get('status')} at {args.run_id}; preserved partial files remain and no recovery or final integrity PASS is accepted while the guarded downloader process exists."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if final_fastq_audit_path is not None and final_fastq_audit is not None:
+        blocker = f"The isolated raw FASTQ final-integrity audit returned {final_fastq_audit.get('status')} at {args.run_id}; it remains raw-source evidence only and the processed-DMS/Phase 0 gate stays locked."
         if blocker not in blockers:
             blockers.append(blocker)
     if raw_fastq_range_probe_path is not None and raw_fastq_range_probe is not None:
