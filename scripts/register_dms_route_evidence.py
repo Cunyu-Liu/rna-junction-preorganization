@@ -81,6 +81,8 @@ def main() -> int:
     parser.add_argument("--chunked-fastq-audit", type=Path)
     parser.add_argument("--partial-size-audit", type=Path)
     parser.add_argument("--final-fastq-audit", type=Path)
+    parser.add_argument("--raw-fastq-install-audit", type=Path)
+    parser.add_argument("--reconstruction-feasibility-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
@@ -104,6 +106,8 @@ def main() -> int:
     chunked_fastq_audit_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
     partial_size_audit_path = args.partial_size_audit.resolve() if args.partial_size_audit else None
     final_fastq_audit_path = args.final_fastq_audit.resolve() if args.final_fastq_audit else None
+    install_audit_path = args.raw_fastq_install_audit.resolve() if args.raw_fastq_install_audit else None
+    reconstruction_path = args.reconstruction_feasibility_audit.resolve() if args.reconstruction_feasibility_audit else None
     additional_range_audit_paths = [path.resolve() for path in args.additional_range_audit]
     route = load(route_path)
     ledger = load(ledger_path)
@@ -222,6 +226,20 @@ def main() -> int:
             raise SystemExit("final FASTQ audit does not preserve the scientific stop rule")
         if final_fastq_audit.get("raw_sequence_content_emitted") is not False or final_fastq_audit.get("scientific_labels_admitted") is not False:
             raise SystemExit("final FASTQ audit is not fail-closed")
+    install_audit = None
+    if install_audit_path is not None:
+        install_audit = load(install_audit_path)
+        if install_audit.get("status") not in {"CHUNKED_RECOVERY_INSTALLED_NO_OVERWRITE", "BLOCKED_TARGET_EXISTS_NO_OVERWRITE"}:
+            raise SystemExit("raw FASTQ install audit has an unexpected status")
+        if install_audit.get("target_overwritten") is not False or install_audit.get("raw_sequence_content_emitted") is not False or install_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("raw FASTQ install audit is not fail-closed")
+    reconstruction_audit = None
+    if reconstruction_path is not None:
+        reconstruction_audit = load(reconstruction_path)
+        if reconstruction_audit.get("status") not in {"BLOCKED_RECONSTRUCTION_INPUTS_MISSING", "RECONSTRUCTION_INPUTS_AVAILABLE_PENDING_AUDIT"}:
+            raise SystemExit("reconstruction feasibility audit has an unexpected status")
+        if reconstruction_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS" or reconstruction_audit.get("raw_sequence_content_emitted") is not False or reconstruction_audit.get("primary_labels_admitted") is not False:
+            raise SystemExit("reconstruction feasibility audit is not fail-closed")
     additional_range_audits = []
     for additional_range_audit_path in additional_range_audit_paths:
         additional_range_audit = load(additional_range_audit_path)
@@ -260,6 +278,8 @@ def main() -> int:
     chunked_fastq_rel = str(chunked_fastq_audit_path.relative_to(artifact_root)) if chunked_fastq_audit_path is not None else None
     partial_size_rel = str(partial_size_audit_path.relative_to(artifact_root)) if partial_size_audit_path is not None else None
     final_fastq_rel = str(final_fastq_audit_path.relative_to(artifact_root)) if final_fastq_audit_path is not None else None
+    install_audit_rel = str(install_audit_path.relative_to(artifact_root)) if install_audit_path is not None else None
+    reconstruction_rel = str(reconstruction_path.relative_to(artifact_root)) if reconstruction_path is not None else None
     additional_range_rels = [str(path.relative_to(artifact_root)) for path in additional_range_audit_paths]
     now = datetime.now(timezone.utc).isoformat()
 
@@ -395,6 +415,18 @@ def main() -> int:
             "kind": "public_raw_fastq_final_integrity_audit_current",
             **relative_artifact(artifact_root, final_fastq_audit_path, status=final_fastq_audit["status"], payload_count=len(final_fastq_audit.get("payloads", [])) if isinstance(final_fastq_audit.get("payloads"), list) else None, pair_audit=final_fastq_audit.get("pair_audit"), raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if install_audit_path is not None and install_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_raw_fastq_install_audit_current",
+            **relative_artifact(artifact_root, install_audit_path, status=install_audit["status"], target=install_audit.get("target"), target_matches_chunked_audit=install_audit.get("target_matches_chunked_audit"), target_overwritten=False, raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
+    if reconstruction_path is not None and reconstruction_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "dms_reconstruction_feasibility_audit_current",
+            **relative_artifact(artifact_root, reconstruction_path, status=reconstruction_audit["status"], required_next_evidence=reconstruction_audit.get("required_next_evidence"), raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
@@ -471,6 +503,13 @@ def main() -> int:
                     if final_fastq_audit["status"] == "FASTQ_PAYLOAD_AUDIT_COMPLETE"
                     else "PUBLIC_RAW_FASTQ_FINAL_INTEGRITY_AUDIT_BLOCKED"
                 )
+            if install_audit_path is not None and install_audit is not None:
+                source["public_raw_fastq_install_audit_current"] = install_audit_rel
+                source["public_raw_fastq_install_audit_current_status"] = install_audit["status"]
+            if reconstruction_path is not None and reconstruction_audit is not None:
+                source["dms_reconstruction_feasibility_audit_current"] = reconstruction_rel
+                source["dms_reconstruction_feasibility_audit_current_status"] = reconstruction_audit["status"]
+                source["dms_reconstruction_status"] = reconstruction_audit["status"]
             if additional_range_audit_paths:
                 source["processed_dms_payload_additional_range_probes_current"] = additional_range_rels
                 source["processed_dms_payload_additional_range_probes_current_status"] = [audit["status"] for audit in additional_range_audits]
@@ -513,6 +552,9 @@ def main() -> int:
             evidence.append(extra_rel)
     if final_fastq_audit_path is not None and final_fastq_audit is not None and final_fastq_rel not in evidence:
         evidence.append(final_fastq_rel)
+    for extra_rel in (install_audit_rel, reconstruction_rel):
+        if extra_rel is not None and extra_rel not in evidence:
+            evidence.append(extra_rel)
     if partial_size_audit_path is not None and partial_size_audit is not None and partial_size_rel not in evidence:
         evidence.append(partial_size_rel)
     for additional_range_rel in additional_range_rels:
@@ -549,6 +591,10 @@ def main() -> int:
         acceptance["note"] += f" A metadata-only partial-size regression audit at {args.run_id} recorded {partial_size_audit.get('observed_compressed_bytes')} bytes versus prior {partial_size_audit.get('prior_observation', {}).get('observed_compressed_bytes')} bytes; cause and scientific meaning remain unassigned."
     if final_fastq_audit_path is not None and final_fastq_audit is not None:
         acceptance["note"] += f" The isolated raw FASTQ final-integrity audit at {args.run_id} returned {final_fastq_audit.get('status')} for {len(final_fastq_audit.get('payloads', [])) if isinstance(final_fastq_audit.get('payloads'), list) else 'unknown'} payload(s); this is raw-source integrity evidence only and does not admit processed-DMS labels or unlock Phase 0."
+    if install_audit_path is not None and install_audit is not None:
+        acceptance["note"] += f" The guarded raw FASTQ install audit at {args.run_id} returned {install_audit.get('status')}; the existing final target was not overwritten and target_matches_chunked_audit={install_audit.get('target_matches_chunked_audit')}."
+    if reconstruction_path is not None and reconstruction_audit is not None:
+        acceptance["note"] += f" The DMS reconstruction feasibility audit at {args.run_id} returned {reconstruction_audit.get('status')}; construct-level source inputs and processed-DMS hierarchy remain unadmitted."
     if additional_range_audit_paths:
         acceptance["note"] += f" Newly discovered Figshare file IDs were each subjected to one exact 128 MiB Range probe at {args.run_id}; all recorded results remain fail-closed and no complete payload was admitted."
     dump_atomic(acceptance_path, acceptance)
@@ -604,6 +650,14 @@ def main() -> int:
             blockers.append(blocker)
     if final_fastq_audit_path is not None and final_fastq_audit is not None:
         blocker = f"The isolated raw FASTQ final-integrity audit returned {final_fastq_audit.get('status')} at {args.run_id}; it remains raw-source evidence only and the processed-DMS/Phase 0 gate stays locked."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if install_audit_path is not None and install_audit is not None:
+        blocker = f"The guarded raw FASTQ install audit returned {install_audit.get('status')} at {args.run_id}; no existing final target was overwritten and raw-source evidence remains separate from processed-DMS evidence."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if reconstruction_path is not None and reconstruction_audit is not None:
+        blocker = f"The DMS reconstruction feasibility audit returned {reconstruction_audit.get('status')} at {args.run_id}; construct-level mutation histograms/reference mapping/count-background-depth inputs are not sufficient for Phase 0."
         if blocker not in blockers:
             blockers.append(blocker)
     if raw_fastq_range_probe_path is not None and raw_fastq_range_probe is not None:

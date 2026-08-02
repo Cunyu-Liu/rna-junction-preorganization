@@ -73,6 +73,8 @@ def main() -> int:
     parser.add_argument("--chunked-fastq-audit", type=Path)
     parser.add_argument("--partial-size-audit", type=Path)
     parser.add_argument("--final-fastq-audit", type=Path)
+    parser.add_argument("--raw-fastq-install-audit", type=Path)
+    parser.add_argument("--reconstruction-feasibility-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
@@ -92,6 +94,8 @@ def main() -> int:
     chunked_fastq_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
     partial_size_path = args.partial_size_audit.resolve() if args.partial_size_audit else None
     final_fastq_path = args.final_fastq_audit.resolve() if args.final_fastq_audit else None
+    install_audit_path = args.raw_fastq_install_audit.resolve() if args.raw_fastq_install_audit else None
+    reconstruction_path = args.reconstruction_feasibility_audit.resolve() if args.reconstruction_feasibility_audit else None
     additional_range_paths = [path.resolve() for path in args.additional_range_audit]
     output = args.output.resolve()
     if output.exists():
@@ -230,6 +234,20 @@ def main() -> int:
             raise SystemExit("final FASTQ audit does not preserve the scientific stop rule")
         if final_fastq_audit.get("raw_sequence_content_emitted") is not False or final_fastq_audit.get("scientific_labels_admitted") is not False:
             raise SystemExit("final FASTQ audit is not fail-closed")
+    install_audit = None
+    if install_audit_path is not None:
+        install_audit = load_json(install_audit_path)
+        if install_audit.get("status") not in {"CHUNKED_RECOVERY_INSTALLED_NO_OVERWRITE", "BLOCKED_TARGET_EXISTS_NO_OVERWRITE"}:
+            raise SystemExit("raw FASTQ install audit has an unexpected status")
+        if install_audit.get("target_overwritten") is not False or install_audit.get("raw_sequence_content_emitted") is not False or install_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("raw FASTQ install audit is not fail-closed")
+    reconstruction_audit = None
+    if reconstruction_path is not None:
+        reconstruction_audit = load_json(reconstruction_path)
+        if reconstruction_audit.get("status") not in {"BLOCKED_RECONSTRUCTION_INPUTS_MISSING", "RECONSTRUCTION_INPUTS_AVAILABLE_PENDING_AUDIT"}:
+            raise SystemExit("reconstruction feasibility audit has an unexpected status")
+        if reconstruction_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS" or reconstruction_audit.get("raw_sequence_content_emitted") is not False or reconstruction_audit.get("primary_labels_admitted") is not False:
+            raise SystemExit("reconstruction feasibility audit is not fail-closed")
     additional_range_audits = []
     for additional_range_path in additional_range_paths:
         additional_range = load_json(additional_range_path)
@@ -362,6 +380,17 @@ def main() -> int:
         route_evidence["latest_final_fastq_payload_count"] = len(final_fastq_audit.get("payloads", [])) if isinstance(final_fastq_audit.get("payloads"), list) else None
         ledger["latest_final_fastq_audit"] = file_record(final_fastq_path)
         ledger["latest_final_fastq_audit_status"] = final_fastq_audit.get("status")
+    if install_audit_path is not None and install_audit is not None:
+        route_evidence["latest_raw_fastq_install_audit"] = file_record(install_audit_path)
+        route_evidence["latest_raw_fastq_install_audit_status"] = install_audit.get("status")
+        route_evidence["latest_raw_fastq_install_target_matches_chunked_audit"] = install_audit.get("target_matches_chunked_audit")
+        ledger["latest_raw_fastq_install_audit"] = file_record(install_audit_path)
+        ledger["latest_raw_fastq_install_audit_status"] = install_audit.get("status")
+    if reconstruction_path is not None and reconstruction_audit is not None:
+        route_evidence["latest_reconstruction_feasibility_audit"] = file_record(reconstruction_path)
+        route_evidence["latest_reconstruction_feasibility_audit_status"] = reconstruction_audit.get("status")
+        ledger["latest_reconstruction_feasibility_audit"] = file_record(reconstruction_path)
+        ledger["latest_reconstruction_feasibility_audit_status"] = reconstruction_audit.get("status")
     if additional_range_paths:
         route_evidence["latest_additional_range_probes"] = [file_record(path) for path in additional_range_paths]
         route_evidence["latest_additional_range_probe_statuses"] = [audit.get("status") for audit in additional_range_audits]
@@ -402,7 +431,7 @@ def main() -> int:
                 requirement.setdefault("additional_evidence", [])
                 if str(fastq_batch_path) not in requirement["additional_evidence"]:
                     requirement["additional_evidence"].append(str(fastq_batch_path))
-            for extra_path in (raw_fastq_range_path, downloader_control_path, chunked_fastq_path, final_fastq_path):
+            for extra_path in (raw_fastq_range_path, downloader_control_path, chunked_fastq_path, final_fastq_path, install_audit_path, reconstruction_path):
                 if extra_path is not None:
                     requirement.setdefault("additional_evidence", [])
                     if str(extra_path) not in requirement["additional_evidence"]:
