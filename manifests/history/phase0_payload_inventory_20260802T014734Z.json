@@ -1582,27 +1582,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "processed_dms_payload_additional_range_probe_current",
-      "relative_path": "phase0/audits/figshare_article_v8_range_probe_20260802T014703Z.json",
-      "exists": true,
-      "size_bytes": 2567,
-      "sha256": "e43a70c28e76a7d5b1af8810ef6706d22fe70cc0092416b5fb974a967ef14132",
-      "status": "BLOCKED_HTTP_403_RANGE_PROBE",
-      "requested_range": {
-        "end": 134217727,
-        "requested_bytes": 134217728,
-        "start": 0
-      },
-      "observed_body_bytes": 0,
-      "observed_total_bytes": null,
-      "payload_downloaded": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1624,7 +1603,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-02T01:47:34.360676+00:00",
+  "last_refresh_utc": "2026-08-02T01:41:40.490777+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
