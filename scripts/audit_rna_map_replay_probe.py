@@ -12,7 +12,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
+import statistics
 import subprocess
 import zipfile
 from datetime import datetime, timezone
@@ -165,6 +167,105 @@ def output_inventory(run_root: Path) -> list[dict[str, object]]:
     return entries
 
 
+def rank(values: list[float]) -> list[float]:
+    ordered = sorted(enumerate(values), key=lambda item: item[1])
+    result = [0.0] * len(values)
+    i = 0
+    while i < len(ordered):
+        j = i + 1
+        while j < len(ordered) and ordered[j][1] == ordered[i][1]:
+            j += 1
+        mean_rank = (i + 1 + j) / 2.0
+        for k in range(i, j):
+            result[ordered[k][0]] = mean_rank
+        i = j
+    return result
+
+
+def correlation(left: list[float], right: list[float]) -> float | None:
+    if len(left) != len(right) or not left:
+        return None
+    left_mean = statistics.fmean(left)
+    right_mean = statistics.fmean(right)
+    left_delta = [value - left_mean for value in left]
+    right_delta = [value - right_mean for value in right]
+    denominator = math.sqrt(
+        sum(value * value for value in left_delta)
+        * sum(value * value for value in right_delta)
+    )
+    return (
+        sum(a * b for a, b in zip(left_delta, right_delta)) / denominator
+        if denominator
+        else None
+    )
+
+
+def cosine(left: list[float], right: list[float]) -> float | None:
+    denominator = math.sqrt(
+        sum(value * value for value in left) * sum(value * value for value in right)
+    )
+    return sum(a * b for a, b in zip(left, right)) / denominator if denominator else None
+
+
+def replay_count_comparison(run_root: Path, archive: Path) -> list[dict[str, object]]:
+    outputs = sorted(run_root.rglob("mutation_histos.json"))
+    if not outputs:
+        return [{"status": "NOT_AVAILABLE"}]
+    names = [f"construct{i}" for i in range(7500)]
+    comparisons = []
+    with zipfile.ZipFile(archive) as handle:
+        official = {}
+        for condition in (
+            "pdb_library_1",
+            "pdb_library_2",
+            "pdb_library_3",
+            "pdb_library_37C_2min",
+            "pdb_library_denature",
+            "pdb_library_nomod",
+        ):
+            rows = json.loads(
+                handle.read(f"data/raw-jsons/constructs/{condition}.json")
+            )
+            official[condition] = {
+                row["name"]: int(row["num_reads"]) for row in rows
+            }
+    for output in outputs:
+        payload = json.loads(output.read_text(encoding="utf-8"))
+        rows = payload.values() if isinstance(payload, dict) else payload
+        probe_counts: dict[str, int] = {}
+        for key, row in (
+            payload.items() if isinstance(payload, dict) else ((None, row) for row in rows)
+        ):
+            name = row.get("name", key) if isinstance(row, dict) else key
+            if isinstance(name, str) and name.startswith("seq_"):
+                name = "construct" + name[4:]
+            if isinstance(name, str) and isinstance(row, dict):
+                probe_counts[name] = int(row.get("num_reads", 0))
+        left = [float(probe_counts.get(name, 0)) for name in names]
+        row_result = {
+            "output_relative_path": str(output.relative_to(run_root)),
+            "output_sha256": sha256_file(output),
+            "probe_entry_count": len(probe_counts),
+            "probe_num_reads_sum": int(sum(left)),
+            "status": "COUNT_VECTOR_COMPARISON_CANDIDATE_ONLY",
+            "conditions": [],
+        }
+        for condition, counts in official.items():
+            right = [float(counts.get(name, 0)) for name in names]
+            row_result["conditions"].append(
+                {
+                    "condition": condition,
+                    "official_num_reads_sum": int(sum(right)),
+                    "pearson": correlation(left, right),
+                    "spearman": correlation(rank(left), rank(right)),
+                    "cosine": cosine(left, right),
+                    "admission": "NOT_ADMITTED",
+                }
+            )
+        comparisons.append(row_result)
+    return comparisons
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-root", required=True, type=Path)
@@ -189,6 +290,7 @@ def main() -> int:
         "processed_archive": archive_summary(args.archive),
         "logs": [log_summary(path) for path in args.log],
         "outputs": output_inventory(args.run_root),
+        "replay_count_comparison": replay_count_comparison(args.run_root, args.archive),
         "primary_labels_admitted": False,
         "raw_sequence_content_emitted": False,
         "phase0_gate_effect": "NO_PHASE_0_PASS",
