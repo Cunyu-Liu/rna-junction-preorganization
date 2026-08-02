@@ -57,8 +57,6 @@ def main() -> int:
         raise SystemExit(f"refusing to overwrite report: {report}")
     if not source.is_file() or not audit_path.is_file():
         raise SystemExit("source and chunked audit must exist")
-    if target.exists():
-        raise SystemExit(f"refusing to overwrite existing target: {target}")
     if source == target:
         raise SystemExit("source and target must be different")
     audit = json.loads(audit_path.read_text(encoding="utf-8"))
@@ -71,11 +69,6 @@ def main() -> int:
     if not isinstance(expected_bytes, int) or not isinstance(expected_sha256, str):
         raise SystemExit("chunked audit lacks merged size/hash")
 
-    source_bytes = source.stat().st_size
-    source_sha256 = sha256(source)
-    if source_bytes != expected_bytes or source_sha256 != expected_sha256:
-        raise SystemExit("source changed or disagrees with terminal chunked audit")
-
     partial = Path(str(target) + ".partial")
     partial_record = {
         "path": str(partial),
@@ -83,6 +76,39 @@ def main() -> int:
         "size_bytes": partial.stat().st_size if partial.is_file() else None,
         "preserved": True,
     }
+    if target.exists():
+        target_bytes = target.stat().st_size
+        target_sha256 = sha256(target)
+        payload = {
+            "schema_version": "phase0-chunked-recovery-install-v1",
+            "status": "BLOCKED_TARGET_EXISTS_NO_OVERWRITE",
+            "installed_at_utc": datetime.now(timezone.utc).isoformat(),
+            "source": str(source),
+            "chunked_audit": str(audit_path),
+            "chunked_audit_sha256": sha256(audit_path),
+            "expected_bytes": expected_bytes,
+            "expected_sha256": expected_sha256,
+            "target": str(target),
+            "target_existed_before": True,
+            "target_bytes": target_bytes,
+            "target_sha256": target_sha256,
+            "target_matches_chunked_audit": target_bytes == expected_bytes and target_sha256 == expected_sha256,
+            "target_overwritten": False,
+            "partial": partial_record,
+            "scientific_labels_admitted": False,
+            "raw_sequence_content_emitted": False,
+            "scientific_gate_effect": "NO_PHASE_0_PASS",
+            "deletions": [],
+        }
+        dump_atomic(report, payload)
+        print(json.dumps({"status": payload["status"], "target": str(target), "target_matches_chunked_audit": payload["target_matches_chunked_audit"], "report": str(report)}, sort_keys=True))
+        return 2
+
+    source_bytes = source.stat().st_size
+    source_sha256 = sha256(source)
+    if source_bytes != expected_bytes or source_sha256 != expected_sha256:
+        raise SystemExit("source changed or disagrees with terminal chunked audit")
+
     target.parent.mkdir(parents=True, exist_ok=True)
     temporary = target.parent / f".{target.name}.install.{os.getpid()}.tmp"
     if temporary.exists():
