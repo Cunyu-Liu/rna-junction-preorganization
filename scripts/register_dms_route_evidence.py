@@ -76,6 +76,7 @@ def main() -> int:
     parser.add_argument("--oai-format-audit", type=Path)
     parser.add_argument("--github-public-audit", type=Path)
     parser.add_argument("--fastq-batch-audit", type=Path)
+    parser.add_argument("--partial-state-audit", type=Path)
     parser.add_argument("--raw-fastq-range-probe", type=Path)
     parser.add_argument("--downloader-control-audit", type=Path)
     parser.add_argument("--chunked-fastq-audit", type=Path)
@@ -101,6 +102,7 @@ def main() -> int:
     oai_format_audit_path = args.oai_format_audit.resolve() if args.oai_format_audit else None
     github_public_audit_path = args.github_public_audit.resolve() if args.github_public_audit else None
     fastq_batch_audit_path = args.fastq_batch_audit.resolve() if args.fastq_batch_audit else None
+    partial_state_audit_path = args.partial_state_audit.resolve() if args.partial_state_audit else None
     raw_fastq_range_probe_path = args.raw_fastq_range_probe.resolve() if args.raw_fastq_range_probe else None
     downloader_control_audit_path = args.downloader_control_audit.resolve() if args.downloader_control_audit else None
     chunked_fastq_audit_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
@@ -185,6 +187,13 @@ def main() -> int:
             raise SystemExit("FASTQ batch audit does not preserve the scientific stop rule")
         if fastq_batch_audit.get("raw_sequence_content_emitted") is not False or fastq_batch_audit.get("scientific_labels_admitted") is not False:
             raise SystemExit("FASTQ batch audit is not fail-closed")
+    partial_state_audit = None
+    if partial_state_audit_path is not None:
+        partial_state_audit = load(partial_state_audit_path)
+        if partial_state_audit.get("status") != "BATCH_PARTIAL_PENDING_OR_BLOCKED":
+            raise SystemExit("partial-state audit has an unexpected status")
+        if partial_state_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS" or partial_state_audit.get("raw_sequence_content_emitted") is not False or partial_state_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("partial-state audit is not fail-closed")
     raw_fastq_range_probe = None
     if raw_fastq_range_probe_path is not None:
         raw_fastq_range_probe = load(raw_fastq_range_probe_path)
@@ -273,6 +282,7 @@ def main() -> int:
     oai_format_rel = str(oai_format_audit_path.relative_to(artifact_root)) if oai_format_audit_path is not None else None
     github_public_rel = str(github_public_audit_path.relative_to(artifact_root)) if github_public_audit_path is not None else None
     fastq_batch_rel = str(fastq_batch_audit_path.relative_to(artifact_root)) if fastq_batch_audit_path is not None else None
+    partial_state_rel = str(partial_state_audit_path.relative_to(artifact_root)) if partial_state_audit_path is not None else None
     raw_fastq_range_rel = str(raw_fastq_range_probe_path.relative_to(artifact_root)) if raw_fastq_range_probe_path is not None else None
     downloader_control_rel = str(downloader_control_audit_path.relative_to(artifact_root)) if downloader_control_audit_path is not None else None
     chunked_fastq_rel = str(chunked_fastq_audit_path.relative_to(artifact_root)) if chunked_fastq_audit_path is not None else None
@@ -382,8 +392,14 @@ def main() -> int:
     if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
-            "kind": "public_raw_fastq_partial_state_audit_current",
+            "kind": "public_raw_fastq_batch_reconciliation_current",
             **relative_artifact(artifact_root, fastq_batch_audit_path, status=fastq_batch_audit["status"], selected_run_count=len(fastq_batch_audit.get("selected_runs", [])), failed_run_count=fastq_batch_audit.get("failed_run_count"), pending_run_count=fastq_batch_audit.get("pending_run_count"), raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
+        })
+    if partial_state_audit_path is not None and partial_state_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_raw_fastq_partial_state_audit_current",
+            **relative_artifact(artifact_root, partial_state_audit_path, status=partial_state_audit["status"], selected_run_count=len(partial_state_audit.get("selected_runs", [])), failed_run_count=partial_state_audit.get("failed_run_count"), pending_run_count=partial_state_audit.get("pending_run_count"), raw_sequence_content_emitted=False, scientific_labels_admitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
     if raw_fastq_range_probe_path is not None and raw_fastq_range_probe is not None:
         append_unique(inventory["artifacts"], {
@@ -481,7 +497,10 @@ def main() -> int:
             if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
                 source["fastq_batch_audit_path"] = fastq_batch_rel
                 source["fastq_batch_audit_status"] = fastq_batch_audit["status"]
-                source["raw_fastq_status"] = "PUBLIC_RAW_FASTQ_PARTIALS_PRESENT_PENDING_RECOVERY_AND_FINAL_INTEGRITY_AUDIT"
+                source["raw_fastq_status"] = "PUBLIC_RAW_FASTQ_FILE_RECONCILIATION_COMPLETE_PRESERVED_PARTIALS_AND_DMS_PAYLOAD_PENDING" if fastq_batch_audit["status"] == "BATCH_COMPLETE" else "PUBLIC_RAW_FASTQ_PARTIALS_PRESENT_PENDING_RECOVERY_AND_FINAL_INTEGRITY_AUDIT"
+            if partial_state_audit_path is not None and partial_state_audit is not None:
+                source["public_raw_fastq_partial_state_audit_current"] = partial_state_rel
+                source["public_raw_fastq_partial_state_audit_current_status"] = partial_state_audit["status"]
             if raw_fastq_range_probe_path is not None and raw_fastq_range_probe is not None:
                 source["public_raw_fastq_range_probe_current"] = raw_fastq_range_rel
                 source["public_raw_fastq_range_probe_current_status"] = raw_fastq_range_probe["status"]
@@ -547,6 +566,8 @@ def main() -> int:
         evidence.append(github_public_rel)
     if fastq_batch_audit_path is not None and fastq_batch_audit is not None and fastq_batch_rel not in evidence:
         evidence.append(fastq_batch_rel)
+    if partial_state_audit_path is not None and partial_state_audit is not None and partial_state_rel not in evidence:
+        evidence.append(partial_state_rel)
     for extra_rel in (raw_fastq_range_rel, downloader_control_rel, chunked_fastq_rel):
         if extra_rel is not None and extra_rel not in evidence:
             evidence.append(extra_rel)
@@ -580,7 +601,12 @@ def main() -> int:
     if github_public_audit_path is not None and github_public_audit is not None:
         acceptance["note"] += f" Official GitHub release/tree metadata returned {github_public_audit.get('status')} at {args.run_id}; release assets and repository payload-like paths were inventoried without downloading repository files, and this metadata cannot substitute for the external processed-DMS payload."
     if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
-        acceptance["note"] += f" A current fail-closed FASTQ partial-state audit at {args.run_id} returned {fastq_batch_audit.get('status')} for {len(fastq_batch_audit.get('selected_runs', []))} explicitly scoped runs; {fastq_batch_audit.get('failed_run_count')} run(s) still contain preserved partial files, so recovery and final integrity audit remain pending."
+        if fastq_batch_audit.get("status") == "BATCH_COMPLETE":
+            acceptance["note"] += f" A current final-file FASTQ reconciliation at {args.run_id} returned BATCH_COMPLETE with {len(fastq_batch_audit.get('selected_runs', []))} explicitly scoped runs; this remains raw-source evidence only and preserved partials are tracked separately."
+        else:
+            acceptance["note"] += f" A current fail-closed FASTQ partial-state audit at {args.run_id} returned {fastq_batch_audit.get('status')} for {len(fastq_batch_audit.get('selected_runs', []))} explicitly scoped runs; {fastq_batch_audit.get('failed_run_count')} run(s) still contain preserved partial files, so recovery and final integrity audit remain pending."
+    if partial_state_audit_path is not None and partial_state_audit is not None:
+        acceptance["note"] += f" The separately registered preserved-partial audit at {args.run_id} returned {partial_state_audit.get('status')} with {partial_state_audit.get('failed_run_count')} run(s) containing partial files; no partial was deleted or admitted as processed data."
     if raw_fastq_range_probe_path is not None and raw_fastq_range_probe is not None:
         acceptance["note"] += f" An isolated public ENA Range probe at {args.run_id} returned {raw_fastq_range_probe.get('status')} for {raw_fastq_range_probe.get('requested_range', {}).get('requested_bytes') if isinstance(raw_fastq_range_probe.get('requested_range'), dict) else 'unknown'} bytes; this raw-source transport evidence does not admit processed-DMS labels."
     if downloader_control_audit_path is not None and downloader_control_audit is not None:
@@ -646,6 +672,10 @@ def main() -> int:
             blockers.append(blocker)
     if fastq_batch_audit_path is not None and fastq_batch_audit is not None:
         blocker = f"The current FASTQ partial-state audit returned {fastq_batch_audit.get('status')} at {args.run_id}; preserved partial files remain and no recovery or final integrity PASS is accepted while the guarded downloader process exists."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if partial_state_audit_path is not None and partial_state_audit is not None:
+        blocker = f"The preserved-partial FASTQ audit returned {partial_state_audit.get('status')} at {args.run_id}; partial files remain retained and are not processed-DMS evidence."
         if blocker not in blockers:
             blockers.append(blocker)
     if final_fastq_audit_path is not None and final_fastq_audit is not None:

@@ -68,6 +68,7 @@ def main() -> int:
     parser.add_argument("--oai-format-audit", type=Path)
     parser.add_argument("--github-public-audit", type=Path)
     parser.add_argument("--fastq-batch-audit", type=Path)
+    parser.add_argument("--partial-state-audit", type=Path)
     parser.add_argument("--raw-fastq-range-probe", type=Path)
     parser.add_argument("--downloader-control-audit", type=Path)
     parser.add_argument("--chunked-fastq-audit", type=Path)
@@ -89,6 +90,7 @@ def main() -> int:
     oai_format_path = args.oai_format_audit.resolve() if args.oai_format_audit else None
     github_public_path = args.github_public_audit.resolve() if args.github_public_audit else None
     fastq_batch_path = args.fastq_batch_audit.resolve() if args.fastq_batch_audit else None
+    partial_state_path = args.partial_state_audit.resolve() if args.partial_state_audit else None
     raw_fastq_range_path = args.raw_fastq_range_probe.resolve() if args.raw_fastq_range_probe else None
     downloader_control_path = args.downloader_control_audit.resolve() if args.downloader_control_audit else None
     chunked_fastq_path = args.chunked_fastq_audit.resolve() if args.chunked_fastq_audit else None
@@ -184,6 +186,13 @@ def main() -> int:
             raise SystemExit("FASTQ batch audit does not preserve the scientific stop rule")
         if fastq_batch_audit.get("raw_sequence_content_emitted") is not False or fastq_batch_audit.get("scientific_labels_admitted") is not False:
             raise SystemExit("FASTQ batch audit is not fail-closed")
+    partial_state_audit = None
+    if partial_state_path is not None:
+        partial_state_audit = load_json(partial_state_path)
+        if partial_state_audit.get("status") != "BATCH_PARTIAL_PENDING_OR_BLOCKED":
+            raise SystemExit("partial-state audit has an unexpected status")
+        if partial_state_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS" or partial_state_audit.get("raw_sequence_content_emitted") is not False or partial_state_audit.get("scientific_labels_admitted") is not False:
+            raise SystemExit("partial-state audit is not fail-closed")
     raw_fastq_range_probe = None
     if raw_fastq_range_path is not None:
         raw_fastq_range_probe = load_json(raw_fastq_range_path)
@@ -344,6 +353,12 @@ def main() -> int:
         ledger["latest_fastq_batch_audit"] = file_record(fastq_batch_path)
         ledger["latest_fastq_batch_audit_status"] = fastq_batch_audit.get("status")
         ledger["latest_fastq_batch_scientific_gate_effect"] = fastq_batch_audit.get("scientific_gate_effect")
+    if partial_state_path is not None and partial_state_audit is not None:
+        route_evidence["latest_partial_state_audit"] = file_record(partial_state_path)
+        route_evidence["latest_partial_state_audit_status"] = partial_state_audit.get("status")
+        route_evidence["latest_partial_state_failed_run_count"] = partial_state_audit.get("failed_run_count")
+        ledger["latest_partial_state_audit"] = file_record(partial_state_path)
+        ledger["latest_partial_state_audit_status"] = partial_state_audit.get("status")
     if raw_fastq_range_path is not None and raw_fastq_range_probe is not None:
         route_evidence["latest_raw_fastq_range_probe"] = file_record(raw_fastq_range_path)
         route_evidence["latest_raw_fastq_range_probe_status"] = raw_fastq_range_probe.get("status")
@@ -431,7 +446,7 @@ def main() -> int:
                 requirement.setdefault("additional_evidence", [])
                 if str(fastq_batch_path) not in requirement["additional_evidence"]:
                     requirement["additional_evidence"].append(str(fastq_batch_path))
-            for extra_path in (raw_fastq_range_path, downloader_control_path, chunked_fastq_path, final_fastq_path, install_audit_path, reconstruction_path):
+            for extra_path in (raw_fastq_range_path, downloader_control_path, chunked_fastq_path, final_fastq_path, install_audit_path, reconstruction_path, partial_state_path):
                 if extra_path is not None:
                     requirement.setdefault("additional_evidence", [])
                     if str(extra_path) not in requirement["additional_evidence"]:
