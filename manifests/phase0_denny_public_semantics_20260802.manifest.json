@@ -1,0 +1,62 @@
+{
+  "schema_version": "phase0-denny-public-semantics-manifest-v1",
+  "status": "PUBLIC_SEMANTICS_BOUND_NO_CROSSWALK_UNLOCK",
+  "audited_at_utc": "2026-08-02T14:15:00Z",
+  "contract": {
+    "path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/contract/1.1.docx",
+    "sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9"
+  },
+  "public_source": {
+    "citation": "Denny et al., High-throughput investigation of diverse junction elements in RNA tertiary folding",
+    "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6053692/",
+    "doi": "10.1016/j.cell.2018.05.038",
+    "snapshot_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/pmc_bioc_PMC6053692.json",
+    "snapshot_sha256": "37d03a1b4c9dfe5cfb54f992d7e19a0c22ed0cfb06419e1db101b2309eec9f2a",
+    "snapshot_size_bytes": 151811,
+    "passage_count": 258
+  },
+  "audit": {
+    "script_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_denny_public_semantics.py",
+    "script_sha256": "49e790e5ab6cc8d963de27794ee6fbca68c56c193d80df6949f60fbcd3207b21",
+    "json_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/denny_public_semantics_20260802T141500Z.json",
+    "json_sha256": "b897baadae28c1aae49c28de75f0eafaccad4847e48d1bad3720094a2c860175",
+    "log_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/denny_public_semantics_20260802T141500Z.log",
+    "log_sha256": "003db47c298b6ea82936bcdc580e302a1b3aed66fd02e136d292d5390d5ba68e",
+    "required_fact_count": 7,
+    "missing_fact_count": 0,
+    "fact_evidence_counts": {
+      "censor_upper_bound": 1,
+      "nonbinder_direction": 1,
+      "same_context_median_interpolation": 1,
+      "nearest_fingerprint_interpolation": 1,
+      "interpolation_only_for_comparative_analysis": 1,
+      "nine_scaffold_context": 1,
+      "nine_to_eleven_bp_context": 1
+    }
+  },
+  "semantic_decisions": {
+    "censor_direction": "UPPER_BOUND_CAP_AT_DELTA_G_MINUS_7_1",
+    "same_context_missing_value_rule": "MEDIAN_OF_OTHER_MOTIFS_IN_SAME_CHIP_SCAFFOLD_FLOW_PIECE_CONTEXT",
+    "dissimilar_context_missing_value_rule": "MEDIAN_OF_20_NEAREST_FINGERPRINTS_WITHIN_0_2_KCAL_MOL_MAD_USING_MEASURED_CONTEXTS",
+    "interpolated_values_admitted_to_individual_data_point_plots": false
+  },
+  "gate_effect": {
+    "semantic_definition_subcomponent": "PASS_BOUND_TO_PUBLIC_SOURCE",
+    "raw_processed_accession_crosswalk": "UNRESOLVED",
+    "manual_matching_acceptance": "PENDING",
+    "primary_labels_admitted": false,
+    "phase0_gate_effect": "NO_PHASE_0_PASS",
+    "scientific_gate_effect": "NO_UNLOCK",
+    "gpu_training_started": false
+  },
+  "report": {
+    "path": "reports/phase0_denny_public_semantics_20260802.md",
+    "sha256": "436aea8c96c598595855766ccb6507c1e94d23027aa07317cbdbe81838ecff3d"
+  },
+  "safety": {
+    "raw_sequence_content_emitted": false,
+    "raw_workbook_values_emitted": false,
+    "primary_labels_emitted": false,
+    "existing_results_overwritten": false
+  }
+}
