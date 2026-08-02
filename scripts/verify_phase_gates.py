@@ -123,7 +123,10 @@ def main() -> int:
         violations.append("METADATA_ONLY_AUDIT_CANNOT_BE_PHASE_0_PASS")
     if matching.get("primary_labels_admitted") is not False:
         violations.append("MATCHING_AUDIT_MUST_NOT_ADMIT_PRIMARY_LABELS_WHILE_BLOCKED")
-    if matching.get("status") != "BLOCKED_PENDING_PRIMARY_PAYLOADS":
+    if matching.get("status") not in {
+        "BLOCKED_PENDING_PRIMARY_PAYLOADS",
+        "BLOCKED_RAW_PROCESSED_CROSSWALK_AND_MANUAL_REVIEW_PENDING",
+    }:
         violations.append("MATCHING_AUDIT_STATUS_MUST_REMAIN_BLOCKED_WHILE_PHASE_0_INCOMPLETE")
 
     for artifact in payload_inventory.get("artifacts", []):

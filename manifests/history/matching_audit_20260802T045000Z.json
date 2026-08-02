@@ -1,7 +1,7 @@
 {
   "schema_version": "phase0-matching-audit-v0",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "status": "BLOCKED_RAW_PROCESSED_CROSSWALK_AND_MANUAL_REVIEW_PENDING",
+  "status": "BLOCKED_PENDING_PRIMARY_PAYLOADS",
   "evidence_class": "AUDIT_SCHEMA_ONLY_NO_MATCHING_ROWS",
   "primary_labels_admitted": false,
   "matching_scope": {
@@ -42,10 +42,10 @@
     "observed_rejected_or_ambiguous_cases": null,
     "matching_accuracy": null,
     "fatal_ambiguity": null,
-    "status": "NOT_STARTED_CROSSWALK_AND_REVIEW_PENDING"
+    "status": "NOT_STARTED_PRIMARY_PAYLOADS_UNAVAILABLE"
   },
   "blocking_reasons": [
-    "Official processed-DMS archive and condition-level construct identity are verified, but raw FASTQ to processed-DMS crosswalk is not bound to the official ENA/SRA run manifest.",
+    "DMS JSON/supplementary payload has not been obtained or validated.",
     "Denny exact 1687/1713/1636 subset mapping is unresolved.",
     "The contract-required canonical motif and split-group semantics are not frozen.",
     "No manual matched/rejected_or_ambiguous review has been performed."
@@ -54,13 +54,7 @@
     "figshare_probe": "phase0/source_metadata/figshare_api_27880434.probe",
     "oup_probe": "phase0/source_metadata/oup_supplement_endpoint.probe",
     "source_registry": "manifests/data_registry.json",
-    "phase_status": "manifests/phase_status.json",
-    "official_processed_payload": "phase0/audits/official_construct_identity_20260802T044000Z.json",
-    "official_processed_payload_sha256": "241d15141298ce78471b360f598fd981c7870aab5ba19b9716f64b057bdfd681",
-    "official_construct_identity_audit": "phase0/audits/official_construct_identity_20260802T044000Z.json",
-    "official_construct_identity_audit_sha256": "40fc3d7513ec8047ab53ad9ba7a41d13f66748b5be574e7819f8b8be92867a81"
+    "phase_status": "manifests/phase_status.json"
   },
-  "gate_effect": "NO_PHASE_0_PASS",
-  "refreshed_at_utc": "2026-08-02T04:33:20Z",
-  "raw_sequence_content_emitted": false
+  "gate_effect": "NO_PHASE_0_PASS"
 }

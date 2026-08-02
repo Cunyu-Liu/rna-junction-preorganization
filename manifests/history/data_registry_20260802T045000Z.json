@@ -486,16 +486,6 @@
       "construct_condition_sequence_count": 7500,
       "raw_processed_run_crosswalk_status": "BLOCKED_NO_DIRECT_SRA_RUN_TOKEN_IN_OFFICIAL_ARCHIVE_MEMBER_NAMES",
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T045000Z",
-      "matching_audit": "manifests/matching_audit.json",
-      "matching_audit_sha256": "cb72aa2bfb2f0825ad3ce720d4fc589c17249a1397838ab5b8e56c9ad8a968fb",
-      "matching_audit_status": "BLOCKED_RAW_PROCESSED_CROSSWALK_AND_MANUAL_REVIEW_PENDING",
-      "official_construct_identity_audit": "phase0/audits/official_construct_identity_20260802T044000Z.json",
-      "raw_processed_run_crosswalk_status": "BLOCKED_NO_DIRECT_SRA_RUN_TOKEN_IN_OFFICIAL_ARCHIVE_MEMBER_NAMES",
-      "manual_review_status": "NOT_STARTED_CROSSWALK_AND_REVIEW_PENDING",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "registry_version": "phase0-source-registry-v0",
@@ -739,6 +729,5 @@
       "source_id": "second_system_tlr_qmapseq"
     }
   ],
-  "status": "PHASE_0_OFFICIAL_PROCESSED_DMS_PAYLOAD_ACQUIRED_IDENTITY_RECONCILIATION_PENDING",
-  "matching_audit_status": "BLOCKED_RAW_PROCESSED_CROSSWALK_AND_MANUAL_REVIEW_PENDING"
+  "status": "PHASE_0_OFFICIAL_PROCESSED_DMS_PAYLOAD_ACQUIRED_IDENTITY_RECONCILIATION_PENDING"
 }
