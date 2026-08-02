@@ -1,0 +1,83 @@
+{
+  "audit_id": "phase0_public_source_crosswalk_recovery_20260802T050305Z",
+  "status": "PARTIAL_OFFICIAL_RUN_METADATA_BINDING_NO_PHASE0_PASS",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "retrieved_at_utc": "2026-08-02T05:03:05Z",
+  "sources": [
+    {
+      "kind": "figshare_article_version_1",
+      "url": "https://api.figshare.com/v2/articles/27880434/versions/1",
+      "file_id": 50690154,
+      "file_name": "data.zip",
+      "size_bytes": 198884358,
+      "merged_sha256": "7baf2487f0e7d75ae109eeb48c943171c6ba923f17da128e755f5e4534c7130b",
+      "zip_crc": "PASS",
+      "archive_member_count": 3144
+    },
+    {
+      "kind": "figshare_article_file_catalog_current",
+      "url": "https://api.figshare.com/v2/articles/27880434",
+      "current_files": ["farfar-models.zip", "data.zip", "pngs.zip"],
+      "sequences_xlsx_as_independent_file": false
+    },
+    {
+      "kind": "official_supplementary_document",
+      "url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC11601540.1/media-1.docx",
+      "sha256": "97a0fb87740ea8628b0a2eadfb599399e15f461ff16c71fc013ab4e28ffdcad0",
+      "observation": "The paper text references Sequences.xlsx, but this public supplemental DOCX contains figures/tables and no embedded Sequences.xlsx or raw-run crosswalk."
+    },
+    {
+      "kind": "official_analysis_repository",
+      "url": "https://github.com/YesselmanLabPublications/2025_char_3d_struct_features",
+      "head_sha": "ed75e36bb36dc2f32c866c436c437d88a4743cf8",
+      "tags_checked": ["v1.0.0", "v1.1.0"],
+      "observation": "Complete public Git history contains no Sequences.xlsx, SRA/ENA sample sheet, accession crosswalk, or run manifest."
+    },
+    {
+      "kind": "ncbi_sra_runinfo",
+      "url": "https://trace.ncbi.nlm.nih.gov/Traces/sra-db-be/runinfo?acc=PRJNA1188187",
+      "sha256": "026ecfda5c90ff034648249fe8eba9ab569a701c9a30a9da7c77088140c49f5e",
+      "row_count": 15
+    }
+  ],
+  "historical_archive_chunk_audit": {
+    "chunk_size_bytes": 134217728,
+    "chunks": [
+      {"start": 0, "end": 134217727, "size_bytes": 134217728, "sha256": "8effcf2b8ea451a78fcc82dc4ad61a88e68fb9eefe6edbd56a19052d5b1ad3a0"},
+      {"start": 134217728, "end": 198884357, "size_bytes": 64666630, "sha256": "d74fb8784b83eaa6def9f724d75b0193cef3a463552211faddc87643a5215888"}
+    ],
+    "merge_order": "ascending byte range with no overlap",
+    "merge_output_sha256": "7baf2487f0e7d75ae109eeb48c943171c6ba923f17da128e755f5e4534c7130b",
+    "member_search": {
+      "sequences_xlsx_members": [],
+      "run_accession_members": [],
+      "sample_manifest_members": [],
+      "construct_condition_members": [
+        "data/raw-jsons/constructs/pdb_library_1.json",
+        "data/raw-jsons/constructs/pdb_library_2.json",
+        "data/raw-jsons/constructs/pdb_library_3.json",
+        "data/raw-jsons/constructs/pdb_library_nomod.json",
+        "data/csvs/library_sequences.csv"
+      ]
+    }
+  },
+  "official_sra_library_metadata_candidates": [
+    {"run": "SRR38259812", "library_name": "rna_lib_37C_2min", "candidate_processed_condition": "pdb_library_37C_2min", "decision": "CANDIDATE_ONLY_NAME_SEMANTICS_NOT_ACCEPTED"},
+    {"run": "SRR35766785", "library_name": "rna_library_denature", "candidate_processed_condition": "pdb_library_denature", "decision": "CANDIDATE_ONLY_NAME_SEMANTICS_NOT_ACCEPTED"},
+    {"run": "SRR35766784", "library_name": "rna_library_nomod", "candidate_processed_condition": "pdb_library_nomod", "decision": "CANDIDATE_ONLY_NAME_SEMANTICS_NOT_ACCEPTED"},
+    {"run": "SRR31402664", "library_name": "rna_library_trial1", "candidate_processed_condition": "pdb_library_1|pdb_library_2|pdb_library_3", "decision": "AMBIGUOUS_UNRESOLVED"},
+    {"run": "SRR31402663", "library_name": "rna_library_trial2", "candidate_processed_condition": "pdb_library_1|pdb_library_2|pdb_library_3", "decision": "AMBIGUOUS_UNRESOLVED"}
+  ],
+  "blocking_findings": [
+    "The public SRA metadata exposes five relevant library names but does not name the processed pickle/JSON output for the trial1/trial2 runs.",
+    "The public Figshare archive history and complete official Git history do not contain Sequences.xlsx or a raw-run-to-processed crosswalk.",
+    "The current processed payload audit contains six condition files, while the historical archive audit contains four construct condition files; version differences do not resolve the run binding.",
+    "No contract-required human review rows exist; no manual matched/rejected_or_ambiguous acceptance threshold is met."
+  ],
+  "gate_effect": {
+    "phase0_gate_effect": "NO_PHASE_0_PASS",
+    "scientific_gate_effect": "NO_UNLOCK",
+    "primary_labels_admitted": false,
+    "training_started": false
+  }
+}
