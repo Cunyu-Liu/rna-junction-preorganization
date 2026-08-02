@@ -84,6 +84,7 @@ def main() -> int:
     parser.add_argument("--final-fastq-audit", type=Path)
     parser.add_argument("--raw-fastq-install-audit", type=Path)
     parser.add_argument("--reconstruction-feasibility-audit", type=Path)
+    parser.add_argument("--pmc-supplementary-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
@@ -110,6 +111,7 @@ def main() -> int:
     final_fastq_audit_path = args.final_fastq_audit.resolve() if args.final_fastq_audit else None
     install_audit_path = args.raw_fastq_install_audit.resolve() if args.raw_fastq_install_audit else None
     reconstruction_path = args.reconstruction_feasibility_audit.resolve() if args.reconstruction_feasibility_audit else None
+    pmc_supplementary_path = args.pmc_supplementary_audit.resolve() if args.pmc_supplementary_audit else None
     additional_range_audit_paths = [path.resolve() for path in args.additional_range_audit]
     route = load(route_path)
     ledger = load(ledger_path)
@@ -249,6 +251,26 @@ def main() -> int:
             raise SystemExit("reconstruction feasibility audit has an unexpected status")
         if reconstruction_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS" or reconstruction_audit.get("raw_sequence_content_emitted") is not False or reconstruction_audit.get("primary_labels_admitted") is not False:
             raise SystemExit("reconstruction feasibility audit is not fail-closed")
+    pmc_supplementary_audit = None
+    if pmc_supplementary_path is not None:
+        pmc_supplementary_audit = load(pmc_supplementary_path)
+        if pmc_supplementary_audit.get("status") != "PUBLIC_SUPPLEMENTARY_SCHEMA_AUDITED_MAIN_DMS_PAYLOAD_NOT_ADMITTED":
+            raise SystemExit("PMC supplementary audit has an unexpected status")
+        if pmc_supplementary_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+            raise SystemExit("PMC supplementary audit does not preserve the scientific stop rule")
+        classification = pmc_supplementary_audit.get("content_classification", {})
+        for field in (
+            "construct_reference_fasta_available",
+            "construct_sequence_structure_mapping_available",
+            "mutation_histograms_available",
+            "processed_construct_json_available",
+            "background_read_depth_hierarchy_available",
+            "raw_sequence_content_emitted",
+            "primary_labels_admitted",
+            "is_substitute_for_figshare_processed_payload",
+        ):
+            if classification.get(field) is not False:
+                raise SystemExit(f"PMC supplementary audit is not fail-closed: {field}")
     additional_range_audits = []
     for additional_range_audit_path in additional_range_audit_paths:
         additional_range_audit = load(additional_range_audit_path)
@@ -290,6 +312,7 @@ def main() -> int:
     final_fastq_rel = str(final_fastq_audit_path.relative_to(artifact_root)) if final_fastq_audit_path is not None else None
     install_audit_rel = str(install_audit_path.relative_to(artifact_root)) if install_audit_path is not None else None
     reconstruction_rel = str(reconstruction_path.relative_to(artifact_root)) if reconstruction_path is not None else None
+    pmc_supplementary_rel = str(pmc_supplementary_path.relative_to(artifact_root)) if pmc_supplementary_path is not None else None
     additional_range_rels = [str(path.relative_to(artifact_root)) for path in additional_range_audit_paths]
     now = datetime.now(timezone.utc).isoformat()
 
@@ -443,6 +466,26 @@ def main() -> int:
             "kind": "dms_reconstruction_feasibility_audit_current",
             **relative_artifact(artifact_root, reconstruction_path, status=reconstruction_audit["status"], required_next_evidence=reconstruction_audit.get("required_next_evidence"), raw_sequence_content_emitted=False, primary_labels_admitted=False, scientific_gate_effect="NO_PHASE_0_PASS"),
         })
+    if pmc_supplementary_path is not None and pmc_supplementary_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_pmc_supplementary_schema_audit_current",
+            **relative_artifact(
+                artifact_root,
+                pmc_supplementary_path,
+                status=pmc_supplementary_audit["status"],
+                pmcid=pmc_supplementary_audit.get("source", {}).get("pmcid"),
+                scope=pmc_supplementary_audit.get("content_classification", {}).get("scope"),
+                construct_reference_fasta_available=False,
+                construct_sequence_structure_mapping_available=False,
+                mutation_histograms_available=False,
+                processed_construct_json_available=False,
+                processed_payload_admitted=False,
+                raw_sequence_content_emitted=False,
+                primary_labels_admitted=False,
+                scientific_gate_effect="NO_PHASE_0_PASS",
+            ),
+        })
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
@@ -458,7 +501,10 @@ def main() -> int:
     registry_path = manifests / "data_registry.json"
     registry = load(registry_path)
     registry["metadata_audit_status"] = "PARTIAL_METADATA_AND_PUBLIC_FASTQ_INVENTORY_NOT_PHASE0_PASS"
-    registry.setdefault("phase0_evidence_updates", []).append({"run_id": args.run_id, "processed_dms_route_reprobe": route_rel, "dms_dependency_ledger": ledger_rel, "scientific_gate_effect": "NO_PHASE_0_PASS"})
+    evidence_update = {"run_id": args.run_id, "processed_dms_route_reprobe": route_rel, "dms_dependency_ledger": ledger_rel, "scientific_gate_effect": "NO_PHASE_0_PASS"}
+    if pmc_supplementary_rel is not None:
+        evidence_update["pmc_supplementary_audit"] = pmc_supplementary_rel
+    registry.setdefault("phase0_evidence_updates", []).append(evidence_update)
     for source in registry.get("sources", []):
         if source.get("source_id") == "deenalattha_2026_dms":
             source["processed_dms_payload_latest_readme_route_reprobe_current"] = route_rel
@@ -530,6 +576,10 @@ def main() -> int:
                 source["dms_reconstruction_feasibility_audit_current"] = reconstruction_rel
                 source["dms_reconstruction_feasibility_audit_current_status"] = reconstruction_audit["status"]
                 source["dms_reconstruction_status"] = reconstruction_audit["status"]
+            if pmc_supplementary_path is not None and pmc_supplementary_audit is not None:
+                source["public_pmc_supplementary_schema_audit_current"] = pmc_supplementary_rel
+                source["public_pmc_supplementary_schema_audit_current_status"] = pmc_supplementary_audit["status"]
+                source["public_pmc_supplementary_main_payload_admitted"] = False
             if additional_range_audit_paths:
                 source["processed_dms_payload_additional_range_probes_current"] = additional_range_rels
                 source["processed_dms_payload_additional_range_probes_current_status"] = [audit["status"] for audit in additional_range_audits]
@@ -577,6 +627,8 @@ def main() -> int:
     for extra_rel in (install_audit_rel, reconstruction_rel):
         if extra_rel is not None and extra_rel not in evidence:
             evidence.append(extra_rel)
+    if pmc_supplementary_path is not None and pmc_supplementary_audit is not None and pmc_supplementary_rel not in evidence:
+        evidence.append(pmc_supplementary_rel)
     if partial_size_audit_path is not None and partial_size_audit is not None and partial_size_rel not in evidence:
         evidence.append(partial_size_rel)
     for additional_range_rel in additional_range_rels:
@@ -622,6 +674,9 @@ def main() -> int:
         acceptance["note"] += f" The guarded raw FASTQ install audit at {args.run_id} returned {install_audit.get('status')}; the existing final target was not overwritten and target_matches_chunked_audit={install_audit.get('target_matches_chunked_audit')}."
     if reconstruction_path is not None and reconstruction_audit is not None:
         acceptance["note"] += f" The DMS reconstruction feasibility audit at {args.run_id} returned {reconstruction_audit.get('status')}; construct-level source inputs and processed-DMS hierarchy remain unadmitted."
+    if pmc_supplementary_path is not None and pmc_supplementary_audit is not None:
+        table_count = pmc_supplementary_audit.get("source", {}).get("docx", {}).get("schema", {}).get("table_count")
+        acceptance["note"] += f" The official Europe PMC supplementary package audit at {args.run_id} found article figures and {table_count} summary/example table(s), but no construct FASTA, sequence/structure mapping, mutation histograms, background/read-depth hierarchy, or processed construct JSON; the package is not admitted as the Figshare processed-DMS payload."
     if additional_range_audit_paths:
         acceptance["note"] += f" Newly discovered Figshare file IDs were each subjected to one exact 128 MiB Range probe at {args.run_id}; all recorded results remain fail-closed and no complete payload was admitted."
     dump_atomic(acceptance_path, acceptance)
@@ -689,6 +744,10 @@ def main() -> int:
             blockers.append(blocker)
     if reconstruction_path is not None and reconstruction_audit is not None:
         blocker = f"The DMS reconstruction feasibility audit returned {reconstruction_audit.get('status')} at {args.run_id}; construct-level mutation histograms/reference mapping/count-background-depth inputs are not sufficient for Phase 0."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if pmc_supplementary_path is not None and pmc_supplementary_audit is not None:
+        blocker = f"The Europe PMC supplementary schema audit returned {pmc_supplementary_audit.get('status')} at {args.run_id}; article summary/example tables do not substitute for the Figshare processed-DMS payload or construct-level primary labels."
         if blocker not in blockers:
             blockers.append(blocker)
     if raw_fastq_range_probe_path is not None and raw_fastq_range_probe is not None:

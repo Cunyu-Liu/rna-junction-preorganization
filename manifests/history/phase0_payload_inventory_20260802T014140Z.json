@@ -1563,25 +1563,6 @@
       "scientific_labels_admitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_pmc_supplementary_schema_audit_current",
-      "relative_path": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
-      "exists": true,
-      "size_bytes": 3972,
-      "sha256": "c094513b1a0b4963cf048e6c7bf97841e00c0070131aff50a0d5406627c16ae6",
-      "status": "PUBLIC_SUPPLEMENTARY_SCHEMA_AUDITED_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
-      "pmcid": "PMC11601540",
-      "scope": "article_figures_and_summary_tables",
-      "construct_reference_fasta_available": false,
-      "construct_sequence_structure_mapping_available": false,
-      "mutation_histograms_available": false,
-      "processed_construct_json_available": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1603,7 +1584,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-02T01:41:40.490777+00:00",
+  "last_refresh_utc": "2026-08-02T01:26:06.469497+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
