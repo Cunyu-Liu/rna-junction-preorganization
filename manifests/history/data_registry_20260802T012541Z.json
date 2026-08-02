@@ -60,7 +60,7 @@
       "license_status": "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED",
       "public_raw_fastq_route": "ENA_filereport_and_FASTQ_mirror",
       "public_raw_fastq_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "raw_fastq_status": "PUBLIC_RAW_FASTQ_FILE_RECONCILIATION_COMPLETE_PRESERVED_PARTIALS_AND_DMS_PAYLOAD_PENDING",
+      "raw_fastq_status": "PUBLIC_RAW_FASTQ_ISOLATED_RECOVERY_FINAL_INTEGRITY_COMPLETE_PENDING_SELECTED_BATCH_CLOSURE",
       "figshare_status": "BLOCKED_HTTP_403_DIRECT_AND_NDOWNLOADER_ROUTES_PRESERVED",
       "download_failure_status": "PRESERVED_PARTIAL_FAILURES",
       "download_failure_events": [
@@ -633,12 +633,6 @@
     },
     {
       "run_id": "20260802T012312Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T012541Z",
       "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS"

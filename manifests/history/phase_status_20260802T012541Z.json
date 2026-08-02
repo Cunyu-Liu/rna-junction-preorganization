@@ -170,20 +170,9 @@
     "The ENA raw FASTQ Range probe returned RANGE_PROBE_206_EXACT at 20260802T012312Z; this transport result is not processed-DMS evidence and cannot unlock Phase 0.",
     "The guarded downloader control audit recorded SIGSTOP at 20260802T012312Z; the preserved partial remains evidence-only until a terminal final integrity audit passes.",
     "The isolated 128 MiB chunked raw FASTQ recovery audit is CHUNKED_MERGE_COMPLETE_GZIP_OK at 20260802T012312Z; raw FASTQ cannot substitute for processed-DMS hierarchy or primary labels.",
-    "A preserved partial-size regression was frozen at 20260802T012312Z (2003124224 vs prior 2361352192 bytes); final integrity and recovery remain unresolved.",
-    "The latest official processed-DMS route re-probe (20260802T012541Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "A real 128 MiB Range GET probe at 20260802T012541Z returned HTTP 403 with zero body bytes and no Content-Range; no processed-DMS chunk is admitted and the payload download gate remains closed.",
-    "The current FASTQ partial-state audit returned BATCH_COMPLETE at 20260802T012541Z; preserved partial files remain and no recovery or final integrity PASS is accepted while the guarded downloader process exists.",
-    "The preserved-partial FASTQ audit returned BATCH_PARTIAL_PENDING_OR_BLOCKED at 20260802T012541Z; partial files remain retained and are not processed-DMS evidence.",
-    "The isolated raw FASTQ final-integrity audit returned FASTQ_PAYLOAD_AUDIT_COMPLETE at 20260802T012541Z; it remains raw-source evidence only and the processed-DMS/Phase 0 gate stays locked.",
-    "The guarded raw FASTQ install audit returned BLOCKED_TARGET_EXISTS_NO_OVERWRITE at 20260802T012541Z; no existing final target was overwritten and raw-source evidence remains separate from processed-DMS evidence.",
-    "The DMS reconstruction feasibility audit returned BLOCKED_RECONSTRUCTION_INPUTS_MISSING at 20260802T012541Z; construct-level mutation histograms/reference mapping/count-background-depth inputs are not sufficient for Phase 0.",
-    "The ENA raw FASTQ Range probe returned RANGE_PROBE_206_EXACT at 20260802T012541Z; this transport result is not processed-DMS evidence and cannot unlock Phase 0.",
-    "The guarded downloader control audit recorded SIGSTOP at 20260802T012541Z; the preserved partial remains evidence-only until a terminal final integrity audit passes.",
-    "The isolated 128 MiB chunked raw FASTQ recovery audit is CHUNKED_MERGE_COMPLETE_GZIP_OK at 20260802T012541Z; raw FASTQ cannot substitute for processed-DMS hierarchy or primary labels.",
-    "A preserved partial-size regression was frozen at 20260802T012541Z (2003124224 vs prior 2361352192 bytes); final integrity and recovery remain unresolved."
+    "A preserved partial-size regression was frozen at 20260802T012312Z (2003124224 vs prior 2361352192 bytes); final integrity and recovery remain unresolved."
   ],
-  "last_transition": "2026-08-02T01:26:06.469497+00:00",
+  "last_transition": "2026-08-02T01:24:01.792234+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json",
   "scientific_gate_effect": "NO_UNLOCK"
 }
