@@ -86,6 +86,7 @@ def main() -> int:
     parser.add_argument("--reconstruction-feasibility-audit", type=Path)
     parser.add_argument("--pmc-supplementary-audit", type=Path)
     parser.add_argument("--biorxiv-supplementary-audit", type=Path)
+    parser.add_argument("--source-reconstruction-boundary-audit", type=Path)
     parser.add_argument("--additional-range-audit", action="append", type=Path, default=[])
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args()
@@ -114,6 +115,7 @@ def main() -> int:
     reconstruction_path = args.reconstruction_feasibility_audit.resolve() if args.reconstruction_feasibility_audit else None
     pmc_supplementary_path = args.pmc_supplementary_audit.resolve() if args.pmc_supplementary_audit else None
     biorxiv_supplementary_path = args.biorxiv_supplementary_audit.resolve() if args.biorxiv_supplementary_audit else None
+    source_reconstruction_boundary_path = args.source_reconstruction_boundary_audit.resolve() if args.source_reconstruction_boundary_audit else None
     additional_range_audit_paths = [path.resolve() for path in args.additional_range_audit]
     route = load(route_path)
     ledger = load(ledger_path)
@@ -297,6 +299,22 @@ def main() -> int:
             expected = True if field == "page_is_metadata_only" else False
             if classification.get(field) is not expected:
                 raise SystemExit(f"bioRxiv supplementary audit is not fail-closed: {field}")
+    source_reconstruction_boundary_audit = None
+    if source_reconstruction_boundary_path is not None:
+        source_reconstruction_boundary_audit = load(source_reconstruction_boundary_path)
+        if source_reconstruction_boundary_audit.get("status") != "BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT":
+            raise SystemExit("source reconstruction boundary audit has an unexpected status")
+        for field in (
+            "official_construct_identity_proven",
+            "algorithmic_equivalence_proven",
+            "processed_dms_payload_admitted",
+            "primary_labels_admitted",
+            "raw_sequence_content_emitted",
+        ):
+            if source_reconstruction_boundary_audit.get(field) is not False:
+                raise SystemExit(f"source reconstruction boundary audit is not fail-closed: {field}")
+        if source_reconstruction_boundary_audit.get("scientific_gate_effect") != "NO_PHASE_0_PASS":
+            raise SystemExit("source reconstruction boundary audit does not preserve the scientific stop rule")
     additional_range_audits = []
     for additional_range_audit_path in additional_range_audit_paths:
         additional_range_audit = load(additional_range_audit_path)
@@ -340,6 +358,7 @@ def main() -> int:
     reconstruction_rel = str(reconstruction_path.relative_to(artifact_root)) if reconstruction_path is not None else None
     pmc_supplementary_rel = str(pmc_supplementary_path.relative_to(artifact_root)) if pmc_supplementary_path is not None else None
     biorxiv_supplementary_rel = str(biorxiv_supplementary_path.relative_to(artifact_root)) if biorxiv_supplementary_path is not None else None
+    source_reconstruction_boundary_rel = str(source_reconstruction_boundary_path.relative_to(artifact_root)) if source_reconstruction_boundary_path is not None else None
     additional_range_rels = [str(path.relative_to(artifact_root)) for path in additional_range_audit_paths]
     now = datetime.now(timezone.utc).isoformat()
 
@@ -531,6 +550,24 @@ def main() -> int:
                 scientific_gate_effect="NO_PHASE_0_PASS",
             ),
         })
+    if source_reconstruction_boundary_path is not None and source_reconstruction_boundary_audit is not None:
+        append_unique(inventory["artifacts"], {
+            "source_id": "deenalattha_2026_dms",
+            "kind": "public_source_reconstruction_boundary_audit_current",
+            **relative_artifact(
+                artifact_root,
+                source_reconstruction_boundary_path,
+                status=source_reconstruction_boundary_audit["status"],
+                source_git_head=source_reconstruction_boundary_audit.get("source_git_head"),
+                required_input_inventory=source_reconstruction_boundary_audit.get("required_input_inventory"),
+                official_construct_identity_proven=False,
+                algorithmic_equivalence_proven=False,
+                processed_dms_payload_admitted=False,
+                primary_labels_admitted=False,
+                raw_sequence_content_emitted=False,
+                scientific_gate_effect="NO_PHASE_0_PASS",
+            ),
+        })
     for additional_range_audit_path, additional_range_audit in zip(additional_range_audit_paths, additional_range_audits):
         append_unique(inventory["artifacts"], {
             "source_id": "deenalattha_2026_dms",
@@ -551,6 +588,8 @@ def main() -> int:
         evidence_update["pmc_supplementary_audit"] = pmc_supplementary_rel
     if biorxiv_supplementary_rel is not None:
         evidence_update["biorxiv_supplementary_audit"] = biorxiv_supplementary_rel
+    if source_reconstruction_boundary_rel is not None:
+        evidence_update["source_reconstruction_boundary_audit"] = source_reconstruction_boundary_rel
     registry.setdefault("phase0_evidence_updates", []).append(evidence_update)
     for source in registry.get("sources", []):
         if source.get("source_id") == "deenalattha_2026_dms":
@@ -631,6 +670,11 @@ def main() -> int:
                 source["public_biorxiv_supplementary_route_audit_current"] = biorxiv_supplementary_rel
                 source["public_biorxiv_supplementary_route_audit_current_status"] = biorxiv_supplementary_audit["status"]
                 source["public_biorxiv_sequences_xlsx_link_present"] = False
+            if source_reconstruction_boundary_path is not None and source_reconstruction_boundary_audit is not None:
+                source["public_source_reconstruction_boundary_audit_current"] = source_reconstruction_boundary_rel
+                source["public_source_reconstruction_boundary_audit_current_status"] = source_reconstruction_boundary_audit["status"]
+                source["public_source_algorithmic_equivalence_proven"] = False
+                source["public_source_official_construct_identity_proven"] = False
             if additional_range_audit_paths:
                 source["processed_dms_payload_additional_range_probes_current"] = additional_range_rels
                 source["processed_dms_payload_additional_range_probes_current_status"] = [audit["status"] for audit in additional_range_audits]
@@ -682,6 +726,8 @@ def main() -> int:
         evidence.append(pmc_supplementary_rel)
     if biorxiv_supplementary_path is not None and biorxiv_supplementary_audit is not None and biorxiv_supplementary_rel not in evidence:
         evidence.append(biorxiv_supplementary_rel)
+    if source_reconstruction_boundary_path is not None and source_reconstruction_boundary_audit is not None and source_reconstruction_boundary_rel not in evidence:
+        evidence.append(source_reconstruction_boundary_rel)
     if partial_size_audit_path is not None and partial_size_audit is not None and partial_size_rel not in evidence:
         evidence.append(partial_size_rel)
     for additional_range_rel in additional_range_rels:
@@ -732,6 +778,8 @@ def main() -> int:
         acceptance["note"] += f" The official Europe PMC supplementary package audit at {args.run_id} found article figures and {table_count} summary/example table(s), but no construct FASTA, sequence/structure mapping, mutation histograms, background/read-depth hierarchy, or processed construct JSON; the package is not admitted as the Figshare processed-DMS payload."
     if biorxiv_supplementary_path is not None and biorxiv_supplementary_audit is not None:
         acceptance["note"] += f" The official bioRxiv supplementary route audit at {args.run_id} exposed {biorxiv_supplementary_audit.get('route_findings', {}).get('file_link_count')} file link(s), with no Sequences.xlsx or construct FASTA/CSV link; the linked docx is auxiliary material and not the processed-DMS payload."
+    if source_reconstruction_boundary_path is not None and source_reconstruction_boundary_audit is not None:
+        acceptance["note"] += f" The public source reconstruction-boundary audit at {args.run_id} returned {source_reconstruction_boundary_audit.get('status')}; the stochastic library-build code requires missing motif inputs and is not proven equivalent to the frozen official construct reference, so no generated construct or labels are admitted."
     if additional_range_audit_paths:
         acceptance["note"] += f" Newly discovered Figshare file IDs were each subjected to one exact 128 MiB Range probe at {args.run_id}; all recorded results remain fail-closed and no complete payload was admitted."
     dump_atomic(acceptance_path, acceptance)
@@ -807,6 +855,10 @@ def main() -> int:
             blockers.append(blocker)
     if biorxiv_supplementary_path is not None and biorxiv_supplementary_audit is not None:
         blocker = f"The bioRxiv supplementary route audit returned {biorxiv_supplementary_audit.get('status')} at {args.run_id}; the official page exposes no Sequences.xlsx or construct reference file link, so the processed-DMS and Phase 0 gates remain locked."
+        if blocker not in blockers:
+            blockers.append(blocker)
+    if source_reconstruction_boundary_path is not None and source_reconstruction_boundary_audit is not None:
+        blocker = f"The public source reconstruction-boundary audit returned {source_reconstruction_boundary_audit.get('status')} at {args.run_id}; source-code generation is not proven equivalent to the frozen official construct reference and cannot unlock Phase 0."
         if blocker not in blockers:
             blockers.append(blocker)
     if raw_fastq_range_probe_path is not None and raw_fastq_range_probe is not None:

@@ -1620,44 +1620,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_source_reconstruction_boundary_audit_current",
-      "relative_path": "phase0/audits/source_reconstruction_boundary_20260802T021259Z.json",
-      "exists": true,
-      "size_bytes": 2409,
-      "sha256": "c1ac7b8d5140bcb1aa816892a3d5e2cd87c3d78551329c03c5456a36e959957d",
-      "status": "BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT",
-      "source_git_head": "ed75e36bb36dc2f32c866c436c437d88a4743cf8",
-      "required_input_inventory": [
-        {
-          "relative_path": "data/csvs/motif_sequences.csv",
-          "exists": false,
-          "is_file": false
-        },
-        {
-          "relative_path": "data/raw-jsons/constructs",
-          "exists": false,
-          "is_file": false
-        },
-        {
-          "relative_path": "data/jsons/pdb_library.json",
-          "exists": false,
-          "is_file": false
-        },
-        {
-          "relative_path": "data/Sequences.xlsx",
-          "exists": false,
-          "is_file": false
-        }
-      ],
-      "official_construct_identity_proven": false,
-      "algorithmic_equivalence_proven": false,
-      "processed_dms_payload_admitted": false,
-      "primary_labels_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1679,7 +1641,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-02T02:14:04.219714+00:00",
+  "last_refresh_utc": "2026-08-02T01:55:56.415363+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

@@ -220,11 +220,9 @@
     "The guarded downloader control audit recorded SIGSTOP at 20260802T015556Z; the preserved partial remains evidence-only until a terminal final integrity audit passes.",
     "The isolated 128 MiB chunked raw FASTQ recovery audit is CHUNKED_MERGE_COMPLETE_GZIP_OK at 20260802T015556Z; raw FASTQ cannot substitute for processed-DMS hierarchy or primary labels.",
     "A preserved partial-size regression was frozen at 20260802T015556Z (2003124224 vs prior 2361352192 bytes); final integrity and recovery remain unresolved.",
-    "Additional Figshare range probe figshare_article_v8_range_probe_20260802T014703Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260802T015556Z; no complete processed-DMS payload is admitted.",
-    "The latest official processed-DMS route re-probe (20260802T021259Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "The public source reconstruction-boundary audit returned BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT at 20260802T021259Z; source-code generation is not proven equivalent to the frozen official construct reference and cannot unlock Phase 0."
+    "Additional Figshare range probe figshare_article_v8_range_probe_20260802T014703Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260802T015556Z; no complete processed-DMS payload is admitted."
   ],
-  "last_transition": "2026-08-02T02:14:04.219714+00:00",
+  "last_transition": "2026-08-02T01:55:56.415363+00:00",
   "transition_evidence": "manifests/phase0_payload_inventory.json",
   "scientific_gate_effect": "NO_UNLOCK"
 }
