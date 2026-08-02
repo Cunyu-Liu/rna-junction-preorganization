@@ -673,6 +673,14 @@
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS",
       "source_reconstruction_boundary_audit": "phase0/audits/source_reconstruction_boundary_20260802T021259Z.json"
+    },
+    {
+      "run_id": "20260802T032100Z",
+      "toolchain_audit": "phase0/audits/toolchain_environment_20260802T032100Z.json",
+      "toolchain_audit_sha256": "870b34ac64e41049d98bfff1753244b70e5180c45c791aa0554b7a0ee05fceb2",
+      "toolchain_status": "READY_FOR_GPU_ONLY_TOOLCHAIN_USE",
+      "training_started": false,
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ]
 }

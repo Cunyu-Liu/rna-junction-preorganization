@@ -1658,6 +1658,95 @@
       "primary_labels_admitted": false,
       "raw_sequence_content_emitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "source_id": "toolchain",
+      "kind": "isolated_environment_audit",
+      "relative_path": "phase0/audits/toolchain_environment_20260802T032100Z.json",
+      "size_bytes": 13108,
+      "sha256": "870b34ac64e41049d98bfff1753244b70e5180c45c791aa0554b7a0ee05fceb2",
+      "status": "READY_FOR_GPU_ONLY_TOOLCHAIN_USE",
+      "training_started": false,
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "cuda_probe": {
+        "checked": true,
+        "cuda_available": true,
+        "device_count": 8,
+        "torch_cuda_version": "12.6",
+        "devices": [
+          {
+            "index": 0,
+            "name": "NVIDIA A100-PCIE-40GB",
+            "capability": [
+              8,
+              0
+            ]
+          },
+          {
+            "index": 1,
+            "name": "NVIDIA A100-PCIE-40GB",
+            "capability": [
+              8,
+              0
+            ]
+          },
+          {
+            "index": 2,
+            "name": "NVIDIA A100-PCIE-40GB",
+            "capability": [
+              8,
+              0
+            ]
+          },
+          {
+            "index": 3,
+            "name": "NVIDIA A100-PCIE-40GB",
+            "capability": [
+              8,
+              0
+            ]
+          },
+          {
+            "index": 4,
+            "name": "NVIDIA A100-PCIE-40GB",
+            "capability": [
+              8,
+              0
+            ]
+          },
+          {
+            "index": 5,
+            "name": "NVIDIA A100-PCIE-40GB",
+            "capability": [
+              8,
+              0
+            ]
+          },
+          {
+            "index": 6,
+            "name": "NVIDIA A100-PCIE-40GB MIG 1g.5gb",
+            "capability": [
+              8,
+              0
+            ]
+          },
+          {
+            "index": 7,
+            "name": "NVIDIA A100-PCIE-40GB MIG 1g.5gb",
+            "capability": [
+              8,
+              0
+            ]
+          }
+        ],
+        "gpu_allocation_probe": {
+          "performed": true,
+          "device": "cuda:0",
+          "tensor_value": 2.0,
+          "memory_allocated_before": 0,
+          "memory_allocated_after": 512
+        }
+      }
     }
   ],
   "required_next_evidence": [
