@@ -1,0 +1,80 @@
+{
+  "manifest_version": "rna-junction-preorganization-phase0-final-nar-supplement-v1",
+  "run_id": "nar_gkag672_supplement_20260802T150000Z",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "status": "PHASE_MINUS1_SUPPLEMENT_AVAILABLE_S2_SEQUENCE_FIDELITY_PASS_DMS_PHASE0_NO_PASS",
+  "source": {
+    "doi": "10.1093/nar/gkag672",
+    "oup_article_id": "8736262",
+    "article_snapshot": {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/oup_article_minimal_8736262.html",
+      "size": 355434,
+      "sha256": "1b42af21aeb646d27abb9a9d4217421b1c3c6a457b3526dfded144f271ecf787"
+    },
+    "supplement_zip": {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/nar_gkag672_20260802T150000Z/gkag672_supplemental_files.zip",
+      "size": 11728925,
+      "sha256": "c1231c9facee20f73d97628a7c6c9f981f11d3c4a385a89bcb09cf3e0a8b8e8f",
+      "chunk_size_limit_bytes": 134217728,
+      "chunk_count": 1,
+      "zip_test": "PASS"
+    },
+    "figshare_data_zip": {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_figshare/data.zip",
+      "size": 643502044,
+      "sha256": "241d15141298ce78471b360f598fd981c7870aab5ba19b9716f64b057bdfd681"
+    }
+  },
+  "content_results": {
+    "s2_construct_count": 7500,
+    "s2_construct_id_range": [0, 7499],
+    "s2_construct_unique": 7500,
+    "s2_construct_duplicate": 0,
+    "s2_construct_missing_numeric_ids": [],
+    "s2_post_header_total_rows": 7512,
+    "s2_post_header_nonconstruct_rows": 12,
+    "figshare_library_sequence_rows": 7500,
+    "s2_figshare_sequence_matches": 7500,
+    "s2_figshare_indexed_name_matches": 7500,
+    "s2_figshare_structure_exact_matches": 7497,
+    "s2_figshare_structure_mismatches": ["construct3362", "construct6271", "construct7182"],
+    "processed_assays": {
+      "pdb_library_1": {"records": 7500, "sequence_matches_after_trim": 7500, "structure_matches_after_trim": 7497},
+      "pdb_library_2": {"records": 7500, "sequence_matches_after_trim": 7500, "structure_matches_after_trim": 7497},
+      "pdb_library_3": {"records": 7500, "sequence_matches_after_trim": 7500, "structure_matches_after_trim": 7497},
+      "pdb_library_37C_2min": {"records": 7500, "sequence_matches_after_trim": 7500, "structure_matches_after_trim": 7497},
+      "pdb_library_denature": {"records": 7500, "sequence_matches_after_trim": 7500, "structure_matches_after_trim": 7497},
+      "pdb_library_nomod": {"records": 7500, "sequence_matches_after_trim": 7500, "structure_matches_after_trim": 7497}
+    },
+    "article_level_filter_rule": {
+      "status": "SOURCE_DOCUMENTED",
+      "initial_sequences": 7500,
+      "removed_sequences": 17,
+      "read_threshold": 2000,
+      "snr_threshold": 4,
+      "per_row_identity_and_reason": "NOT_AVAILABLE_NOT_ASSERTED"
+    }
+  },
+  "missing_or_blocking": {
+    "condition_batch_barcode_fastq_sra_crosswalk": "BLOCKED_UNRESOLVED",
+    "per_row_17_sequence_exclusion_ledger": "NOT_AVAILABLE_NOT_ASSERTED",
+    "full_structure_identity": "CONDITIONAL_PENDING_THREE_RECONCILIATIONS",
+    "phase0_dms_unlock": false,
+    "sequence_model_training_authorized": false
+  },
+  "reproducibility": {
+    "script": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_nar_supplement.py",
+    "script_sha256": "90897c405269ee38c3c599cd48d9cebc235c6f09cd15c5344f8e3ff45360a9f1",
+    "audit_output_dir": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/nar_gkag672_supplement_20260802T150000Z",
+    "raw_sequences_emitted": false,
+    "raw_rows_emitted": false
+  },
+  "operator_incidents": [
+    {
+      "class": "wrong_output_root_attempt",
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260802/phase0/audits/nar_gkag672_supplement_20260802T150000Z",
+      "authoritative": false,
+      "handling": "preserved_as_diagnostic_evidence_and_excluded_from_gate"
+    }
+  ]
+}
