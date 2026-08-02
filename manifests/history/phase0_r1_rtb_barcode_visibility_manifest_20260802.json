@@ -1,0 +1,42 @@
+{
+  "manifest_version": "rna-junction-preorganization-r1-rtb-visibility-v1",
+  "run_id": "r1_rtb_barcode_visibility_20260802",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "status": "NO_SYSTEMATIC_KNOWN_RTB_BARCODE_SIGNAL_IN_BOUNDED_R1_SAMPLE_CANDIDATE_ONLY",
+  "method_source": {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11601540/",
+    "published_example_barcode_count": 3,
+    "barcode_location_claim_checked": "5-prime R1",
+    "orientation_checked": ["forward", "reverse_complement"]
+  },
+  "scope": {
+    "runs": ["SRR31402663", "SRR31402664", "SRR35766784", "SRR35766785", "SRR38259812"],
+    "records_per_run": 100000,
+    "search_window_bases": 160,
+    "raw_sequences_emitted": false,
+    "raw_headers_emitted": false
+  },
+  "results": {
+    "malformed_records_total": 0,
+    "published_rtb_total_hits": 1,
+    "runs_with_zero_published_rtb_hits": 4,
+    "runs_with_only_single_low_frequency_hit": 1,
+    "header_index_like_tokens_total": 0,
+    "dominant_first12_fraction_range": [0.98416, 0.99307],
+    "interpretation": "bounded candidate evidence only; no systematic known RTB signal"
+  },
+  "gate": {
+    "barcode_payload_absence_proven": false,
+    "demultiplexing_status_proven": false,
+    "raw_to_processed_crosswalk_proven": false,
+    "primary_labels_admitted": false,
+    "scientific_gate_effect": "NO_PHASE_0_PASS",
+    "training_started": false
+  },
+  "reproducibility": {
+    "script_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_r1_rtb_barcode_visibility.py",
+    "script_sha256": "28496c811595f012fe9f15894db623053fe79fcf3e06c709a3001b2c5f913103",
+    "audit_json_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/r1_rtb_barcode_visibility_20260802.json",
+    "audit_json_sha256": "d21f3d957cc9c4ae2981d07e2e9482b237323409fc68376a84c535303e9ad937"
+  }
+}
