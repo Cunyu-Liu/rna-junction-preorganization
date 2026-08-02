@@ -475,17 +475,6 @@
       "run_id": "20260802T041500Z_retry01",
       "scientific_gate_effect": "NO_PHASE_0_PASS",
       "sequences_xlsx_present": false
-    },
-    {
-      "run_id": "20260802T044000Z",
-      "official_processed_construct_identity_audit": "phase0/audits/official_construct_identity_20260802T044000Z.json",
-      "official_processed_construct_identity_audit_sha256": "40fc3d7513ec8047ab53ad9ba7a41d13f66748b5be574e7819f8b8be92867a81",
-      "processed_construct_identity_status": "OFFICIAL_PROCESSED_CONSTRUCT_CONDITION_IDENTITY_SET_EQUAL",
-      "construct_condition_count": 6,
-      "construct_condition_reference_count": 7500,
-      "construct_condition_sequence_count": 7500,
-      "raw_processed_run_crosswalk_status": "BLOCKED_NO_DIRECT_SRA_RUN_TOKEN_IN_OFFICIAL_ARCHIVE_MEMBER_NAMES",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "registry_version": "phase0-source-registry-v0",
@@ -528,7 +517,7 @@
     },
     {
       "code_locator": "https://github.com/YesselmanLabPublications/2025_char_3d_struct_features",
-      "construct_identity_binding_status": "OFFICIAL_PROCESSED_CONDITION_IDENTITY_PASS_RAW_SRA_CROSSWALK_PENDING",
+      "construct_identity_binding_status": "PENDING_EXACT_FROZEN_IDENTITY_AUDIT",
       "data_locator": "https://doi.org/10.6084/m9.figshare.27880434",
       "dms_phase0_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802.json",
       "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
@@ -676,11 +665,7 @@
       "zenodo_code_record_route_audit": "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json",
       "zenodo_code_record_route_audit_current": "phase0/audits/zenodo_code_record_16884333_route_audit_20260801T205218Z.json",
       "zenodo_code_record_route_audit_current_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000",
-      "zenodo_code_record_route_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000",
-      "processed_construct_identity_status": "OFFICIAL_PROCESSED_CONSTRUCT_CONDITION_IDENTITY_SET_EQUAL",
-      "processed_construct_identity_audit": "phase0/audits/official_construct_identity_20260802T044000Z.json",
-      "processed_construct_identity_audit_sha256": "40fc3d7513ec8047ab53ad9ba7a41d13f66748b5be574e7819f8b8be92867a81",
-      "raw_processed_run_crosswalk_status": "BLOCKED_NO_DIRECT_SRA_RUN_TOKEN_IN_OFFICIAL_ARCHIVE_MEMBER_NAMES"
+      "zenodo_code_record_route_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000"
     },
     {
       "download_status": "NOT_DOWNLOADED",

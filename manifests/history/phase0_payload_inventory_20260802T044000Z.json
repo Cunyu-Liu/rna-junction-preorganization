@@ -1795,20 +1795,6 @@
       "source_id": "deenalattha_2026_dms",
       "status": "VERIFIED_OFFICIAL_FIGSHARE_PAYLOAD_ACQUIRED",
       "zip_member_count": 3220
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "official_processed_construct_identity_audit",
-      "relative_path": "phase0/audits/official_construct_identity_20260802T044000Z.json",
-      "size_bytes": 6286,
-      "sha256": "40fc3d7513ec8047ab53ad9ba7a41d13f66748b5be574e7819f8b8be92867a81",
-      "status": "OFFICIAL_PROCESSED_CONSTRUCT_CONDITION_IDENTITY_SET_EQUAL",
-      "construct_json_member_count": 6,
-      "construct_condition_reference_count": 7500,
-      "construct_condition_sequence_count": 7500,
-      "raw_processed_run_crosswalk_status": "BLOCKED_NO_DIRECT_SRA_RUN_TOKEN_IN_OFFICIAL_ARCHIVE_MEMBER_NAMES",
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
@@ -1838,7 +1824,7 @@
     }
   ],
   "inventory_id": "PHASE0_PAYLOAD_INVENTORY_20260801T203216Z",
-  "last_refresh_utc": "2026-08-02T04:30:01Z",
+  "last_refresh_utc": "2026-08-02T04:17:04Z",
   "matching_audit_manifest": "manifests/matching_audit.json",
   "metadata_collection_log": {
     "path": "phase0/source_metadata/source_metadata_20260801T060605Z.log",
@@ -1862,9 +1848,8 @@
     "reconcile raw FASTQ to construct-level DMS counts, background, read-depth and QC semantics",
     "safe resume of every preserved partial download, followed by final size/hash/gzip/pair audit",
     "verified official processed-DMS 2xx route with expected payload size, then 128 MiB range download and hash/gzip/provenance audit",
-    "exact_frozen_construct_identity_binding_for_official_library_reference",
-    "raw_fastq_to_processed_construct_crosswalk_bound_to_official_run_manifest"
+    "exact_frozen_construct_identity_binding_for_official_library_reference"
   ],
   "scientific_gate_effect": "NO_PHASE_0_PASS",
-  "status": "OFFICIAL_PROCESSED_CONSTRUCT_IDENTITY_AUDITED_RAW_PROCESSED_CROSSWALK_PENDING"
+  "status": "OFFICIAL_PROCESSED_DMS_PAYLOAD_ACQUIRED_IDENTITY_RECONCILIATION_PENDING"
 }

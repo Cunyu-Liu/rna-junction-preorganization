@@ -202,8 +202,7 @@
     "Additional Figshare range probe figshare_article_v8_range_probe_20260802T014703Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260802T015556Z; no complete processed-DMS payload is admitted.",
     "The latest official processed-DMS route re-probe (20260802T021259Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
     "The public source reconstruction-boundary audit returned BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT at 20260802T021259Z; source-code generation is not proven equivalent to the frozen official construct reference and cannot unlock Phase 0.",
-    "Official processed-DMS archive is verified, but exact frozen construct identity binding remains pending; Sequences.xlsx is absent from the archive and library_sequences.csv is not yet admitted as an equivalent frozen reference.",
-    "Official processed-condition construct identity sets are equal, but raw ENA FASTQ to processed-DMS construct crosswalk is not directly bound by an official SRA run token/provenance artifact."
+    "Official processed-DMS archive is verified, but exact frozen construct identity binding remains pending; Sequences.xlsx is absent from the archive and library_sequences.csv is not yet admitted as an equivalent frozen reference."
   ],
   "current_phase": "PHASE_0",
   "gates": {
@@ -219,7 +218,7 @@
     "phase_8_reproducibility_freeze": "LOCKED"
   },
   "last_transition": "2026-08-02T02:14:04.219714+00:00",
-  "overall_status": "PHASE_0_OFFICIAL_PROCESSED_CONSTRUCT_IDENTITY_AUDITED_RAW_PROCESSED_CROSSWALK_PENDING",
+  "overall_status": "PHASE_0_OFFICIAL_PAYLOAD_ACQUIRED_IDENTITY_RECONCILIATION_PENDING",
   "scientific_gate_effect": "NO_UNLOCK",
   "stop_rules": [
     "fatal field ambiguity or untraceable primary labels",
@@ -228,5 +227,5 @@
     "CUDA unavailable or CPU fallback during authorized GPU work",
     "missing complete acceptance evidence"
   ],
-  "transition_evidence": "phase0/audits/official_construct_identity_20260802T044000Z.json"
+  "transition_evidence": "phase0/audits/figshare_payload_member_metadata_20260802T041500Z_retry01.json"
 }
