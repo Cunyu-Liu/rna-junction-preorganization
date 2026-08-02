@@ -1433,40 +1433,6 @@
       "scientific_labels_admitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260802T004712Z.json",
-      "exists": true,
-      "size_bytes": 24404,
-      "sha256": "f754cc772f73f7da41d4760a2150a048e3cad5626f7d0f004c48e8f3d541e7b2",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_raw_fastq_final_integrity_audit_current",
-      "relative_path": "phase0/audits/fastq_pair_audit_SRR38259812_recovery_20260801T233700Z.json",
-      "exists": true,
-      "size_bytes": 2136,
-      "sha256": "00362043cdda4fa13f51a11a008422e22786758217233489bbd6386693dae8fa",
-      "status": "FASTQ_PAYLOAD_AUDIT_COMPLETE",
-      "payload_count": 2,
-      "pair_audit": {
-        "r1": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/recovery_payloads/ena_chunked/SRR38259812/SRR38259812_2.fastq.gz",
-        "r2": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR38259812/SRR38259812_1.fastq.gz",
-        "compared_record_pairs": 231892427,
-        "read_id_mismatch_count_capped": 0,
-        "paired_ids_consistent": true
-      },
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1488,7 +1454,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-02T00:48:20.561828+00:00",
+  "last_refresh_utc": "2026-08-01T22:51:43.844130+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
