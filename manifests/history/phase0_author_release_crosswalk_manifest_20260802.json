@@ -1,0 +1,73 @@
+{
+  "manifest_version": "rna-junction-preorganization-author-release-crosswalk-v1",
+  "run_id": "author_release_crosswalk_zenodo_16884333_20260802",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "status": "AUTHOR_RELEASE_NO_EXPLICIT_CROSSWALK_OR_BARCODE_PAYLOAD_DMS_PHASE0_REMAINS_BLOCKED",
+  "source": {
+    "url": "https://zenodo.org/records/16884333",
+    "doi": "10.5281/zenodo.16884333",
+    "release": "v1.0.0",
+    "archive_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/author_release/zenodo_16884333/2025_char_3d_struct_features-v1.0.0.zip",
+    "archive_size": 2271489,
+    "archive_sha256": "93f87d6f450b5650720be38eb6004bdec35ece4a5d9c577acfabcf7156b3cae7",
+    "chunk_size_limit_bytes": 134217728,
+    "chunk_count": 1,
+    "related_author_repository": "https://github.com/YesselmanLabPublications/2025_char_3d_struct_features/tree/v1.0.0"
+  },
+  "archive_audit": {
+    "member_count": 40,
+    "expected_payload_presence": {
+      "Sequences.xlsx": false,
+      "barcode_or_rtb_payload_name": false,
+      "sample_or_crosswalk_payload_name": false,
+      "FASTQ_or_SRA_payload_name": false
+    },
+    "member_name_token_counts": {
+      "Sequences.xlsx": 0,
+      "barcode": 0,
+      "rtb": 0,
+      "trial1": 0,
+      "trial2": 0,
+      "SRA_accession": 0,
+      "FASTQ": 0,
+      "sample_sheet": 0,
+      "condition": 0,
+      "batch": 0
+    },
+    "text_token_counts": {
+      "Sequences.xlsx": 0,
+      "barcode": 0,
+      "rtb": 0,
+      "trial1": 0,
+      "trial2": 0,
+      "SRA_accession": 0,
+      "FASTQ": 0,
+      "sample_sheet": 0,
+      "condition": 2,
+      "batch": 0
+    },
+    "explicit_crosswalk_signal_count": 0,
+    "crosswalk_evidence_found": false,
+    "raw_sequences_emitted": false,
+    "raw_text_payloads_emitted": false
+  },
+  "gate_effect": {
+    "scientific_gate_effect": "NO_PHASE_0_PASS",
+    "primary_labels_admitted": false,
+    "dms_phase0": "BLOCKED",
+    "phase0_5": "NOT_AUTHORIZED",
+    "gpu_validation": "NOT_AUTHORIZED",
+    "sequence_model_training": "NOT_AUTHORIZED"
+  },
+  "development_incident": {
+    "first_run_false_positive": true,
+    "cause": "generic condition token in code was treated as crosswalk evidence",
+    "corrected_and_rerun": true,
+    "final_classification": "negative"
+  },
+  "reproducibility": {
+    "script_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_author_release_crosswalk.py",
+    "script_sha256": "9cbe812ad2f1720460336e691bb4a0623e7351a3ced935efc7e862db5f4baa3f",
+    "audit_json_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/author_release_crosswalk_zenodo_16884333_20260802.json"
+  }
+}
