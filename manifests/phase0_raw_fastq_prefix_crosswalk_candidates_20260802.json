@@ -1,0 +1,58 @@
+{
+  "schema": "phase0_raw_fastq_prefix_crosswalk_candidate_manifest_v1",
+  "status": "RAW_FASTQ_PREFIX_SAMPLE_CANDIDATE_ONLY",
+  "generated_at_utc": "2026-08-02T05:46:47Z",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "implementation": {
+    "script_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_raw_fastq_construct_prefix_candidates.py",
+    "script_sha256": "d95135727023608d63fd5de0186645b7c8c6554971e9f0d445c9ee83f1345b07",
+    "report_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/reports/phase0_raw_fastq_prefix_crosswalk_candidates_20260802.md"
+  },
+  "inputs": {
+    "processed_archive": {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_figshare/data.zip",
+      "sha256": "241d15141298ce78471b360f598fd981c7870aab5ba19b9716f64b057bdfd681"
+    },
+    "library_table_member": "data/csvs/library_sequences.csv",
+    "raw_fastq": [
+      {
+        "run": "SRR31402664",
+        "condition_label": "rna_library_trial1",
+        "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402664/SRR31402664_2.fastq.gz",
+        "size_bytes": 12819005836,
+        "expected_ena_size_bytes": 12819005836,
+        "first_1m_compressed_sha256": "d4a592457f00d73a87ad554d8e74c8e92c865c1878b75476f1e628c9a9812fd6"
+      },
+      {
+        "run": "SRR31402663",
+        "condition_label": "rna_library_trial2",
+        "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz",
+        "size_bytes": 12057140369,
+        "expected_ena_size_bytes": 12057140369,
+        "first_1m_compressed_sha256": "95c94947bb640b4b3cdd78c65b7584ba18507ae06efd3af39f9e3b2214ee3c71"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/raw_prefix_candidates_SRR31402664_R2_20260802T054628Z.json",
+      "sha256": "7515ccb5100c0969ee06011737bfd756edfe045fdd9004346ef68e90b6455ed2",
+      "log_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/logs/raw_prefix_candidates_SRR31402664_R2_20260802T054628Z.log",
+      "log_sha256": "82dad94f0b81e88a544c87f3bced310a4e77e493196e9dd3808e6a6984a294de"
+    },
+    {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/raw_prefix_candidates_SRR31402663_R2_20260802T054647Z.json",
+      "sha256": "94a466ae42e31d153de2ad6d2dc8faba7e111817bd78cb8bb17641cd43459ed1",
+      "log_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/logs/raw_prefix_candidates_SRR31402663_R2_20260802T054647Z.log",
+      "log_sha256": "0bd0d72968341e327289a219e66e315da85fa1779c0faf5e1369ff22642cc068"
+    }
+  ],
+  "gate_effect": {
+    "raw_processed_crosswalk_gate_effect": "NO_CHANGE",
+    "primary_labels_admitted": false,
+    "phase0_gate_effect": "NO_PHASE_0_PASS",
+    "scientific_gate_effect": "NO_UNLOCK",
+    "training_started": false
+  },
+  "interpretation_boundary": "Prefix-sample correlation is candidate evidence only; it does not prove raw accession to processed condition identity, especially for pdb_library_3."
+}
