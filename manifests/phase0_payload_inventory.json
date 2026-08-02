@@ -1747,6 +1747,24 @@
           "memory_allocated_after": 512
         }
       }
+    },
+    {
+      "source_id": "deenalattha_2026_dms",
+      "kind": "FASTQ_batch_payload_audit",
+      "relative_path": "phase0/audits/full_selected_ena_fastq_reconciliation_20260802T033000Z.json",
+      "size_bytes": 7625,
+      "sha256": "eec68feda4739936a85e1eb4f37c1939effad89eda94fe7dc1c0c8144d3b92e4",
+      "status": "BATCH_COMPLETE",
+      "selected_run_count": 5,
+      "file_count_expected": 10,
+      "file_count_reconciled": 10,
+      "missing_file_count": 0,
+      "size_mismatch_count": 0,
+      "preserved_partial_count": 3,
+      "raw_sequence_content_emitted": false,
+      "scientific_labels_admitted": false,
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "batch_gate_effect": "PUBLIC_FASTQ_PAYLOAD_RECONCILED_BUT_DMS_PROCESSED_PAYLOAD_AND_MATCHING_GATES_REMAIN_BLOCKED"
     }
   ],
   "required_next_evidence": [

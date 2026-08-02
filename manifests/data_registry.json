@@ -681,6 +681,15 @@
       "toolchain_status": "READY_FOR_GPU_ONLY_TOOLCHAIN_USE",
       "training_started": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "run_id": "20260802T033000Z",
+      "ena_fastq_reconciliation": "phase0/audits/full_selected_ena_fastq_reconciliation_20260802T033000Z.json",
+      "ena_fastq_reconciliation_sha256": "eec68feda4739936a85e1eb4f37c1939effad89eda94fe7dc1c0c8144d3b92e4",
+      "ena_fastq_reconciliation_status": "BATCH_COMPLETE",
+      "missing_file_count": 0,
+      "size_mismatch_count": 0,
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ]
 }
