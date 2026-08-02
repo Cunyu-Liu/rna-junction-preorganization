@@ -1534,35 +1534,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "DMS_phase0_dependency_ledger_current",
-      "relative_path": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "exists": true,
-      "size_bytes": 27310,
-      "sha256": "f9ab65d9b28efb3ea5fe35a6bc85afe6c6d27df4acd2fcdc1504c0cd47b88626",
-      "status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "payload_downloaded": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_raw_fastq_batch_reconciliation_current",
-      "relative_path": "phase0/audits/full_selected_ena_fastq_reconciliation_20260802T010510Z.json",
-      "exists": true,
-      "size_bytes": 7625,
-      "sha256": "4ff682d731243bb369976ac08ee7fb6a73aaf4f4d5bfb79c852afa36742080b1",
-      "status": "BATCH_COMPLETE",
-      "selected_run_count": 5,
-      "failed_run_count": null,
-      "pending_run_count": null,
-      "raw_sequence_content_emitted": false,
-      "scientific_labels_admitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1584,7 +1555,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-02T01:24:01.792234+00:00",
+  "last_refresh_utc": "2026-08-02T01:08:22.086155+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {
