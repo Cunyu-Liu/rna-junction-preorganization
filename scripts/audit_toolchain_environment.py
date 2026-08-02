@@ -86,12 +86,30 @@ def cuda_probe(torch_probe: dict[str, Any]) -> dict[str, Any]:
                     "capability": list(torch.cuda.get_device_capability(index)),
                 }
             )
+        allocation = {"performed": False}
+        if available and count > 0:
+            device = torch.device("cuda:0")
+            before = int(torch.cuda.memory_allocated(device))
+            probe_tensor = torch.ones((1,), device=device)
+            probe_tensor.add_(1)
+            torch.cuda.synchronize(device)
+            after = int(torch.cuda.memory_allocated(device))
+            allocation = {
+                "performed": True,
+                "device": str(device),
+                "tensor_value": float(probe_tensor.item()),
+                "memory_allocated_before": before,
+                "memory_allocated_after": after,
+            }
+            del probe_tensor
+            torch.cuda.empty_cache()
         return {
             "checked": True,
             "cuda_available": available,
             "device_count": count,
             "torch_cuda_version": str(torch.version.cuda),
             "devices": devices,
+            "gpu_allocation_probe": allocation,
         }
     except Exception as exc:  # keep CUDA failure fail-closed
         return {"checked": True, "cuda_available": False, "error": repr(exc)}
