@@ -1603,23 +1603,6 @@
       "raw_sequence_content_emitted": false,
       "primary_labels_admitted": false,
       "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "source_id": "deenalattha_2026_dms",
-      "kind": "public_biorxiv_supplementary_route_audit_current",
-      "relative_path": "phase0/audits/biorxiv_supplementary_route_audit_20260802T015145Z.json",
-      "exists": true,
-      "size_bytes": 2563,
-      "sha256": "cc1ce5887f53e3291327415a114030680fa54ee70ae699566c7f2d91a5443eb1",
-      "status": "PUBLIC_BIORXIV_SUPPLEMENTARY_PAGE_AUDITED_NO_CONSTRUCT_FILE_LINK_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
-      "supplementary_page_url": "https://www.biorxiv.org/content/10.1101/2024.11.21.624766v2.supplementary-material",
-      "file_link_count": 1,
-      "sequences_xlsx_link_present": false,
-      "construct_reference_file_link_present": false,
-      "processed_payload_admitted": false,
-      "raw_sequence_content_emitted": false,
-      "primary_labels_admitted": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
     }
   ],
   "required_next_evidence": [
@@ -1641,7 +1624,7 @@
   ],
   "phase0_gate_effect": "NO_PHASE_0_PASS",
   "primary_labels_admitted": false,
-  "last_refresh_utc": "2026-08-02T01:55:56.415363+00:00",
+  "last_refresh_utc": "2026-08-02T01:47:34.360676+00:00",
   "scientific_gate_effect": "NO_PHASE_0_PASS",
   "download_failure_events": [
     {

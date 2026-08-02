@@ -166,10 +166,7 @@
       "public_raw_fastq_partial_state_audit_current_status": "BATCH_PARTIAL_PENDING_OR_BLOCKED",
       "public_pmc_supplementary_schema_audit_current": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
       "public_pmc_supplementary_schema_audit_current_status": "PUBLIC_SUPPLEMENTARY_SCHEMA_AUDITED_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
-      "public_pmc_supplementary_main_payload_admitted": false,
-      "public_biorxiv_supplementary_route_audit_current": "phase0/audits/biorxiv_supplementary_route_audit_20260802T015145Z.json",
-      "public_biorxiv_supplementary_route_audit_current_status": "PUBLIC_BIORXIV_SUPPLEMENTARY_PAGE_AUDITED_NO_CONSTRUCT_FILE_LINK_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
-      "public_biorxiv_sequences_xlsx_link_present": false
+      "public_pmc_supplementary_main_payload_admitted": false
     },
     {
       "source_id": "rna3db_and_codnas_rna",
@@ -654,14 +651,6 @@
       "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
       "scientific_gate_effect": "NO_PHASE_0_PASS",
       "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json"
-    },
-    {
-      "run_id": "20260802T015556Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
-      "biorxiv_supplementary_audit": "phase0/audits/biorxiv_supplementary_route_audit_20260802T015145Z.json"
     }
   ]
 }
