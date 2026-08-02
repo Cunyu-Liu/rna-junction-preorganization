@@ -1,0 +1,38 @@
+{
+  "schema": "phase0_candidate_audit_manifest_v1",
+  "status": "CANDIDATE_ONLY_RAW_PROCESSED_CROSSWALK_UNRESOLVED",
+  "generated_at_utc": "2026-08-02T05:26:51Z",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "inputs": [
+    {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_runinfo_PRJNA1188187.csv",
+      "sha256": "026ecfda5c90ff034648249fe8eba9ab569a701c9a30a9da7c77088140c49f5e",
+      "role": "selected public SRA run metadata"
+    },
+    {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_figshare/data.zip",
+      "sha256": "241d15141298ce78471b360f598fd981c7870aab5ba19b9716f64b057bdfd681",
+      "role": "current public processed payload"
+    }
+  ],
+  "implementation": {
+    "script_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_condition_run_read_depth_candidates.py",
+    "script_sha256": "be95f455f33cec7deabe3c9804876a9cf544ac373cc78c4b1b89fc8b819f8320",
+    "report_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/reports/phase0_condition_run_read_depth_candidates_20260802.md",
+    "report_sha256": "962a7539f5b33a81602b5a7e681f9da04a1ef947a1fdace7a86507ad6eb54b69"
+  },
+  "artifacts": {
+    "audit_json_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/condition_run_read_depth_candidates_20260802T052651Z.json",
+    "audit_json_sha256": "ce3e6998abd62e2f407017e3db39bb8500cf69503b838f1e13069817c3d37d38",
+    "execution_log_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/logs/condition_run_read_depth_candidates_20260802T052651Z.log",
+    "execution_log_sha256": "282848e43ca89aad3e7fd0cbe159a12cc045c367941fe8284ffe8610af7f3d6a"
+  },
+  "gate_effect": {
+    "raw_processed_crosswalk_gate_effect": "NO_CHANGE",
+    "primary_labels_admitted": false,
+    "phase0_gate_effect": "NO_PHASE_0_PASS",
+    "scientific_gate_effect": "NO_UNLOCK",
+    "training_started": false
+  },
+  "interpretation_boundary": "Read-depth similarity is candidate evidence only; it is not an accession-preserving identity proof and cannot satisfy the crosswalk gate."
+}
