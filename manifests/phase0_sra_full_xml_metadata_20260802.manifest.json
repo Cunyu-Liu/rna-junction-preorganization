@@ -1,0 +1,78 @@
+{
+  "schema": "phase0_sra_full_xml_metadata_manifest_v1",
+  "status": "SRA_FULL_XML_METADATA_COMPLETE_CANDIDATE_ONLY_NO_CROSSWALK_UNLOCK",
+  "generated_at_utc": "2026-08-02T16:35:00Z",
+  "contract": {
+    "path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/contract/1.1.docx",
+    "sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9"
+  },
+  "source": {
+    "provider": "NCBI E-utilities",
+    "endpoint_template": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&id={RUN}&rettype=full&retmode=xml",
+    "selected_runs": [
+      "SRR31402663",
+      "SRR31402664",
+      "SRR35766784",
+      "SRR35766785",
+      "SRR38259812"
+    ],
+    "raw_xml_directory": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_full_xml_20260802T163000Z/",
+    "raw_xml_count": 5,
+    "raw_xml_parse_failures": 0,
+    "raw_xml": [
+      {"run":"SRR31402663","path":"/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_full_xml_20260802T163000Z/SRR31402663.xml","size_bytes":9360,"sha256":"a89d5216661845ca6f467195d12b242a7db0dc83b2f76d08561fd74f3b077f8e"},
+      {"run":"SRR31402664","path":"/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_full_xml_20260802T163000Z/SRR31402664.xml","size_bytes":9364,"sha256":"6807a637379bf722934af1c8f4e6ad7e09aef68bcab333c28b86ac53d768fba4"},
+      {"run":"SRR35766784","path":"/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_full_xml_20260802T163000Z/SRR35766784.xml","size_bytes":9305,"sha256":"242de5d3016f5807c0005a29b46ca55b4334f7630ce0a971d09061d7ff6b76b6"},
+      {"run":"SRR35766785","path":"/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_full_xml_20260802T163000Z/SRR35766785.xml","size_bytes":9344,"sha256":"3c1fe1c308d5fb407d674e942c5251b8c68c793ab5bb8f1589b5e9915ac68730"},
+      {"run":"SRR38259812","path":"/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/sra_full_xml_20260802T163000Z/SRR38259812.xml","size_bytes":9315,"sha256":"7b1e12934545148f653f85c1c0406b8caf15986977ada59f6dc85b1edf601bfb"}
+    ]
+  },
+  "implementation": {
+    "script_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_sra_full_xml_metadata.py",
+    "script_sha256": "996c91843a1a687378b2cc4b0610cb54c39a28039c9e3eb07a58075e17b678e3",
+    "completed_audit_json_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/sra_full_xml_metadata_20260802T163500Z.json",
+    "completed_audit_json_sha256": "280007c8f4ad90598aa2f2d9ffd36892399ada5085d1120e4ecae1487be9b2ca",
+    "completed_audit_log_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/sra_full_xml_metadata_20260802T163500Z.log",
+    "completed_audit_log_sha256": "f0a8f0f538d3c6f7c9da1519aff8ec9413f579a135f5afc3c1bac3b5f0df7cd4"
+  },
+  "recovered_metadata": {
+    "library_metadata": {
+      "SRR31402663": {"experiment":"SRX26771789","sample":"SRS23258854","library_alias":"rna_library_trial2","library_name":"rna_library_trial2","source_material_id":"2"},
+      "SRR31402664": {"experiment":"SRX26771788","sample":"SRS23258855","library_alias":"rna_library_trial1","library_name":"rna_library_trial1","source_material_id":"1"},
+      "SRR35766784": {"experiment":"SRX30816075","sample":"SRS26827868","library_alias":"rna_library_nomod","library_name":"rna_library_nomod","source_material_id":null},
+      "SRR35766785": {"experiment":"SRX30816074","sample":"SRS26827867","library_alias":"rna_library_denature","library_name":"rna_library_denature","source_material_id":null},
+      "SRR38259812": {"experiment":"SRX33096510","sample":"SRS28915053","library_alias":"rna_lib_37C_2min","library_name":"rna_lib_37C_2min","source_material_id":null}
+    },
+    "processed_namespace_tokens_found_in_xml": [],
+    "source_material_id_is_candidate_only": true,
+    "processed_library_binding_found_in_xml": false
+  },
+  "retained_failure": {
+    "status": "NETWORK_RETRIEVAL_FAILED_BEFORE_XML_WRITE",
+    "json_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/sra_full_xml_metadata_20260802T163000Z.json",
+    "json_sha256": "432921294f06945a912f67bc25ba370946b2a79789304f625d98c08f9e596ff0",
+    "log_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/sra_full_xml_metadata_20260802T163000Z.log",
+    "log_sha256": "cee7454bb6916aea80f1a1a2663ffaa3cdce28af36918baf2ff87647782d3a24"
+  },
+  "gate_effect": {
+    "raw_processed_crosswalk": "UNRESOLVED",
+    "trial1_trial2_assignment": "AMBIGUOUS_CANDIDATE_ONLY",
+    "manual_matching_acceptance": "PENDING",
+    "primary_labels_admitted": false,
+    "phase0_gate_effect": "NO_PHASE_0_PASS",
+    "phase0_5_specification_freeze": "NOT_AUTHORIZED",
+    "scientific_gate_effect": "NO_UNLOCK",
+    "gpu_training_started": false
+  },
+  "report": {
+    "path": "reports/phase0_sra_full_xml_metadata_20260802.md",
+    "sha256": "3dc1e0a0de2cebac2517879a8d1ca5f2eba1d85ef2a906fa4b54ef172567c537"
+  },
+  "safety": {
+    "read_sequences_emitted": false,
+    "primary_labels_emitted": false,
+    "existing_results_overwritten": false,
+    "user_download_processes_killed": false
+  },
+  "interpretation_boundary": "SRA Full XML metadata and source_material_id are provenance candidates only; integer equality, condition names, read-depth similarity, and raw-FASTQ prefix correlations are not accession-preserving processed-library identity proofs."
+}
