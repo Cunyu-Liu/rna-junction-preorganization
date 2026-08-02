@@ -517,11 +517,12 @@ def main() -> int:
             if final_fastq_audit_path is not None and final_fastq_audit is not None:
                 source["public_raw_fastq_final_integrity_audit_current"] = final_fastq_rel
                 source["public_raw_fastq_final_integrity_audit_current_status"] = final_fastq_audit["status"]
-                source["raw_fastq_status"] = (
-                    "PUBLIC_RAW_FASTQ_ISOLATED_RECOVERY_FINAL_INTEGRITY_COMPLETE_PENDING_SELECTED_BATCH_CLOSURE"
-                    if final_fastq_audit["status"] == "FASTQ_PAYLOAD_AUDIT_COMPLETE"
-                    else "PUBLIC_RAW_FASTQ_FINAL_INTEGRITY_AUDIT_BLOCKED"
-                )
+                if source.get("fastq_batch_audit_status") != "BATCH_COMPLETE":
+                    source["raw_fastq_status"] = (
+                        "PUBLIC_RAW_FASTQ_ISOLATED_RECOVERY_FINAL_INTEGRITY_COMPLETE_PENDING_SELECTED_BATCH_CLOSURE"
+                        if final_fastq_audit["status"] == "FASTQ_PAYLOAD_AUDIT_COMPLETE"
+                        else "PUBLIC_RAW_FASTQ_FINAL_INTEGRITY_AUDIT_BLOCKED"
+                    )
             if install_audit_path is not None and install_audit is not None:
                 source["public_raw_fastq_install_audit_current"] = install_audit_rel
                 source["public_raw_fastq_install_audit_current_status"] = install_audit["status"]
