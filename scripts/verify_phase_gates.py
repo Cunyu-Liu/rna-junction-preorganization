@@ -115,6 +115,7 @@ def main() -> int:
         "NOT_EXECUTED",
         "PHASE_0_METADATA_PARTIAL_PAYLOAD_AUDIT_IN_PROGRESS",
         "PHASE_0_PUBLIC_FASTQ_PAYLOAD_AUDIT_IN_PROGRESS",
+        "PHASE_0_OFFICIAL_PROCESSED_DMS_PAYLOAD_ACQUIRED_IDENTITY_RECONCILIATION_PENDING",
     }
     if registry.get("status") not in allowed_registry_statuses:
         violations.append("SOURCE_REGISTRY_STATUS_UNEXPECTED")

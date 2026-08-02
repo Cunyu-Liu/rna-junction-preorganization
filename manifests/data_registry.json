@@ -1,227 +1,483 @@
 {
-  "registry_version": "phase0-source-registry-v0",
   "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
-  "status": "PHASE_0_PUBLIC_FASTQ_PAYLOAD_AUDIT_IN_PROGRESS",
-  "metadata_audit_status": "PARTIAL_METADATA_AND_PUBLIC_FASTQ_INVENTORY_NOT_PHASE0_PASS",
+  "matching_audit_manifest": "manifests/matching_audit.json",
   "metadata_audit_manifest": "manifests/source_metadata_audit.json",
   "metadata_audit_report": "reports/phase0_source_metadata_audit_20260801.md",
-  "payload_inventory_manifest": "manifests/phase0_payload_inventory.json",
-  "matching_audit_manifest": "manifests/matching_audit.json",
+  "metadata_audit_status": "PARTIAL_METADATA_AND_PUBLIC_FASTQ_INVENTORY_NOT_PHASE0_PASS",
   "metadata_collection_log": "phase0/source_metadata/source_metadata_20260801T060605Z.log",
-  "source_content_policy": "metadata_only_until_provenance_and_contract_gates_pass",
-  "sources": [
+  "payload_inventory_manifest": "manifests/phase0_payload_inventory.json",
+  "phase0_acceptance": {
+    "failure_record": null,
+    "minimum_manual_audit": {
+      "matched": 50,
+      "rejected_or_ambiguous": 30
+    },
+    "minimum_matching_accuracy": 0.95,
+    "pass_record": null,
+    "required_outcome": "all_primary_labels_traceable_and_no_fatal_field_ambiguity",
+    "scientific_gate_effect": "NO_PHASE_0_PASS",
+    "status": "IN_PROGRESS_CONTRACT_SOURCE_VERIFIED"
+  },
+  "phase0_evidence_updates": [
     {
-      "source_id": "denny_2018_tectorna",
-      "role": "primary_A_tectoRNA_observation",
-      "locator": "https://doi.org/10.1016/j.cell.2018.05.038",
-      "full_text_locator": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6053692/",
-      "required_audit": [
-        "workbook/schema/units",
-        "raw_vs_interpolated_vs_censored",
-        "-7.1_kcal_per_mol_censor_direction",
-        "replicate/bootstrap/covariance",
-        "1687_1713_1636_count_reconciliation"
-      ],
-      "download_status": "DOWNLOADED_SUPPLEMENTARY_WORKBOOK_METADATA_AUDITED",
-      "raw_file_path": "phase0/source_payloads/denny/261_SI.xlsx",
-      "sha256": "f68ed6049b31750ad044a303fdb157ec64fb1e565cbf56fad247e0bbc1deda20",
-      "license_status": "DATA_LICENSE_NOT_VERIFIED",
-      "metadata_audit_path": "phase0/audits/denny_workbook_metadata.json",
-      "semantics_audit_path": "phase0/audits/denny_semantics_20260801T065000Z.json",
-      "semantics_audit_status": "AGGREGATE_COMPLETE_EXACT_COUNT_MAPPING_OPEN",
-      "semantic_evidence_path": "phase0/audits/denny_xlsx_semantic_evidence_20260801T090500Z.json",
-      "semantic_evidence_status": "EXTRACTED_24073_VARIANT_SUM_1713_CARDINALITY_MINUS7_1_UPPER_BOUND_CONSISTENT_NOT_PROOF"
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T074000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
     },
     {
-      "source_id": "deenalattha_2026_dms",
-      "role": "primary_B_cross_assay_complementary_observation",
-      "locator": "https://doi.org/10.1093/nar/gkag672",
-      "data_locator": "https://doi.org/10.6084/m9.figshare.27880434",
-      "code_locator": "https://github.com/YesselmanLabPublications/2025_char_3d_struct_features",
-      "sra_locator": "PRJNA1188187",
-      "required_audit": [
-        "JSON_supplement_sequence_and_construct_mapping",
-        "treated_count/background/read_depth_hierarchy",
-        "QC/outlier/contamination_semantics",
-        "construct_and_connected_component_split_groups",
-        "official_article_and_public_code_data_layout"
-      ],
-      "download_status": "METADATA_DOWNLOADED_FIGSHARE_PAYLOAD_BLOCKED_HTTP_403",
-      "metadata_paths": [
-        "phase0/source_metadata/ncbi_bioproject_1188187.json",
-        "phase0/source_metadata/crossref_dms_2026.json",
-        "phase0/source_metadata/yesselman_dms_code_refs.txt",
-        "phase0/source_metadata/sra_runinfo_PRJNA1188187.csv",
-        "phase0/source_metadata/oup_supplement_endpoint.probe"
-      ],
-      "sra_runinfo_audit_path": "phase0/audits/sra_runinfo_20260801T071500Z.json",
-      "sra_runinfo_audit_status": "RUN_LEVEL_ONLY_CONSTRUCT_LEVEL_HIERARCHY_UNRESOLVED",
-      "sha256": null,
-      "license_status": "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED",
-      "public_raw_fastq_route": "ENA_filereport_and_FASTQ_mirror",
-      "public_raw_fastq_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "raw_fastq_status": "PUBLIC_RAW_FASTQ_FILE_RECONCILIATION_COMPLETE_PRESERVED_PARTIALS_AND_DMS_PAYLOAD_PENDING",
-      "figshare_status": "BLOCKED_HTTP_403_DIRECT_AND_NDOWNLOADER_ROUTES_PRESERVED",
-      "download_failure_status": "PRESERVED_PARTIAL_FAILURES",
-      "download_failure_events": [
-        {
-          "run": "SRR31402663",
-          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz.partial",
-          "expected_bytes": null,
-          "observed_bytes": null,
-          "returncode": 56,
-          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
-        },
-        {
-          "run": "SRR31402664",
-          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402664/SRR31402664_1.fastq.gz.partial",
-          "expected_bytes": null,
-          "observed_bytes": null,
-          "returncode": 56,
-          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
-        },
-        {
-          "run": "SRR31402663",
-          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz.partial",
-          "expected_bytes": null,
-          "returncode": 56,
-          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
-        }
-      ],
-      "resume_wrapper_incident": "phase0/audits/resume_wrapper_incident_20260801T161500Z.json",
-      "resume_wrapper_status": "CORRECTED_FAIL_CLOSED_TESTED_WHILE_ORIGINAL_DOWNLOADER_ACTIVE",
-      "download_partial_size_anomaly_path": "phase0/audits/download_partial_size_anomaly_20260801T084716Z.json",
-      "download_partial_size_anomaly_status": "OBSERVED_REQUIRES_FINAL_INTEGRITY_AUDIT",
-      "figshare_ndownloader_probe": "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status",
-      "download_partial_size_regression_reobserved_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T113210Z.json",
-      "download_partial_size_regression_reobserved_status": "REOBSERVED_UNRESOLVED_REQUIRES_FINAL_INTEGRITY_AUDIT",
-      "download_resume_diagnostic_path": "phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json",
-      "download_resume_diagnostic_status": "ACTIVE_TRANSPORT_INSTABILITY_UNRESOLVED",
-      "download_partial_size_regression_third_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json",
-      "download_partial_size_regression_third_status": "THIRD_REGRESSION_FROZEN_FOR_DIAGNOSTICS",
-      "fastq_batch_audit_path": "phase0/audits/full_selected_ena_fastq_reconciliation_20260802T010510Z.json",
-      "fastq_batch_audit_status": "BATCH_COMPLETE",
-      "processed_dms_payload_route_audit": "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json",
-      "processed_dms_payload_status": "BLOCKED_ALL_TESTED_PUBLIC_FIGSHARE_ROUTES_HTTP_403",
-      "zenodo_code_record_route_audit": "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json",
-      "zenodo_code_record_route_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000",
-      "dms_reconstruction_feasibility_audit": "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json",
-      "dms_reconstruction_status": "BLOCKED_RECONSTRUCTION_INPUTS_MISSING",
-      "processed_dms_payload_route_reprobe": "phase0/audits/figshare_route_reprobe_20260801T194600Z.json",
-      "processed_dms_payload_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "processed_dms_payload_readme_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json",
-      "processed_dms_payload_readme_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "processing_readme_snapshot": "phase0/source_metadata/dms_official_readme_ed75e36_20260802.md",
-      "processing_readme_snapshot_status": "PUBLIC_PROCESSING_README_SNAPSHOT_PINNED",
-      "processed_dms_payload_latest_readme_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T200800Z.json",
-      "processed_dms_payload_latest_readme_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "dms_phase0_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802.json",
-      "dms_phase0_dependency_ledger_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "processed_dms_payload_latest_readme_route_reprobe_current": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "processed_dms_payload_latest_readme_route_reprobe_current_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
-      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "dms_phase0_dependency_ledger_current_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
-      "public_source_repository_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
-      "public_source_repository_tree_status": "GITHUB_TREE_METADATA_COMPLETE",
-      "public_source_repository_tree_audit": "phase0/audits/dms_github_tree_payload_audit_20260801T215150Z.json",
-      "public_source_repository_tree_audit_status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
-      "zenodo_code_record_route_audit_current": "phase0/audits/zenodo_code_record_16884333_route_audit_20260801T205218Z.json",
-      "zenodo_code_record_route_audit_current_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000",
-      "processed_dms_payload_range_probe_current": "phase0/audits/figshare_file_66482813_range_probe_20260802T010510Z.json",
-      "processed_dms_payload_range_probe_current_status": "BLOCKED_HTTP_403_RANGE_PROBE",
-      "processed_dms_payload_file_metadata_probe_current": "phase0/audits/figshare_file_66482813_metadata_probe_20260801T210534Z.json",
-      "processed_dms_payload_file_metadata_probe_current_status": "BLOCKED_HTTP_403_FILE_METADATA_PROBE",
-      "processed_dms_payload_provenance_route_audit_current": "phase0/audits/figshare_provenance_route_audit_20260801T212722Z.json",
-      "processed_dms_payload_provenance_route_audit_current_status": "BLOCKED_NO_2XX_PROVENANCE_ROUTE",
-      "processed_dms_payload_doi_oai_provenance_audit_current": "phase0/audits/doi_oai_provenance_route_audit_20260801T213706Z.json",
-      "processed_dms_payload_doi_oai_provenance_audit_current_status": "DOI_OAI_PROVENANCE_METADATA_AVAILABLE",
-      "processed_dms_payload_additional_range_probes_current": [
-        "phase0/audits/figshare_article_v8_range_probe_20260802T014703Z.json"
-      ],
-      "processed_dms_payload_additional_range_probes_current_status": [
-        "BLOCKED_HTTP_403_RANGE_PROBE"
-      ],
-      "processed_dms_payload_figshare_v8_route_audit_current": "phase0/audits/figshare_v8_route_audit_20260801T215150Z.json",
-      "processed_dms_payload_figshare_v8_route_audit_current_status": "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE",
-      "processed_dms_payload_oai_format_audit_current": "phase0/audits/figshare_oai_format_audit_20260801T220235Z.json",
-      "processed_dms_payload_oai_format_audit_current_status": "FIGSHARE_OAI_FORMAT_METADATA_AVAILABLE",
-      "public_github_release_tree_metadata_audit_current": "phase0/audits/github_public_metadata_audit_20260801T221809Z.json",
-      "public_github_release_tree_metadata_audit_current_status": "GITHUB_PUBLIC_METADATA_AVAILABLE",
-      "public_raw_fastq_range_probe_current": "phase0/audits/ena_SRR38259812_2_range_probe_20260801T224037Z.json",
-      "public_raw_fastq_range_probe_current_status": "RANGE_PROBE_206_EXACT",
-      "public_raw_fastq_downloader_control_audit_current": "phase0/audits/control_downloader_pause_20260801T223854Z.json",
-      "public_raw_fastq_downloader_control_audit_current_status": "SIGSTOP_SENT",
-      "public_raw_fastq_downloader_last_signal": "SIGSTOP",
-      "public_raw_fastq_chunked_download_audit_current": "phase0/audits/ena_SRR38259812_2_chunked_download_20260801T224037Z.json",
-      "public_raw_fastq_chunked_download_audit_current_status": "CHUNKED_MERGE_COMPLETE_GZIP_OK",
-      "public_raw_fastq_partial_size_audit_current": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T223854Z.json",
-      "public_raw_fastq_partial_size_audit_current_status": "PARTIAL_SIZE_REGRESSION_AFTER_SAFE_CONTINUE_FROZEN",
-      "public_raw_fastq_final_integrity_audit_current": "phase0/audits/fastq_pair_audit_SRR38259812_recovery_20260801T233700Z.json",
-      "public_raw_fastq_final_integrity_audit_current_status": "FASTQ_PAYLOAD_AUDIT_COMPLETE",
-      "public_raw_fastq_install_audit_current": "phase0/audits/SRR38259812_chunked_install_20260802T005554Z.json",
-      "public_raw_fastq_install_audit_current_status": "BLOCKED_TARGET_EXISTS_NO_OVERWRITE",
-      "dms_reconstruction_feasibility_audit_current": "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json",
-      "dms_reconstruction_feasibility_audit_current_status": "BLOCKED_RECONSTRUCTION_INPUTS_MISSING",
-      "public_raw_fastq_partial_state_audit_current": "phase0/audits/selected_fastq_partial_state_20260801T222125Z.json",
-      "public_raw_fastq_partial_state_audit_current_status": "BATCH_PARTIAL_PENDING_OR_BLOCKED",
-      "public_pmc_supplementary_schema_audit_current": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
-      "public_pmc_supplementary_schema_audit_current_status": "PUBLIC_SUPPLEMENTARY_SCHEMA_AUDITED_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
-      "public_pmc_supplementary_main_payload_admitted": false,
-      "public_biorxiv_supplementary_route_audit_current": "phase0/audits/biorxiv_supplementary_route_audit_20260802T015145Z.json",
-      "public_biorxiv_supplementary_route_audit_current_status": "PUBLIC_BIORXIV_SUPPLEMENTARY_PAGE_AUDITED_NO_CONSTRUCT_FILE_LINK_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
-      "public_biorxiv_sequences_xlsx_link_present": false,
-      "public_source_reconstruction_boundary_audit_current": "phase0/audits/source_reconstruction_boundary_20260802T021259Z.json",
-      "public_source_reconstruction_boundary_audit_current_status": "BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT",
-      "public_source_algorithmic_equivalence_proven": false,
-      "public_source_official_construct_identity_proven": false
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T083000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
     },
     {
-      "source_id": "rna3db_and_codnas_rna",
-      "role": "weak_geometry_and_time_family_validation",
-      "locator": "https://pubmed.ncbi.nlm.nih.gov/38552946/",
-      "secondary_locator": "https://academic.oup.com/bioinformatics/article/38/6/1745/6483078",
-      "required_audit": [
-        "structure_id_chain_resolution_method_release_date",
-        "family_and_cluster_split_provenance"
-      ],
-      "download_status": "NOT_DOWNLOADED",
-      "sha256": null,
-      "license_status": "NOT_VERIFIED"
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T084500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
     },
     {
-      "source_id": "operator_mechanism_priors",
-      "role": "registered_operator_uncertainty_prior_only",
-      "locators": [
-        "https://doi.org/10.1021/acs.jctc.7b00061",
-        "https://doi.org/10.1021/acs.jcim.5c00576"
-      ],
-      "required_audit": [
-        "operator_source_and_evidence_level",
-        "parameter_range_or_discrete_ensemble",
-        "F_U_G_contact_G_elec_gauge_reference"
-      ],
-      "download_status": "NOT_DOWNLOADED",
-      "sha256": null,
-      "license_status": "NOT_VERIFIED"
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T092000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
     },
     {
-      "source_id": "second_system_tlr_qmapseq",
-      "role": "conditional_phase7_second_measurement_system",
-      "locators": [
-        "https://doi.org/10.1073/pnas.2109085118",
-        "https://rnajournal.cshlp.org/content/early/2024/10/03/rna.080039.124.full.pdf",
-        "https://doi.org/10.1093/nar/gkae633"
-      ],
-      "required_audit": [
-        "new_estimand_spec",
-        "new_operator_transport_symmetry_specs",
-        "not_a_junction_mechanics_label_by_default"
-      ],
-      "download_status": "LOCKED_UNTIL_PHASE7",
-      "sha256": null,
-      "license_status": "NOT_VERIFIED"
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T114500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T123000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T150000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T174500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T193000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T210000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T220000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T232800Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T165500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T084800Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T090700Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T091000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T091800Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T094700Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T095700Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T102300Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T111357Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T113505Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T114659Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "run_id": "20260801T120610Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T142500Z.json",
+      "run_id": "20260801T142530Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T164500Z.json",
+      "run_id": "20260801T164700Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T164500Z.json",
+      "run_id": "20260801T165500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T164500Z.json",
+      "run_id": "20260801T170000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T190000Z.json",
+      "run_id": "20260801T190500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T191500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T192000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T193500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T193800Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T194000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T195300Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T200100Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T200500Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json",
+      "run_id": "20260801T201000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/full_selected_ena_fastq_reconciliation_20260801T201911Z.json",
+      "run_id": "20260801T201911Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "fastq_batch_audit": "phase0/audits/full_selected_ena_fastq_reconciliation_20260801T203216Z.json",
+      "run_id": "20260801T203216Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T203858Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T204700Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T205218Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T205942Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T205942Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T210534Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T210534Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T212722Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T212722Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T214209Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T214209Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T215150Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T215150Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T220235Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T220235Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T221809Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T221809Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T222125Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T222125Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T224037Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T224037Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T223854Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260801T223854Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T004712Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T004712Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T010510Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T010510Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T012312Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T012541Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
+      "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T014140Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
+      "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T014734Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "biorxiv_supplementary_audit": "phase0/audits/biorxiv_supplementary_route_audit_20260802T015145Z.json",
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
+      "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T015556Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS"
+    },
+    {
+      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
+      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "run_id": "20260802T021259Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "source_reconstruction_boundary_audit": "phase0/audits/source_reconstruction_boundary_20260802T021259Z.json"
+    },
+    {
+      "run_id": "20260802T032100Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "toolchain_audit": "phase0/audits/toolchain_environment_20260802T032100Z.json",
+      "toolchain_audit_sha256": "870b34ac64e41049d98bfff1753244b70e5180c45c791aa0554b7a0ee05fceb2",
+      "toolchain_status": "READY_FOR_GPU_ONLY_TOOLCHAIN_USE",
+      "training_started": false
+    },
+    {
+      "ena_fastq_reconciliation": "phase0/audits/full_selected_ena_fastq_reconciliation_20260802T033000Z.json",
+      "ena_fastq_reconciliation_sha256": "eec68feda4739936a85e1eb4f37c1939effad89eda94fe7dc1c0c8144d3b92e4",
+      "ena_fastq_reconciliation_status": "BATCH_COMPLETE",
+      "missing_file_count": 0,
+      "run_id": "20260802T033000Z",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "size_mismatch_count": 0
+    },
+    {
+      "construct_identity_binding_status": "PENDING_EXACT_FROZEN_IDENTITY_AUDIT",
+      "official_processed_dms_payload": "phase0/source_payloads/dms_figshare/data.zip",
+      "official_processed_dms_payload_member_audit": "phase0/audits/figshare_payload_member_metadata_20260802T041500Z_retry01.json",
+      "official_processed_dms_payload_merge_audit": "phase0/audits/figshare_uploaded_chunk_merge_20260802T041500Z.json",
+      "official_processed_dms_payload_sha256": "241d15141298ce78471b360f598fd981c7870aab5ba19b9716f64b057bdfd681",
+      "official_processed_dms_payload_status": "ACQUIRED_AND_ARCHIVE_VERIFIED",
+      "official_sequence_reference": "data/csvs/library_sequences.csv",
+      "primary_labels_admitted": false,
+      "run_id": "20260802T041500Z_retry01",
+      "scientific_gate_effect": "NO_PHASE_0_PASS",
+      "sequences_xlsx_present": false
     }
   ],
+  "registry_version": "phase0-source-registry-v0",
   "required_registry_fields": [
     "dataset",
     "DOI_or_URL",
@@ -235,461 +491,228 @@
     "split_group",
     "exclusion_reason"
   ],
-  "phase0_acceptance": {
-    "status": "IN_PROGRESS_CONTRACT_SOURCE_VERIFIED",
-    "minimum_manual_audit": {
-      "matched": 50,
-      "rejected_or_ambiguous": 30
-    },
-    "minimum_matching_accuracy": 0.95,
-    "required_outcome": "all_primary_labels_traceable_and_no_fatal_field_ambiguity",
-    "pass_record": null,
-    "failure_record": null
-  },
-  "phase0_evidence_updates": [
+  "source_content_policy": "metadata_only_until_provenance_and_contract_gates_pass",
+  "sources": [
     {
-      "run_id": "20260801T074000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T083000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
+      "download_status": "DOWNLOADED_SUPPLEMENTARY_WORKBOOK_METADATA_AUDITED",
+      "full_text_locator": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6053692/",
+      "license_status": "DATA_LICENSE_NOT_VERIFIED",
+      "locator": "https://doi.org/10.1016/j.cell.2018.05.038",
+      "metadata_audit_path": "phase0/audits/denny_workbook_metadata.json",
+      "raw_file_path": "phase0/source_payloads/denny/261_SI.xlsx",
+      "required_audit": [
+        "workbook/schema/units",
+        "raw_vs_interpolated_vs_censored",
+        "-7.1_kcal_per_mol_censor_direction",
+        "replicate/bootstrap/covariance",
+        "1687_1713_1636_count_reconciliation"
+      ],
+      "role": "primary_A_tectoRNA_observation",
+      "semantic_evidence_path": "phase0/audits/denny_xlsx_semantic_evidence_20260801T090500Z.json",
+      "semantic_evidence_status": "EXTRACTED_24073_VARIANT_SUM_1713_CARDINALITY_MINUS7_1_UPPER_BOUND_CONSISTENT_NOT_PROOF",
+      "semantics_audit_path": "phase0/audits/denny_semantics_20260801T065000Z.json",
+      "semantics_audit_status": "AGGREGATE_COMPLETE_EXACT_COUNT_MAPPING_OPEN",
+      "sha256": "f68ed6049b31750ad044a303fdb157ec64fb1e565cbf56fad247e0bbc1deda20",
+      "source_id": "denny_2018_tectorna"
     },
     {
-      "run_id": "20260801T084500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T092000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T114500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T123000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T150000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T174500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T193000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T210000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T220000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T232800Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T165500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T084800Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T090700Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T091000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T091800Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T094700Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T095700Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T102300Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T111357Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T113505Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T114659Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T120610Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T142530Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
+      "code_locator": "https://github.com/YesselmanLabPublications/2025_char_3d_struct_features",
+      "construct_identity_binding_status": "PENDING_EXACT_FROZEN_IDENTITY_AUDIT",
+      "data_locator": "https://doi.org/10.6084/m9.figshare.27880434",
+      "dms_phase0_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802.json",
+      "dms_phase0_dependency_ledger_current": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
+      "dms_phase0_dependency_ledger_current_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
+      "dms_phase0_dependency_ledger_status": "BLOCKED_PHASE0_DMS_PAYLOAD_UNAVAILABLE",
+      "dms_reconstruction_feasibility_audit": "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json",
+      "dms_reconstruction_feasibility_audit_current": "phase0/audits/dms_reconstruction_feasibility_audit_20260802.json",
+      "dms_reconstruction_feasibility_audit_current_status": "BLOCKED_RECONSTRUCTION_INPUTS_MISSING",
+      "dms_reconstruction_status": "BLOCKED_RECONSTRUCTION_INPUTS_MISSING",
+      "download_failure_events": [
+        {
+          "expected_bytes": null,
+          "observed_bytes": null,
+          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz.partial",
+          "returncode": 56,
+          "run": "SRR31402663",
+          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
+        },
+        {
+          "expected_bytes": null,
+          "observed_bytes": null,
+          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402664/SRR31402664_1.fastq.gz.partial",
+          "returncode": 56,
+          "run": "SRR31402664",
+          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
+        },
+        {
+          "expected_bytes": null,
+          "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_sra/main_library/SRR31402663/SRR31402663_2.fastq.gz.partial",
+          "returncode": 56,
+          "run": "SRR31402663",
+          "status": "DOWNLOAD_FAILED_PARTIAL_PRESERVED"
+        }
+      ],
+      "download_failure_status": "PRESERVED_PARTIAL_FAILURES",
+      "download_partial_size_anomaly_path": "phase0/audits/download_partial_size_anomaly_20260801T084716Z.json",
+      "download_partial_size_anomaly_status": "OBSERVED_REQUIRES_FINAL_INTEGRITY_AUDIT",
+      "download_partial_size_regression_reobserved_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T113210Z.json",
+      "download_partial_size_regression_reobserved_status": "REOBSERVED_UNRESOLVED_REQUIRES_FINAL_INTEGRITY_AUDIT",
+      "download_partial_size_regression_third_path": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T115127Z.json",
+      "download_partial_size_regression_third_status": "THIRD_REGRESSION_FROZEN_FOR_DIAGNOSTICS",
+      "download_resume_diagnostic_path": "phase0/audits/download_resume_diagnostic_SRR38259812_2_20260801T114255Z.json",
+      "download_resume_diagnostic_status": "ACTIVE_TRANSPORT_INSTABILITY_UNRESOLVED",
+      "download_status": "METADATA_DOWNLOADED_FIGSHARE_PAYLOAD_BLOCKED_HTTP_403",
+      "fastq_batch_audit_path": "phase0/audits/full_selected_ena_fastq_reconciliation_20260802T010510Z.json",
+      "fastq_batch_audit_status": "BATCH_COMPLETE",
+      "figshare_ndownloader_probe": "phase0/source_metadata/figshare_ndownloader_data_20260801T091600Z.status",
+      "figshare_status": "BLOCKED_HTTP_403_DIRECT_AND_NDOWNLOADER_ROUTES_PRESERVED",
+      "license_status": "ARTICLE_LICENSE_REGISTERED_RAW_FASTQ_TERMS_AND_DATA_PAYLOAD_TERMS_NOT_YET_VERIFIED",
+      "locator": "https://doi.org/10.1093/nar/gkag672",
+      "metadata_paths": [
+        "phase0/source_metadata/ncbi_bioproject_1188187.json",
+        "phase0/source_metadata/crossref_dms_2026.json",
+        "phase0/source_metadata/yesselman_dms_code_refs.txt",
+        "phase0/source_metadata/sra_runinfo_PRJNA1188187.csv",
+        "phase0/source_metadata/oup_supplement_endpoint.probe"
+      ],
+      "official_sequence_reference_status": "OFFICIAL_LIBRARY_SEQUENCES_CSV_PRESENT_SEQUENCES_XLSX_NOT_IN_ARCHIVE",
+      "primary_labels_admitted": false,
+      "processed_dms_payload_additional_range_probes_current": [
+        "phase0/audits/figshare_article_v8_range_probe_20260802T014703Z.json"
+      ],
+      "processed_dms_payload_additional_range_probes_current_status": [
+        "BLOCKED_HTTP_403_RANGE_PROBE"
+      ],
+      "processed_dms_payload_admitted": true,
+      "processed_dms_payload_archive": "phase0/source_payloads/dms_figshare/data.zip",
+      "processed_dms_payload_archive_sha256": "241d15141298ce78471b360f598fd981c7870aab5ba19b9716f64b057bdfd681",
+      "processed_dms_payload_doi_oai_provenance_audit_current": "phase0/audits/doi_oai_provenance_route_audit_20260801T213706Z.json",
+      "processed_dms_payload_doi_oai_provenance_audit_current_status": "DOI_OAI_PROVENANCE_METADATA_AVAILABLE",
+      "processed_dms_payload_figshare_v8_route_audit_current": "phase0/audits/figshare_v8_route_audit_20260801T215150Z.json",
+      "processed_dms_payload_figshare_v8_route_audit_current_status": "BLOCKED_NO_2XX_FIGSHARE_V8_ROUTE",
+      "processed_dms_payload_file_metadata_probe_current": "phase0/audits/figshare_file_66482813_metadata_probe_20260801T210534Z.json",
+      "processed_dms_payload_file_metadata_probe_current_status": "BLOCKED_HTTP_403_FILE_METADATA_PROBE",
+      "processed_dms_payload_latest_readme_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T200800Z.json",
+      "processed_dms_payload_latest_readme_route_reprobe_current": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
+      "processed_dms_payload_latest_readme_route_reprobe_current_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
+      "processed_dms_payload_latest_readme_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
+      "processed_dms_payload_member_audit": "phase0/audits/figshare_payload_member_metadata_20260802T041500Z_retry01.json",
+      "processed_dms_payload_merge_audit": "phase0/audits/figshare_uploaded_chunk_merge_20260802T041500Z.json",
+      "processed_dms_payload_oai_format_audit_current": "phase0/audits/figshare_oai_format_audit_20260801T220235Z.json",
+      "processed_dms_payload_oai_format_audit_current_status": "FIGSHARE_OAI_FORMAT_METADATA_AVAILABLE",
+      "processed_dms_payload_provenance_route_audit_current": "phase0/audits/figshare_provenance_route_audit_20260801T212722Z.json",
+      "processed_dms_payload_provenance_route_audit_current_status": "BLOCKED_NO_2XX_PROVENANCE_ROUTE",
+      "processed_dms_payload_range_probe_current": "phase0/audits/figshare_file_66482813_range_probe_20260802T010510Z.json",
+      "processed_dms_payload_range_probe_current_status": "BLOCKED_HTTP_403_RANGE_PROBE",
+      "processed_dms_payload_readme_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T195800Z.json",
+      "processed_dms_payload_readme_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
+      "processed_dms_payload_route_audit": "phase0/audits/figshare_dms_processed_payload_route_audit_20260801T192200Z.json",
+      "processed_dms_payload_route_reprobe": "phase0/audits/figshare_route_reprobe_20260801T194600Z.json",
+      "processed_dms_payload_route_reprobe_status": "ROUTE_REPROBE_BLOCKED_NO_2XX",
+      "processed_dms_payload_status": "VERIFIED_OFFICIAL_FIGSHARE_PAYLOAD_ACQUIRED",
+      "processing_readme_snapshot": "phase0/source_metadata/dms_official_readme_ed75e36_20260802.md",
+      "processing_readme_snapshot_status": "PUBLIC_PROCESSING_README_SNAPSHOT_PINNED",
+      "public_biorxiv_sequences_xlsx_link_present": false,
+      "public_biorxiv_supplementary_route_audit_current": "phase0/audits/biorxiv_supplementary_route_audit_20260802T015145Z.json",
+      "public_biorxiv_supplementary_route_audit_current_status": "PUBLIC_BIORXIV_SUPPLEMENTARY_PAGE_AUDITED_NO_CONSTRUCT_FILE_LINK_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
+      "public_github_release_tree_metadata_audit_current": "phase0/audits/github_public_metadata_audit_20260801T221809Z.json",
+      "public_github_release_tree_metadata_audit_current_status": "GITHUB_PUBLIC_METADATA_AVAILABLE",
+      "public_pmc_supplementary_main_payload_admitted": false,
+      "public_pmc_supplementary_schema_audit_current": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
+      "public_pmc_supplementary_schema_audit_current_status": "PUBLIC_SUPPLEMENTARY_SCHEMA_AUDITED_MAIN_DMS_PAYLOAD_NOT_ADMITTED",
+      "public_raw_fastq_chunked_download_audit_current": "phase0/audits/ena_SRR38259812_2_chunked_download_20260801T224037Z.json",
+      "public_raw_fastq_chunked_download_audit_current_status": "CHUNKED_MERGE_COMPLETE_GZIP_OK",
+      "public_raw_fastq_downloader_control_audit_current": "phase0/audits/control_downloader_pause_20260801T223854Z.json",
+      "public_raw_fastq_downloader_control_audit_current_status": "SIGSTOP_SENT",
+      "public_raw_fastq_downloader_last_signal": "SIGSTOP",
+      "public_raw_fastq_final_integrity_audit_current": "phase0/audits/fastq_pair_audit_SRR38259812_recovery_20260801T233700Z.json",
+      "public_raw_fastq_final_integrity_audit_current_status": "FASTQ_PAYLOAD_AUDIT_COMPLETE",
+      "public_raw_fastq_install_audit_current": "phase0/audits/SRR38259812_chunked_install_20260802T005554Z.json",
+      "public_raw_fastq_install_audit_current_status": "BLOCKED_TARGET_EXISTS_NO_OVERWRITE",
+      "public_raw_fastq_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
+      "public_raw_fastq_partial_size_audit_current": "phase0/audits/download_partial_size_regression_SRR38259812_2_20260801T223854Z.json",
+      "public_raw_fastq_partial_size_audit_current_status": "PARTIAL_SIZE_REGRESSION_AFTER_SAFE_CONTINUE_FROZEN",
+      "public_raw_fastq_partial_state_audit_current": "phase0/audits/selected_fastq_partial_state_20260801T222125Z.json",
+      "public_raw_fastq_partial_state_audit_current_status": "BATCH_PARTIAL_PENDING_OR_BLOCKED",
+      "public_raw_fastq_range_probe_current": "phase0/audits/ena_SRR38259812_2_range_probe_20260801T224037Z.json",
+      "public_raw_fastq_range_probe_current_status": "RANGE_PROBE_206_EXACT",
+      "public_raw_fastq_route": "ENA_filereport_and_FASTQ_mirror",
+      "public_source_algorithmic_equivalence_proven": false,
+      "public_source_official_construct_identity_proven": false,
+      "public_source_reconstruction_boundary_audit_current": "phase0/audits/source_reconstruction_boundary_20260802T021259Z.json",
+      "public_source_reconstruction_boundary_audit_current_status": "BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT",
+      "public_source_repository_tree": "phase0/source_metadata/dms_github_v1.0.0_tree_20260801T204700Z.json",
+      "public_source_repository_tree_audit": "phase0/audits/dms_github_tree_payload_audit_20260801T215150Z.json",
+      "public_source_repository_tree_audit_status": "PUBLIC_SOURCE_REPOSITORY_TREE_METADATA_COMPLETE_NO_PROCESSED_PAYLOAD_ADMITTED",
+      "public_source_repository_tree_status": "GITHUB_TREE_METADATA_COMPLETE",
+      "raw_fastq_status": "PUBLIC_RAW_FASTQ_FILE_RECONCILIATION_COMPLETE_PRESERVED_PARTIALS_AND_DMS_PAYLOAD_PENDING",
+      "required_audit": [
+        "JSON_supplement_sequence_and_construct_mapping",
+        "treated_count/background/read_depth_hierarchy",
+        "QC/outlier/contamination_semantics",
+        "construct_and_connected_component_split_groups",
+        "official_article_and_public_code_data_layout"
+      ],
+      "resume_wrapper_incident": "phase0/audits/resume_wrapper_incident_20260801T161500Z.json",
+      "resume_wrapper_status": "CORRECTED_FAIL_CLOSED_TESTED_WHILE_ORIGINAL_DOWNLOADER_ACTIVE",
+      "role": "primary_B_cross_assay_complementary_observation",
       "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T142500Z.json"
+      "sha256": null,
+      "source_id": "deenalattha_2026_dms",
+      "sra_locator": "PRJNA1188187",
+      "sra_runinfo_audit_path": "phase0/audits/sra_runinfo_20260801T071500Z.json",
+      "sra_runinfo_audit_status": "RUN_LEVEL_ONLY_CONSTRUCT_LEVEL_HIERARCHY_UNRESOLVED",
+      "zenodo_code_record_route_audit": "phase0/audits/zenodo_code_record_16884333_route_audit_20260802.json",
+      "zenodo_code_record_route_audit_current": "phase0/audits/zenodo_code_record_16884333_route_audit_20260801T205218Z.json",
+      "zenodo_code_record_route_audit_current_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000",
+      "zenodo_code_record_route_status": "BLOCKED_ZENODO_API_CONNECTION_REFUSED_HTTP_000"
     },
     {
-      "run_id": "20260801T164700Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T164500Z.json"
+      "download_status": "NOT_DOWNLOADED",
+      "license_status": "NOT_VERIFIED",
+      "locator": "https://pubmed.ncbi.nlm.nih.gov/38552946/",
+      "required_audit": [
+        "structure_id_chain_resolution_method_release_date",
+        "family_and_cluster_split_provenance"
+      ],
+      "role": "weak_geometry_and_time_family_validation",
+      "secondary_locator": "https://academic.oup.com/bioinformatics/article/38/6/1745/6483078",
+      "sha256": null,
+      "source_id": "rna3db_and_codnas_rna"
     },
     {
-      "run_id": "20260801T165500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T164500Z.json"
+      "download_status": "NOT_DOWNLOADED",
+      "license_status": "NOT_VERIFIED",
+      "locators": [
+        "https://doi.org/10.1021/acs.jctc.7b00061",
+        "https://doi.org/10.1021/acs.jcim.5c00576"
+      ],
+      "required_audit": [
+        "operator_source_and_evidence_level",
+        "parameter_range_or_discrete_ensemble",
+        "F_U_G_contact_G_elec_gauge_reference"
+      ],
+      "role": "registered_operator_uncertainty_prior_only",
+      "sha256": null,
+      "source_id": "operator_mechanism_priors"
     },
     {
-      "run_id": "20260801T170000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T164500Z.json"
-    },
-    {
-      "run_id": "20260801T190500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T190000Z.json"
-    },
-    {
-      "run_id": "20260801T191500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T192000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T193500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T193800Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T194000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T195300Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T200100Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T200500Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T201000Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/selected_fastq_recovery_scope_20260801T191000Z.json"
-    },
-    {
-      "run_id": "20260801T201911Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/full_selected_ena_fastq_reconciliation_20260801T201911Z.json"
-    },
-    {
-      "run_id": "20260801T203216Z",
-      "ena_inventory": "phase0/source_metadata/ena_fastq_inventory_20260801.json",
-      "small_fastq_audit": "phase0/audits/junction_design_1_fastq_20260801T064900Z.json",
-      "denny_subset_audit": "phase0/audits/denny_subset_mapping_20260801T072000Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "fastq_batch_audit": "phase0/audits/full_selected_ena_fastq_reconciliation_20260801T203216Z.json"
-    },
-    {
-      "run_id": "20260801T203858Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T204700Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T205218Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T203858Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T205942Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T205942Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T210534Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T210534Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T212722Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T212722Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T214209Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T214209Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T215150Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T215150Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T220235Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T220235Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T221809Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T221809Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T222125Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T222125Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T224037Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T224037Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260801T223854Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260801T223854Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T004712Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T004712Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T010510Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T010510Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T012312Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T012541Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T014140Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json"
-    },
-    {
-      "run_id": "20260802T014734Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json"
-    },
-    {
-      "run_id": "20260802T015556Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "pmc_supplementary_audit": "phase0/audits/pmc_supplementary_audit_20260802T013923Z.json",
-      "biorxiv_supplementary_audit": "phase0/audits/biorxiv_supplementary_route_audit_20260802T015145Z.json"
-    },
-    {
-      "run_id": "20260802T021259Z",
-      "processed_dms_route_reprobe": "phase0/audits/figshare_readme_reprobe_20260801T203858Z.json",
-      "dms_dependency_ledger": "phase0/audits/dms_phase0_dependency_ledger_20260802T012312Z.json",
-      "scientific_gate_effect": "NO_PHASE_0_PASS",
-      "source_reconstruction_boundary_audit": "phase0/audits/source_reconstruction_boundary_20260802T021259Z.json"
-    },
-    {
-      "run_id": "20260802T032100Z",
-      "toolchain_audit": "phase0/audits/toolchain_environment_20260802T032100Z.json",
-      "toolchain_audit_sha256": "870b34ac64e41049d98bfff1753244b70e5180c45c791aa0554b7a0ee05fceb2",
-      "toolchain_status": "READY_FOR_GPU_ONLY_TOOLCHAIN_USE",
-      "training_started": false,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
-    },
-    {
-      "run_id": "20260802T033000Z",
-      "ena_fastq_reconciliation": "phase0/audits/full_selected_ena_fastq_reconciliation_20260802T033000Z.json",
-      "ena_fastq_reconciliation_sha256": "eec68feda4739936a85e1eb4f37c1939effad89eda94fe7dc1c0c8144d3b92e4",
-      "ena_fastq_reconciliation_status": "BATCH_COMPLETE",
-      "missing_file_count": 0,
-      "size_mismatch_count": 0,
-      "scientific_gate_effect": "NO_PHASE_0_PASS"
+      "download_status": "LOCKED_UNTIL_PHASE7",
+      "license_status": "NOT_VERIFIED",
+      "locators": [
+        "https://doi.org/10.1073/pnas.2109085118",
+        "https://rnajournal.cshlp.org/content/early/2024/10/03/rna.080039.124.full.pdf",
+        "https://doi.org/10.1093/nar/gkae633"
+      ],
+      "required_audit": [
+        "new_estimand_spec",
+        "new_operator_transport_symmetry_specs",
+        "not_a_junction_mechanics_label_by_default"
+      ],
+      "role": "conditional_phase7_second_measurement_system",
+      "sha256": null,
+      "source_id": "second_system_tlr_qmapseq"
     }
-  ]
+  ],
+  "status": "PHASE_0_OFFICIAL_PROCESSED_DMS_PAYLOAD_ACQUIRED_IDENTITY_RECONCILIATION_PENDING"
 }

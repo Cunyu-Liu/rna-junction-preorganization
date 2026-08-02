@@ -1,4 +1,25 @@
 {
+  "current_phase": "PHASE_0",
+  "overall_status": "PHASE_0_IN_PROGRESS_CONTRACT_VERIFIED",
+  "gates": {
+    "phase_0_data_semantics": "IN_PROGRESS",
+    "phase_0_5_four_specs": "LOCKED_UNTIL_PHASE_0_PASS",
+    "phase_1_registry_qc_benchmark": "LOCKED",
+    "phase_2_synthetic_robust_identification": "LOCKED",
+    "phase_3_tecto_real_data": "LOCKED",
+    "phase_4_dms_increment": "LOCKED",
+    "phase_5_target_preorganization": "LOCKED",
+    "phase_6_sequence_deployment": "FORBIDDEN_UNTIL_L3",
+    "phase_7_external_validation": "LOCKED",
+    "phase_8_reproducibility_freeze": "LOCKED"
+  },
+  "stop_rules": [
+    "fatal field ambiguity or untraceable primary labels",
+    "manual matching accuracy below 0.95",
+    "any four-specification contradiction or failed round-trip/sanity test",
+    "CUDA unavailable or CPU fallback during authorized GPU work",
+    "missing complete acceptance evidence"
+  ],
   "blocking_conditions": [
     "A shallow /mnt/cunyuliu directory-name scan found no dedicated Denny/DMS/tectoRNA/junction root; this is not a data availability conclusion.",
     "The deeper name scan was stopped after entering NFS D-state to avoid sustained IO impact.",
@@ -201,31 +222,9 @@
     "A preserved partial-size regression was frozen at 20260802T015556Z (2003124224 vs prior 2361352192 bytes); final integrity and recovery remain unresolved.",
     "Additional Figshare range probe figshare_article_v8_range_probe_20260802T014703Z.json returned BLOCKED_HTTP_403_RANGE_PROBE at 20260802T015556Z; no complete processed-DMS payload is admitted.",
     "The latest official processed-DMS route re-probe (20260802T021259Z) returned no 2xx response; the payload remains unavailable and the 128 MiB download stop rule is still active.",
-    "The public source reconstruction-boundary audit returned BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT at 20260802T021259Z; source-code generation is not proven equivalent to the frozen official construct reference and cannot unlock Phase 0.",
-    "Official processed-DMS archive is verified, but exact frozen construct identity binding remains pending; Sequences.xlsx is absent from the archive and library_sequences.csv is not yet admitted as an equivalent frozen reference."
+    "The public source reconstruction-boundary audit returned BLOCKED_SOURCE_RECONSTRUCTION_NOT_EQUIVALENT at 20260802T021259Z; source-code generation is not proven equivalent to the frozen official construct reference and cannot unlock Phase 0."
   ],
-  "current_phase": "PHASE_0",
-  "gates": {
-    "phase_0_5_four_specs": "LOCKED_UNTIL_PHASE_0_PASS",
-    "phase_0_data_semantics": "IN_PROGRESS",
-    "phase_1_registry_qc_benchmark": "LOCKED",
-    "phase_2_synthetic_robust_identification": "LOCKED",
-    "phase_3_tecto_real_data": "LOCKED",
-    "phase_4_dms_increment": "LOCKED",
-    "phase_5_target_preorganization": "LOCKED",
-    "phase_6_sequence_deployment": "FORBIDDEN_UNTIL_L3",
-    "phase_7_external_validation": "LOCKED",
-    "phase_8_reproducibility_freeze": "LOCKED"
-  },
   "last_transition": "2026-08-02T02:14:04.219714+00:00",
-  "overall_status": "PHASE_0_OFFICIAL_PAYLOAD_ACQUIRED_IDENTITY_RECONCILIATION_PENDING",
-  "scientific_gate_effect": "NO_UNLOCK",
-  "stop_rules": [
-    "fatal field ambiguity or untraceable primary labels",
-    "manual matching accuracy below 0.95",
-    "any four-specification contradiction or failed round-trip/sanity test",
-    "CUDA unavailable or CPU fallback during authorized GPU work",
-    "missing complete acceptance evidence"
-  ],
-  "transition_evidence": "phase0/audits/figshare_payload_member_metadata_20260802T041500Z_retry01.json"
+  "transition_evidence": "manifests/phase0_payload_inventory.json",
+  "scientific_gate_effect": "NO_UNLOCK"
 }
