@@ -1,0 +1,90 @@
+{
+  "schema_version": "phase0-public-crosswalk-exhaustion-manifest-v1",
+  "status": "PUBLIC_CROSSWALK_SEARCH_COMPLETE_UNRESOLVED",
+  "audited_at_utc": "2026-08-02T15:15:00Z",
+  "contract_sha256": "218dec34037487fae14c50eef2aeb28b79292fe428bd4917a9da1f36687aa0e9",
+  "inputs": {
+    "figshare_current_data_zip": {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/dms_figshare/data.zip",
+      "size_bytes": 643502044,
+      "sha256": "241d15141298ce78471b360f598fd981c7870aab5ba19b9716f64b057bdfd681"
+    },
+    "current_dms_pmc_bioc_snapshot": {
+      "path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_metadata/pmc_bioc_PMC11601540.json",
+      "size_bytes": 93087,
+      "sha256": "5a048b4b4e236426901fb65c357b582979e4e83e1a187025b8cbf91b8c28eb8f"
+    }
+  },
+  "audit": {
+    "script_path": "/home/cunyuliu/rna_junction_preorganization_v1_1_20260801/scripts/audit_public_crosswalk_exhaustion.py",
+    "script_sha256": "06726aa48ce7d0dc35559fd630cf33ef39b2323f107d3cb64dcf6dc6bddc6f64",
+    "json_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/public_crosswalk_exhaustion_20260802T151500Z.json",
+    "json_sha256": "eb57646e58988c12c82ca14a1f6f7287badc7bfcdaf9de671858c93a91d6fabf",
+    "log_path": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/audits/public_crosswalk_exhaustion_20260802T151500Z.log",
+    "log_sha256": "3f829e66a353f2d91f57dffc6490b423ee8412ad169dd5083f72d4a1fc2dae5c",
+    "archive_member_count": 3220,
+    "candidate_text_member_count": 10,
+    "skipped_oversized_candidate_text_member_count": 0,
+    "archive_member_name_processed_main_matches": 6,
+    "archive_member_name_processed_control_matches": 6,
+    "archive_member_name_raw_accession_matches": 0,
+    "archive_member_name_trial_matches": 0,
+    "archive_member_name_sequences_workbook_matches": 0,
+    "archive_content_raw_accession_matching_members": 0,
+    "archive_content_processed_namespace_matching_members": 0,
+    "same_member_raw_processed_cooccurrence": 0,
+    "source_snapshot_project_accession_token_count": 2,
+    "source_snapshot_sequences_workbook_token_count": 2,
+    "source_snapshot_raw_accession_token_count": 0,
+    "source_snapshot_processed_namespace_token_count": 0
+  },
+  "execution_incidents_preserved": [
+    {
+      "attempt_id": "public_crosswalk_exhaustion_20260802T150000Z",
+      "status": "BLOCKED_INPUT_HASH_MISMATCH",
+      "json_sha256": "ff5e577060c8d4344f39d987ac4b521c7f0550c6ab89ba17592ec1ef4ffb9724",
+      "log_sha256": "cbd39f61c7bc2063c7adf180e721b1a13fd4306d1a5e83760de585ca8e7d8721",
+      "note": "The Denny PMC snapshot hash was initially supplied for the current-DMS snapshot; no search result was used."
+    },
+    {
+      "attempt_id": "public_crosswalk_exhaustion_20260802T150500Z",
+      "status": "EXECUTION_INTERRUPTED_AFTER_SAFE_PAUSE",
+      "empty_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "The inefficient self-started audit was paused and then terminated after preserving PID and empty-log evidence; no user process was touched."
+    }
+  ],
+  "bounded_search_scope": {
+    "member_names_all_scanned": true,
+    "content_candidate_directories": ["data/csvs/", "metadata/", "source_metadata/"],
+    "content_candidate_basenames": ["README", "README.md", "manifest.txt"],
+    "content_candidate_basename_tokens": ["sample", "manifest", "metadata", "sequence"],
+    "max_uncompressed_candidate_text_bytes": 67108864,
+    "raw_json_and_revision_trees_skipped_for_content": true,
+    "negative_search_is_bounded_not_universal": true
+  },
+  "finding": {
+    "accession_preserving_crosswalk_evidence_found": false,
+    "processed_payload_namespace_found": true,
+    "raw_run_namespace_found": false,
+    "project_level_sra_reference_found": true,
+    "row_level_run_to_processed_binding_found": false
+  },
+  "gate_effect": {
+    "raw_processed_accession_crosswalk": "UNRESOLVED",
+    "manual_matching_acceptance": "PENDING",
+    "primary_labels_admitted": false,
+    "phase0_gate_effect": "NO_PHASE_0_PASS",
+    "scientific_gate_effect": "NO_UNLOCK",
+    "training_started": false
+  },
+  "safety": {
+    "raw_sequence_content_emitted": false,
+    "primary_labels_emitted": false,
+    "existing_results_overwritten": false,
+    "user_download_processes_touched": false
+  },
+  "report": {
+    "path": "reports/phase0_public_crosswalk_exhaustion_20260802.md",
+    "sha256": "22befc05ac913a6277f1afcdbef8fb501346bbc013a10e5f8e8793e99dfef9df"
+  }
+}
