@@ -7,7 +7,7 @@
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-03T16:06:56Z",
+  "updated_at_utc": "2026-08-03T16:08:05Z",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -19,7 +19,8 @@
   },
   "output_artifacts": [
     "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t0/t0_denny_canonical_records.jsonl",
-    "manifests/t0_denny_semantics_manifest.json"
+    "manifests/t0_denny_semantics_manifest.json",
+    "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/s0_spec_manifest.json"
   ],
   "output_checksums": {
     "t0_denny_canonical_records.jsonl": "0989ddc00bb230fdb00bbc65433c943a0419e35c3d0799b481e741c4a24defe2",
@@ -27,7 +28,7 @@
   },
   "gate_statuses": {
     "T0": "PASS",
-    "S0": "NOT_STARTED",
+    "S0": "RUNNING",
     "T1": "NOT_STARTED",
     "M0": "NOT_STARTED",
     "T2": "NOT_STARTED",
@@ -81,5 +82,7 @@
   "claim_class": "NOT_ADJUDICATED",
   "finalizer_status": "PASS",
   "sentinel_status": "PASS",
-  "derived_manifest_freshness": {}
+  "derived_manifest_freshness": {
+    "s0_spec_manifest": "b71547e43cae7807aa509b30b7770f80dd1982cd6ce06b29ff9a04eec13a2ebb"
+  }
 }
