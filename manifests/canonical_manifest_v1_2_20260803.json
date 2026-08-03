@@ -2,12 +2,12 @@
   "schema_version": "1.0.0",
   "contract_version": "v1.2",
   "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
-  "code_commit": "dd0224b52558496852975c919a0a3895a6166440",
+  "code_commit": "e5510b04bb9045db712cc5fd94700726ff2c9a46",
   "worktree_path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803",
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-03T16:08:05Z",
+  "updated_at_utc": "2026-08-03T16:09:18Z",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -20,6 +20,7 @@
   "output_artifacts": [
     "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t0/t0_denny_canonical_records.jsonl",
     "manifests/t0_denny_semantics_manifest.json",
+    "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/s0_spec_manifest.json",
     "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/s0_spec_manifest.json"
   ],
   "output_checksums": {
@@ -73,6 +74,44 @@
         "schema_ok": true
       },
       "finalized_at_utc": "2026-08-03T16:06:56Z"
+    },
+    "S0": {
+      "gate": "S0",
+      "decision": "PARTIAL_ENGINEERING_EVIDENCE",
+      "summary": "S0: estimand, operator, symmetry, assay-transport (current-DMS closed, qMaPseq), primary-analysis thresholds, and negative-control specs frozen before any outcome look.",
+      "fake_claim_guard": "S0 PASS only freezes the estimand/operator/symmetry/analysis protocol; no real tecto labels are yet admitted for modeling.",
+      "evidence": {
+        "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+        "contract_hash_ok": true,
+        "code_commit": "e5510b04bb9045db712cc5fd94700726ff2c9a46",
+        "branch": "v1.2/tecto-qmap",
+        "worktree_dirty_ok": true,
+        "schema_ok": true,
+        "required_specs_present": true,
+        "missing_specs": [],
+        "spec_manifest_present": true,
+        "hash_mismatch": [
+          "estimand_spec.json",
+          "operator_uncertainty_spec.json",
+          "symmetry_frame_spec.json",
+          "assay_transport_current_dms.json",
+          "assay_transport_qmapseq.json",
+          "primary_analysis_spec.json",
+          "negative_control_spec.json"
+        ],
+        "spec_hashes_ok": false,
+        "estimand_complete": true,
+        "current_dms_closed": true,
+        "thresholds_frozen": true
+      },
+      "finalizer_criteria": {
+        "required_artifacts_present": true,
+        "checksums_valid": false,
+        "tests_passed": true,
+        "contract_hash_ok": true,
+        "schema_ok": true
+      },
+      "finalized_at_utc": "2026-08-03T16:08:57Z"
     }
   },
   "current_operational_state": "BLOCKED_AT_TECTO_DATA_ADMISSION",
@@ -80,9 +119,9 @@
   "scientific_unlock": "NO_UNLOCK",
   "qmap_terminal_disposition": "NOT_STARTED",
   "claim_class": "NOT_ADJUDICATED",
-  "finalizer_status": "PASS",
+  "finalizer_status": "FAIL",
   "sentinel_status": "PASS",
   "derived_manifest_freshness": {
-    "s0_spec_manifest": "b71547e43cae7807aa509b30b7770f80dd1982cd6ce06b29ff9a04eec13a2ebb"
+    "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e"
   }
 }

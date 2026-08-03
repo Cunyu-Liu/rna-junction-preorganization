@@ -26,12 +26,20 @@ def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def write_spec(name, spec):
     os.makedirs(SPEC_DIR, exist_ok=True)
     path = os.path.join(SPEC_DIR, name)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(spec, f, indent=2, ensure_ascii=False)
-    return path, sha256_text(json.dumps(spec, sort_keys=True))
+    return path, sha256_file(path)
 
 
 def git(*args):
@@ -322,7 +330,7 @@ def main():
     spec_manifest_path = os.path.join(SPEC_DIR, "s0_spec_manifest.json")
     with open(spec_manifest_path, "w", encoding="utf-8") as f:
         json.dump(spec_manifest, f, indent=2, ensure_ascii=False)
-    spec_manifest_hash = sha256_text(json.dumps(spec_manifest, sort_keys=True))
+    spec_manifest_hash = sha256_file(spec_manifest_path)
     print(f"spec_manifest sha256={spec_manifest_hash[:16]}")
 
     # Update canonical manifest: record S0 artifacts + derived manifest freshness
