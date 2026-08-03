@@ -230,6 +230,23 @@ def main() -> int:
         "likelihood": "censored likelihood for rows at cap; do not treat as exact point values",
     }
 
+    # ---- replicate / bootstrap / covariance / context semantics ----
+    # The workbook reports one aggregated measurement per (junction, scaffold) with
+    # bootstrap 95% CI (err10/err9/err11/err10_5mM). The paper's Figure 1G reports
+    # two replicate experiments; the workbook does not carry per-replicate rows, so
+    # replicate variance is not recoverable at row level and must not be assumed.
+    rep_semantics = {
+        "per_replicate_rows_present": False,
+        "rows_are_aggregated": True,
+        "bootstrap_ci_columns": ["err10", "err9", "err11", "err10_5mM"],
+        "bootstrap_ci_meaning": "95% CI from bootstrapped cluster fluorescence (paper Figure 1H)",
+        "two_replicate_experiments": "reported in paper Figure 1G; not present as row-level replicates",
+        "replicate_variance_recoverable": False,
+        "covariance_default": "NOT independent; same construct/scaffold shared across rows",
+        "scaffold_context": "chip_scaffold (9 values) reused across constructs; context must enter grouping/hierarchical model",
+        "note": "Treat per-row err as measurement uncertainty, not independent replicate noise",
+    }
+
     # ---- attrition table ----
     attrition = {
         "raw_rows": n_raw,
@@ -274,6 +291,7 @@ def main() -> int:
         "n_records": n_raw,
         "attrition": attrition,
         "censoring": censoring,
+        "replicate_semantics": rep_semantics,
         "effective_n": effective_n,
         "graph": {
             "levels": {"constructs": len(all_c), "scaffolds": n_scaffolds, "motifs": n_motifs, "studies": n_studies},
@@ -308,6 +326,10 @@ def main() -> int:
     L.append(f"- rows at cap: {censoring['n_rows_at_cap']}")
     L.append(f"- constructs exclusively censored: {censoring['n_constructs_exclusively_censored']}")
     L.append(f"- likelihood: {censoring['likelihood']}")
+    L.append("")
+    L.append("## Replicate / bootstrap / covariance semantics")
+    for k, v in rep_semantics.items():
+        L.append(f"- {k}: {v}")
     L.append("")
     L.append("## Attrition")
     for k, v in attrition.items():

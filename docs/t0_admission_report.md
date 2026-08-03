@@ -1,7 +1,7 @@
 # T0 tecto Data Admission Report
 
 run_id: v1_2_tecto_qmap_20260803
-generated_at_utc: 2026-08-03T15:50:44.340953+00:00
+generated_at_utc: 2026-08-03T15:52:52.587735+00:00
 canonical sha256: 0989ddc00bb230fdb00bbc65433c943a0419e35c3d0799b481e741c4a24defe2
 
 ## Censoring semantics (-7.1 kcal/mol)
@@ -10,6 +10,17 @@ canonical sha256: 0989ddc00bb230fdb00bbc65433c943a0419e35c3d0799b481e741c4a24def
 - rows at cap: 5865
 - constructs exclusively censored: 6
 - likelihood: censored likelihood for rows at cap; do not treat as exact point values
+
+## Replicate / bootstrap / covariance semantics
+- per_replicate_rows_present: False
+- rows_are_aggregated: True
+- bootstrap_ci_columns: ['err10', 'err9', 'err11', 'err10_5mM']
+- bootstrap_ci_meaning: 95% CI from bootstrapped cluster fluorescence (paper Figure 1H)
+- two_replicate_experiments: reported in paper Figure 1G; not present as row-level replicates
+- replicate_variance_recoverable: False
+- covariance_default: NOT independent; same construct/scaffold shared across rows
+- scaffold_context: chip_scaffold (9 values) reused across constructs; context must enter grouping/hierarchical model
+- note: Treat per-row err as measurement uncertainty, not independent replicate noise
 
 ## Attrition
 - raw_rows: 28935
