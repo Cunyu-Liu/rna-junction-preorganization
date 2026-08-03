@@ -43,3 +43,14 @@
 | 建议方案 | 获取 Denny 论文补充方法与 crystal junction 完整清单，逐行核对 18 个排除项；在此期间以"1328 designed junctionmat（工作簿可重建）+ 359 crystal（论文报告）"为 1687 的带限定重建，不把 26 个排除项（8 designed wc1 + 18 crystal）的全部逐行证据写成已闭环。 |
 | 采用解释 | **fail-closed**：8 个 designed wc1 排除项已给出逐行证据（见 `manifests/t0_denny_semantics_manifest.json` 的 `set_mapping.designed_exclusion_evidence`）；18 个 crystal 排除项在补充材料到位前标记为 `RESIDUAL_EVIDENCE_GAP`，不降低 T0 其他科学 Gate，但 1687 的 crystal 归属不宣称已独立重建。 |
 | 受影响依赖阶段 | T0 的 1687 集合重建声明；S0/T1 若依赖 1687 精确成员名单，需先补齐 crystal 排除项证据。 |
+## Issue-005 — Censoring 语义：S0 表述 vs T0 操作规则
+
+| 字段 | 值 |
+|---|---|
+| 章节 | 八、S0 EstimandSpec identification_assumptions / Phase 2 (M0) |
+| 日期 | 2026-08-03 |
+| 冲突内容 | S0 estimand 表述"censoring at -7.1 kcal/mol is left-censoring (values at/more negative than floor are not point-measurable)"字面会把"比 -7.1 更负"的行也视为 censored。但 T0 数据准入（已 PASS）的操作规则是 `censored = (dg10 == -7.1)`：28222 行 `dg10 != -7.1`（更负，如 -15.03）作为点测量，5865 行 `dg10 == -7.1` 作为 cap 行进入 censored likelihood。若按 S0 字面把所有 `<= -7.1` 行都 censored，则全部数据在单一阈值处 censored，family 均值不可点识别，T2 反向求解不可行。 |
+| 影响 | 若按 S0 字面解释，T2 非可识别（whole-data 全删失）；若按 T0 操作规则，22,292 行点测量 + 5,865 行删失，可识别。 |
+| 建议方案 | 以 T0 已 PASS 的操作规则为准：`censored = (dg10 == -7.1)`（cap 行），cap 行进入 left-censored likelihood（真值 <= -7.1），更负行作为点值。禁用任意"把更负点值改判为 censored"的灵活性。 |
+| 采用解释 | **fail-closed + 只能前进**：cap 行（== -7.1）删除失（两解释一致）；更负行保留为点测量（T0 已锁定，避免整个数据不可识别导致 T2 无法前进）。S0 的"more negative"措辞记为表述偏差，不推翻 T0 操作规则。 |
+| 受影响依赖阶段 | T2 的 censoring likelihood 方向；M0 已按此语义验证（cap 行 = 真值 <= CAP）。 |
