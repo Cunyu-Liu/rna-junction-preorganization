@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0.0",
   "contract_version": "v1.2",
-  "contract_sha256": "",
-  "code_commit": "db0ebb0",
+  "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+  "code_commit": "dd0224b52558496852975c919a0a3895a6166440",
   "worktree_path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803",
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-03T15:49:04Z",
+  "updated_at_utc": "2026-08-03T16:06:56Z",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -26,7 +26,7 @@
     "t0_denny_semantics_manifest.json": "51f6645a9029570fd528f2a3741e662410907011c3ab526c437444d474b5c4da"
   },
   "gate_statuses": {
-    "T0": "RUNNING",
+    "T0": "PASS",
     "S0": "NOT_STARTED",
     "T1": "NOT_STARTED",
     "M0": "NOT_STARTED",
@@ -39,13 +39,47 @@
     "Q4": "NOT_STARTED",
     "Q5": "NOT_STARTED"
   },
-  "gate_decisions": {},
+  "gate_decisions": {
+    "T0": {
+      "gate": "T0",
+      "decision": "PARTIAL_ENGINEERING_EVIDENCE",
+      "summary": "T0 data admission: 1687/1713/1636 set relations, censoring, replicate/covariance, effective-N, graph, outer-holdout feasibility all reconstructed and audited.",
+      "fake_claim_guard": "T0 PASS does NOT admit any tecto labels for modeling; S0/T1/M0 must still pass before T2 inference.",
+      "evidence": {
+        "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+        "contract_hash_ok": true,
+        "code_commit": "dd0224b52558496852975c919a0a3895a6166440",
+        "branch": "v1.2/tecto-qmap",
+        "dirty": true,
+        "worktree_dirty_ok": false,
+        "schema_ok": true,
+        "schema_errors": [],
+        "required_artifacts_present": true,
+        "missing_artifacts": [],
+        "canonical_checksum_ok": true,
+        "semantics_checksum_ok": true,
+        "admission_checksum_consistent": true,
+        "tests_passed": true,
+        "test_output": "ok",
+        "designed_junctionmat_count": 1328,
+        "designed_junctionmat_reconstructed": true
+      },
+      "finalizer_criteria": {
+        "required_artifacts_present": true,
+        "checksums_valid": true,
+        "tests_passed": true,
+        "contract_hash_ok": true,
+        "schema_ok": true
+      },
+      "finalized_at_utc": "2026-08-03T16:06:56Z"
+    }
+  },
   "current_operational_state": "BLOCKED_AT_TECTO_DATA_ADMISSION",
   "current_scientific_disposition": "CONDITIONAL_CANDIDATE",
   "scientific_unlock": "NO_UNLOCK",
   "qmap_terminal_disposition": "NOT_STARTED",
   "claim_class": "NOT_ADJUDICATED",
-  "finalizer_status": "NOT_RUN",
-  "sentinel_status": "RUNNING",
+  "finalizer_status": "PASS",
+  "sentinel_status": "PASS",
   "derived_manifest_freshness": {}
 }
