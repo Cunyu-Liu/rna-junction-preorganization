@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0.0",
+  "title": "CanonicalStateManifest schema for RNA Junction Preorganization v1.2",
+  "required": [
+    "schema_version",
+    "contract_version",
+    "contract_sha256",
+    "code_commit",
+    "worktree_path",
+    "run_id",
+    "parent_run_id",
+    "created_at_utc",
+    "updated_at_utc",
+    "host",
+    "environment_lock_hash",
+    "source_manifests",
+    "input_artifacts",
+    "input_checksums",
+    "output_artifacts",
+    "output_checksums",
+    "gate_statuses",
+    "gate_decisions",
+    "current_operational_state",
+    "current_scientific_disposition",
+    "scientific_unlock",
+    "qmap_terminal_disposition",
+    "claim_class",
+    "finalizer_status",
+    "sentinel_status",
+    "derived_manifest_freshness"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "contract_version": {"type": "string"},
+    "contract_sha256": {"type": "string"},
+    "code_commit": {"type": "string"},
+    "worktree_path": {"type": "string"},
+    "run_id": {"type": "string"},
+    "parent_run_id": {"type": "string"},
+    "created_at_utc": {"type": "string"},
+    "updated_at_utc": {"type": "string"},
+    "host": {"type": "string"},
+    "environment_lock_hash": {"type": "string"},
+    "source_manifests": {"type": "array", "items": {"type": "object"}},
+    "input_artifacts": {"type": "array", "items": {"type": "string"}},
+    "input_checksums": {"type": "object"},
+    "output_artifacts": {"type": "array", "items": {"type": "string"}},
+    "output_checksums": {"type": "object"},
+    "gate_statuses": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["NOT_STARTED", "RUNNING", "PASS", "FAIL", "BLOCKED", "CLOSED", "NOT_APPLICABLE", "STALE_NOT_AUTHORITATIVE"]
+      }
+    },
+    "gate_decisions": {"type": "object"},
+    "current_operational_state": {
+      "type": "string",
+      "enum": ["BLOCKED_AT_TECTO_DATA_ADMISSION", "RUNNING", "TECTO_SPECIFIC", "STOP_MECHANISM_ROUTE", "IMPLEMENTATION_COMPLETE"]
+    },
+    "current_scientific_disposition": {
+      "type": "string",
+      "enum": ["CONDITIONAL_CANDIDATE", "NOT_ADJUDICATED", "ADJUDICATED"]
+    },
+    "scientific_unlock": {
+      "type": "string",
+      "enum": ["NO_UNLOCK", "UNLOCKED"]
+    },
+    "qmap_terminal_disposition": {
+      "type": "string",
+      "enum": ["NOT_STARTED", "NOT_ADJUDICATED", "QMAP_TRANSFER_SUPPORTED", "QMAP_TRANSFER_NOT_SUPPORTED", "QMAP_INCONCLUSIVE", "QMAP_NOT_ADMITTED"]
+    },
+    "claim_class": {
+      "type": "string",
+      "enum": ["NOT_ADJUDICATED", "TECTO_SPECIFIC", "STRONG_CROSS_SYSTEM", "STOP_MECHANISM_ROUTE"]
+    },
+    "finalizer_status": {
+      "type": "string",
+      "enum": ["NOT_RUN", "PASS", "FAIL", "BLOCKED"]
+    },
+    "sentinel_status": {"type": "string"},
+    "derived_manifest_freshness": {"type": "object"}
+  }
+}
