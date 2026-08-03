@@ -1,0 +1,52 @@
+{
+  "schema_version": "operator-uncertainty-spec-v1",
+  "spec_version": "1.0.0",
+  "run_id": "v1_2_tecto_qmap_20260803",
+  "frozen_at_utc": "2026-08-03T16:08:05Z",
+  "code_commit": "1dfcb2fa2fb8624eaeaccf71e27f20988b0badec",
+  "operators": [
+    {
+      "operator": "Delta G 10-bp scaffold (kcal/mol)",
+      "source": "Denny et al. 2018 Cell, supplementary workbook 261_SI.xlsx",
+      "citation": "doi:10.1016/j.cell.2018.05.038",
+      "unit": "kcal/mol",
+      "range": "measured range to -7.1 kcal/mol cap (left-censored floor)",
+      "uncertainty": "per-row bootstrap 95% CI reported in err10; NOT independent replicate noise",
+      "applicability": "junction-inserted tectoRNA assembly, 10 mM Mg2+",
+      "calibration_material": "synthetic fixtures with known Delta G (M0)",
+      "calibration_procedure": "QR/interval calibration on synthetic fixtures before any real-outcome look",
+      "calibration_holdout": "synthetic holdout, not real tecto labels",
+      "sensitivity_result": "reserved: filled after M0 sensitivity run",
+      "evidence_hash": ""
+    },
+    {
+      "operator": "Delta G 9-bp and 11-bp scaffold (kcal/mol)",
+      "source": "Denny et al. 2018 Cell, supplementary workbook 261_SI.xlsx",
+      "citation": "doi:10.1016/j.cell.2018.05.038",
+      "unit": "kcal/mol",
+      "range": "measured range to -7.1 kcal/mol cap",
+      "uncertainty": "per-row bootstrap 95% CI (err9, err11); NOT independent replicate noise",
+      "applicability": "junction-inserted tectoRNA assembly, scaffold-length sensitivity",
+      "calibration_material": "synthetic fixtures with known Delta G (M0)",
+      "calibration_procedure": "interval calibration on synthetic fixtures",
+      "calibration_holdout": "synthetic holdout",
+      "sensitivity_result": "reserved",
+      "evidence_hash": ""
+    },
+    {
+      "operator": "Delta G 10-bp 5mM Mg2+ (kcal/mol)",
+      "source": "Denny et al. 2018 Cell, supplementary workbook 261_SI.xlsx",
+      "citation": "doi:10.1016/j.cell.2018.05.038",
+      "unit": "kcal/mol",
+      "range": "measured range to -7.1 kcal/mol cap",
+      "uncertainty": "per-row bootstrap 95% CI (err10_5mM)",
+      "applicability": "ionic-condition sensitivity operator",
+      "calibration_material": "synthetic fixtures",
+      "calibration_procedure": "interval calibration on synthetic fixtures",
+      "calibration_holdout": "synthetic holdout",
+      "sensitivity_result": "reserved",
+      "evidence_hash": ""
+    }
+  ],
+  "note": "A single subjective uncertainty set does not constitute PASS; each operator must carry external basis, calibration, holdout, and observed sensitivity."
+}

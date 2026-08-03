@@ -1,0 +1,49 @@
+{
+  "schema_version": "estimand-spec-v1",
+  "spec_version": "1.0.0",
+  "run_id": "v1_2_tecto_qmap_20260803",
+  "frozen_at_utc": "2026-08-03T16:08:05Z",
+  "code_commit": "1dfcb2fa2fb8624eaeaccf71e27f20988b0badec",
+  "primary_estimand": "target-specific thermodynamic functional",
+  "primary_target": "thermodynamic stability of forming a two-way RNA junction tertiary geometry within a tectoRNA assembly, parameterized by the folding free energy (Delta G)",
+  "condition": "in vitro, 37C, 10 mM Mg2+ (as in Denny et al. 2018 tectoRNA binding assay); 5 mM Mg2+ variant reported separately",
+  "input_space": "junction sequence (two-way junction with unpaired residues), flanking base-pair context, chip scaffold length/position, sublibrary",
+  "output_functional": "Delta G(junction | scaffold, flank) in kcal/mol; the target-specific thermodynamic functional is the conditional expected free energy of the junction-inserted assembly relative to a reference",
+  "units": "kcal/mol",
+  "nuisance_variables": [
+    "chip_scaffold identity (9 values)",
+    "flanking sequence context",
+    "helix length",
+    "sublibrary / position",
+    "measurement batch / cluster fluorescence"
+  ],
+  "identification_assumptions": [
+    "conditional exchangeability given (junction, scaffold, flank) for the measured non-censored rows",
+    "censoring at -7.1 kcal/mol is left-censoring (values at/more negative than floor are not point-measurable); censored rows enter a censored likelihood, not exact values",
+    "no unmeasured confounder shifts Delta G differentially across within-scaffold comparisons"
+  ],
+  "point_identification_conditions": [
+    "rows are non-censored and non-interpolated",
+    "sufficient support across scaffold/flank for a given junction family",
+    "no unresolved operator ambiguity for the measured value"
+  ],
+  "partial_identification_conditions": [
+    "rows at the -7.1 cap (left-censored)",
+    "rows with only interpolated values",
+    "motif/scaffold cells with zero support",
+    "any unresolved operator range overlap"
+  ],
+  "identified_set_interval": "where point identification fails, report an identified set/interval from the censored likelihood and operator-uncertainty propagation; never report a pseudo-exact point",
+  "primary_uncertainty_summary": "95% credible interval (or identified interval) on the conditional Delta G contrast, together with the coverage of the interval on synthetic fixtures",
+  "allowed_interpretations": [
+    "conditional thermodynamic preference of a junction within the tectoRNA platform",
+    "within-platform ordering of junction families under the frozen symmetric frame"
+  ],
+  "prohibited_interpretations": [
+    "absolute free energy independent of the platform/scaffold",
+    "DMS reactivity or geometric state as the same latent truth as Delta G",
+    "cross-measurement-system junction equivalence without qMaP transfer evidence",
+    "any sequence embedding treated as thermodynamic ground truth"
+  ],
+  "note": "DMS reactivity, geometric state, and sequence embedding are distinct objects, not the same latent truth."
+}

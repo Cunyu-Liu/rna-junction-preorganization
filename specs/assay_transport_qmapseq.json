@@ -1,0 +1,25 @@
+{
+  "schema_version": "assay-transport-spec-v1",
+  "spec_version": "1.0.0",
+  "run_id": "v1_2_tecto_qmap_20260803",
+  "frozen_at_utc": "2026-08-03T16:08:05Z",
+  "system": "qMaPseq TL/TLR-Mg2+ (NAR 2024, doi:10.1093/nar/gkae633)",
+  "operational_contact_stability": "stability of the tetraloop/tetraloop-receptor contact in the qMaPseq scaffold as a function of [Mg2+]",
+  "mg_half": "[Mg2+]1/2: the magnesium concentration at which the contact reaches half-maximal stability; units mM",
+  "rna_map_reference_dg": "RNA-MaP reference Delta G derived from the qMaP titration; a distinct measurement from the Denny tectoRNA Delta G",
+  "dms_titration_operator": "DMS signal titration vs [Mg2+] as the chemical-mapping operator",
+  "uncertainty": "per-variant uncertainty from the qMaP fit; censored cases ([Mg2+]1/2 > 40 mM) enter a censored likelihood",
+  "selection_mechanism": "selection on the Mg2+ midpoint of the contact stability",
+  "transport_assumptions": [
+    "qMaPseq does not share a latent q with the Denny junction functional",
+    "any cross-system transfer claim requires a locked Q5 transfer test"
+  ],
+  "allowed_cross_system_claims": [
+    "restricted cross-measurement-system migration statement if QMAP_TRANSFER_SUPPORTED",
+    "pre-registered negative/boundary evidence if QMAP_TRANSFER_NOT_SUPPORTED"
+  ],
+  "forbidden_cross_system_claims": [
+    "qMaPseq as independent replication of junction preorganization",
+    "junction equivalence across systems without Q5 transfer evidence"
+  ]
+}

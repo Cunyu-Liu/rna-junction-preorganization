@@ -1,0 +1,36 @@
+{
+  "spec_version": "s0-spec-manifest-v1",
+  "frozen_at_utc": "2026-08-03T16:08:05Z",
+  "code_commit": "1dfcb2fa2fb8624eaeaccf71e27f20988b0badec",
+  "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+  "specs": {
+    "estimand_spec.json": {
+      "path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/estimand_spec.json",
+      "sha256": "086e0d1b653832a3318434f6fd69a27121b9edfbcb6e92540f18995f81fe52b2"
+    },
+    "operator_uncertainty_spec.json": {
+      "path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/operator_uncertainty_spec.json",
+      "sha256": "671798e484cd1b4e1f8b2b26d306bd5f37b5cf6fa632ea13a5abd1239311cd20"
+    },
+    "symmetry_frame_spec.json": {
+      "path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/symmetry_frame_spec.json",
+      "sha256": "9a1b3f5b91bc51e07e8a979c864a380b478feebaf246dd66cb8d0f8ab1659e27"
+    },
+    "assay_transport_current_dms.json": {
+      "path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/assay_transport_current_dms.json",
+      "sha256": "67921bbb15e62c2af79972dd52cc3ce58716ba3c8e73a0fc4613cda19608d166"
+    },
+    "assay_transport_qmapseq.json": {
+      "path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/assay_transport_qmapseq.json",
+      "sha256": "f4c02066763f905b22f56c270e9bf79c13e68183da742d0449d08375908e19d8"
+    },
+    "primary_analysis_spec.json": {
+      "path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/primary_analysis_spec.json",
+      "sha256": "d854aaebb036dc8343c26ec2141169698fef6be1b254882d6c0b33c1c4329aab"
+    },
+    "negative_control_spec.json": {
+      "path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/negative_control_spec.json",
+      "sha256": "6ae321fc759c8c527c1cc1d53bb4cb1dc109a512c5ed6214bbebef9507373ba4"
+    }
+  }
+}

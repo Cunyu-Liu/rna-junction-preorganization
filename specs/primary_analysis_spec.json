@@ -1,0 +1,34 @@
+{
+  "schema_version": "primary-analysis-spec-v1",
+  "spec_version": "1.0.0",
+  "run_id": "v1_2_tecto_qmap_20260803",
+  "frozen_at_utc": "2026-08-03T16:08:05Z",
+  "code_commit": "1dfcb2fa2fb8624eaeaccf71e27f20988b0badec",
+  "primary_estimand": "target-specific thermodynamic functional",
+  "primary_target": "conditional Delta G of junction within tectoRNA platform",
+  "primary_generalization_split": "motif-family holdout (pre-registered; blocks leakage via shared motif/scaffold; see T1 for the frozen split manifest)",
+  "primary_operator_robustness_criterion": "estimated identified-interval width must be <= 1.0 kcal/mol for the primary contrast on the held-out axis, and interval calibration must be within [0.9, 1.0] on synthetic fixtures",
+  "primary_held_out_metric": "interval coverage on the held-out motif families (primary); point MAE as secondary, never as the primary conclusion",
+  "primary_qmap_transport_test": "locked Q5 transfer test (assign only after Q0-Q3 pass)",
+  "thresholds": {
+    "min_meaningful_effect_kcal": {
+      "value": 1.0,
+      "basis": "Yesselman et al. 2019 PNAS reported >2 kcal/mol transduced effects from small helix differences; a 1.0 kcal/mol minimum meaningful effect is a conservative scientific floor for the tectoRNA platform",
+      "frozen_before_outcome": true
+    },
+    "interval_width_max_kcal": {
+      "value": 1.0,
+      "basis": "consistent with the minimum meaningful effect; intervals wider than this cannot support a meaningful effect claim",
+      "frozen_before_outcome": true
+    },
+    "calibration_target": {
+      "value": [
+        0.9,
+        1.0
+      ],
+      "basis": "standard 90-100% interval coverage target on synthetic fixtures",
+      "frozen_before_outcome": true
+    }
+  },
+  "note": "Thresholds are frozen before any real held-out outcome is examined; they must not be changed because results are unfavorable."
+}

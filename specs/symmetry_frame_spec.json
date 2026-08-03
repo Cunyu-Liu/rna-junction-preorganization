@@ -1,0 +1,18 @@
+{
+  "schema_version": "symmetry-frame-spec-v1",
+  "spec_version": "1.0.0",
+  "run_id": "v1_2_tecto_qmap_20260803",
+  "frozen_at_utc": "2026-08-03T16:08:05Z",
+  "code_commit": "1dfcb2fa2fb8624eaeaccf71e27f20988b0badec",
+  "strand_definition": "RNA sequences are written 5'->3' for each strand of the two-way junction; junction_seq is encoded as STRAND1_STRAND2 with '_' separator",
+  "boundary": "junction unpaired residues between the two interleaved WC helices; the two flanking base pairs are the boundary anchors",
+  "flank": "the two WC base pairs adjacent to the junction on each side, part of the two-way junction",
+  "sequence_orientation": "5'->3' canonical; the reciprocal orientation is handled by the reciprocal-equivalence rule below",
+  "reciprocal_equivalence": "the junction STRAND1_STRAND2 and its reverse complement / strand-swap are symmetry-equivalent when the physical geometry is identical; canonicalization maps both to the same frame",
+  "symmetry_equivalence": "junctions that differ only by the exchange of the two helical directions (mirror) or by a global sequence reversal that preserves the base-pairing pattern are placed in the same symmetry-equivalence group",
+  "canonical_frame": "lexicographically-minimal canonical representation: choose the orientation (and strand assignment) that yields the smallest canonical string after considering all symmetry transforms",
+  "target_geometry": "two-way junction (bulge / internal loop) with the two emanating helices aligned to the tectoRNA contact geometry",
+  "canonicalization_procedure": "1) normalize strand separator; 2) generate all symmetry transforms (reverse, complement, reverse-complement, strand swap); 3) pick the lexicographically minimal canonical string; 4) assign the canonical frame id",
+  "ambiguity_handling": "if two transforms collide (non-unique minimal), apply a deterministic tie-break and record the ambiguity in the CleaningLedger; a symmetry-equivalent group must never be split across train/test folds",
+  "rule": "same symmetry-equivalent group must not cross folds"
+}
