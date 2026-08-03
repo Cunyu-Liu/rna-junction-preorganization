@@ -100,8 +100,8 @@ def main():
         "decision": "PASS" if all_ok else "PARTIAL_ENGINEERING_EVIDENCE",
         "summary": "T3: target-specific thermodynamic functional. Per-junction identified-set intervals; "
                    "hierarchical (motif+scaffold) model vs matched simple baselines on frozen motif-family "
-                   "holdout; operator sensitivity; group-level scaffold bootstrap; extrapolation &
-                   interpretation boundaries; GPU execution.",
+                   "holdout; operator sensitivity; group-level scaffold bootstrap; extrapolation & "
+                   "interpretation boundaries; GPU execution.",
         "fake_claim_guard": "T3 PASS centers the functional on the identified set/interval, coverage and width; "
                             "it does NOT claim a pseudo-exact biological Delta G. The scientific disposition is "
                             "reported separately (INCONCLUSIVE_FOR_1_KCAL_PRECISION if width > 1.0 kcal/mol).",
