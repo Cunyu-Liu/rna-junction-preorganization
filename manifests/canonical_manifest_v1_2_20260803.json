@@ -2,12 +2,12 @@
   "schema_version": "1.0.0",
   "contract_version": "v1.2",
   "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
-  "code_commit": "71d85bdf551ebf2daaae2bf6bae10b66ae5e2c88",
+  "code_commit": "e596a3f8143cd425bd3b57da5bb9e19650efc3c2",
   "worktree_path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803",
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-03T16:36:28Z",
+  "updated_at_utc": "2026-08-03T16:45:11.563363+00:00",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -33,7 +33,7 @@
     "T1": "PASS",
     "M0": "PASS",
     "T2": "PASS",
-    "T3": "NOT_STARTED",
+    "T3": "PARTIAL_ENGINEERING_EVIDENCE",
     "Q0": "NOT_STARTED",
     "Q1": "NOT_STARTED",
     "Q2": "NOT_STARTED",
@@ -207,9 +207,88 @@
         "schema_ok": true
       },
       "finalized_at_utc": "2026-08-03T16:36:28Z"
+    },
+    "T3": {
+      "gate": "T3",
+      "decision": "PARTIAL_ENGINEERING_EVIDENCE",
+      "summary": "T3: target-specific thermodynamic functional. Per-junction identified-set intervals; hierarchical (motif+scaffold) model vs matched simple baselines on frozen motif-family holdout; operator sensitivity; group-level scaffold bootstrap; extrapolation & interpretation boundaries; GPU execution.",
+      "fake_claim_guard": "T3 PASS centers the functional on the identified set/interval, coverage and width; it does NOT claim a pseudo-exact biological Delta G. The scientific disposition is reported separately (INCONCLUSIVE_FOR_1_KCAL_PRECISION if width > 1.0 kcal/mol).",
+      "evidence": {
+        "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+        "contract_hash_ok": true,
+        "code_commit": "e596a3f8143cd425bd3b57da5bb9e19650efc3c2",
+        "branch": "v1.2/tecto-qmap",
+        "dirty": true,
+        "worktree_dirty_ok": false,
+        "required_artifacts_present": true,
+        "missing_artifacts": [],
+        "output_checksums": {
+          "t3_results.json": "446d28923a03d4e4ef3507f2b77728bb8fece6cab3ac1cb51b8bd7fdf785f995"
+        },
+        "device": "cuda",
+        "gpu_used": true,
+        "controls_ok": true,
+        "n_junctions_identifiable": 1336,
+        "pipeline_ok": true,
+        "scientific_disposition": "INCONCLUSIVE_FOR_1_KCAL_PRECISION",
+        "matched_baseline": {
+          "strongest_simple_baseline": "motif_mean",
+          "strongest_baseline_score": 27.031719497889167,
+          "t3_score": 41.813174294170395,
+          "relative_gain": -0.5468188879895514,
+          "t3_beats_baseline": false
+        },
+        "group_bootstrap": {
+          "n_scaffold_resamples": 38,
+          "gain_mean": -0.5039409342746366,
+          "gain_sd": 0.0717485397856951,
+          "gain_ci": [
+            -0.5468188879895514,
+            -0.3838826638728748
+          ],
+          "gain_positive_frac": 0.0
+        },
+        "operator_sensitivity": {
+          "dg9": {
+            "n_junctions": 1336,
+            "n_identifiable": 1333,
+            "n_not_identifiable": 3,
+            "width_median": 1.233667167568102,
+            "width_p90": 1.7495786953496704
+          },
+          "dg11": {
+            "n_junctions": 1336,
+            "n_identifiable": 1317,
+            "n_not_identifiable": 19,
+            "width_median": 0.5491309860615458,
+            "width_p90": 0.9666047250779075
+          },
+          "dg10_5mM": {
+            "n_junctions": 1336,
+            "n_identifiable": 1319,
+            "n_not_identifiable": 17,
+            "width_median": 0.7664186583678331,
+            "width_p90": 1.2359268706567215
+          }
+        },
+        "schema_ok": true,
+        "schema_errors": [],
+        "canonical_checksum_ok": true,
+        "tests_passed": true,
+        "test_output": "ok"
+      },
+      "finalizer_criteria": {
+        "required_artifacts_present": true,
+        "checksums_valid": true,
+        "tests_passed": true,
+        "contract_hash_ok": true,
+        "schema_ok": true
+      },
+      "scientific_disposition": "INCONCLUSIVE_FOR_1_KCAL_PRECISION",
+      "finalized_at_utc": "2026-08-03T16:45:11.563363+00:00"
     }
   },
-  "current_operational_state": "BLOCKED_AT_TECTO_DATA_ADMISSION",
+  "current_operational_state": "TECTO_MAIN_LINE_COMPLETE",
   "current_scientific_disposition": "CONDITIONAL_CANDIDATE",
   "scientific_unlock": "NO_UNLOCK",
   "qmap_terminal_disposition": "NOT_STARTED",
