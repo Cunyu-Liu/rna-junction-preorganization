@@ -85,18 +85,37 @@ def collect_tools(env_prefix: Path) -> dict[str, object]:
 
 def input_summary(run_root: Path) -> dict[str, object]:
     path = run_root / "inputs_manifest.json"
+    manifest_kind = "inputs_manifest"
+    if not path.is_file():
+        path = run_root / "run_manifest.json"
+        manifest_kind = "run_manifest"
     if not path.is_file():
         return {"present": False, "status": "INPUT_MANIFEST_MISSING"}
     data = json.loads(path.read_text(encoding="utf-8"))
+    reference = data.get("reference_fasta", {})
+    source_files = data.get("source_fastq_files", [])
+    input_hashes = data.get("sha256", {})
+    if not isinstance(input_hashes, dict):
+        input_hashes = {}
+    if isinstance(source_files, list):
+        for item in source_files:
+            if isinstance(item, dict) and item.get("path") and item.get("sha256"):
+                input_hashes[str(item["path"])] = item["sha256"]
+    if isinstance(reference, dict) and reference.get("path") and reference.get("sha256"):
+        input_hashes[str(reference["path"])] = reference["sha256"]
     return {
         "present": True,
-        "sha256": sha256_file(path),
-        "status": data.get("status"),
-        "source_fastq_run": data.get("source_fastq_run"),
+        "manifest_kind": manifest_kind,
+        "manifest_path": str(path),
+        "manifest_sha256": sha256_file(path),
+        "schema": data.get("schema"),
+        "status": "MANIFEST_PRESENT",
+        "manifest_declared_status": data.get("status"),
+        "source_fastq_run": data.get("source_fastq_run", data.get("source_accession")),
         "sample_records_per_mate": data.get("sample_records_per_mate"),
-        "reference_count": data.get("reference_count"),
+        "reference_count": data.get("reference_count", reference.get("reference_count")),
         "raw_sequence_content_emitted": data.get("raw_sequence_content_emitted"),
-        "input_sha256": data.get("sha256", {}),
+        "input_sha256": input_hashes,
     }
 
 
@@ -123,7 +142,7 @@ def archive_summary(archive: Path) -> dict[str, object]:
     }
 
 
-def log_summary(path: Path) -> dict[str, object]:
+def log_summary(path: Path, run_root: Path) -> dict[str, object]:
     text = path.read_text(encoding="utf-8", errors="replace") if path.is_file() else ""
     exit_match = re.search(r"exit_code=(\d+)", text)
     errors = []
@@ -134,8 +153,25 @@ def log_summary(path: Path) -> dict[str, object]:
     ):
         if marker in text:
             errors.append(marker.rstrip(":"))
+    output_dir = run_root / "output" / "BitVector_Files"
+    completion_outputs = [
+        output_dir / "mutation_histos.json",
+        output_dir / "mutation_histos.p",
+        output_dir / "summary.csv",
+    ]
+    output_completion_evidence = [
+        str(path.relative_to(run_root))
+        for path in completion_outputs
+        if path.is_file() and path.stat().st_size > 0
+    ]
+    completed_output_set = len(output_completion_evidence) == len(completion_outputs)
+    analysis_completed_marker = (
+        "Analysis completed successfully" in text or "MUTATION SUMMARY:" in text
+    )
     if exit_match and exit_match.group(1) == "0":
         status = "REPLAY_PROBE_PASS_ENGINEERING_ONLY"
+    elif completed_output_set and analysis_completed_marker and not errors:
+        status = "REPLAY_COMPLETED_ENGINEERING_ONLY"
     elif "DREEMMissingRequirementsException:" in text:
         status = "BLOCKED_REPLAY_ENVIRONMENT"
     elif exit_match:
@@ -148,7 +184,8 @@ def log_summary(path: Path) -> dict[str, object]:
         "status": status,
         "exit_code": int(exit_match.group(1)) if exit_match else None,
         "error_markers": errors,
-        "analysis_completed_marker": "Analysis completed successfully" in text,
+        "analysis_completed_marker": analysis_completed_marker,
+        "completion_output_evidence": output_completion_evidence,
     }
 
 
@@ -288,7 +325,7 @@ def main() -> int:
         "toolchain": collect_tools(args.env_prefix),
         "inputs": input_summary(args.run_root),
         "processed_archive": archive_summary(args.archive),
-        "logs": [log_summary(path) for path in args.log],
+        "logs": [log_summary(path, args.run_root) for path in args.log],
         "outputs": output_inventory(args.run_root),
         "replay_count_comparison": replay_count_comparison(args.run_root, args.archive),
         "primary_labels_admitted": False,
