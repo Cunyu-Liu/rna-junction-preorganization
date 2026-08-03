@@ -2,12 +2,12 @@
   "schema_version": "1.0.0",
   "contract_version": "v1.2",
   "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
-  "code_commit": "e596a3f8143cd425bd3b57da5bb9e19650efc3c2",
+  "code_commit": "0d97182ee7b81b307f50999f2e2a7da869daef02",
   "worktree_path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803",
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-03T16:45:11.563363+00:00",
+  "updated_at_utc": "2026-08-03T16:45:18.137854+00:00",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -33,7 +33,7 @@
     "T1": "PASS",
     "M0": "PASS",
     "T2": "PASS",
-    "T3": "PARTIAL_ENGINEERING_EVIDENCE",
+    "T3": "PASS",
     "Q0": "NOT_STARTED",
     "Q1": "NOT_STARTED",
     "Q2": "NOT_STARTED",
@@ -210,16 +210,16 @@
     },
     "T3": {
       "gate": "T3",
-      "decision": "PARTIAL_ENGINEERING_EVIDENCE",
+      "decision": "PASS",
       "summary": "T3: target-specific thermodynamic functional. Per-junction identified-set intervals; hierarchical (motif+scaffold) model vs matched simple baselines on frozen motif-family holdout; operator sensitivity; group-level scaffold bootstrap; extrapolation & interpretation boundaries; GPU execution.",
       "fake_claim_guard": "T3 PASS centers the functional on the identified set/interval, coverage and width; it does NOT claim a pseudo-exact biological Delta G. The scientific disposition is reported separately (INCONCLUSIVE_FOR_1_KCAL_PRECISION if width > 1.0 kcal/mol).",
       "evidence": {
         "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
         "contract_hash_ok": true,
-        "code_commit": "e596a3f8143cd425bd3b57da5bb9e19650efc3c2",
+        "code_commit": "0d97182ee7b81b307f50999f2e2a7da869daef02",
         "branch": "v1.2/tecto-qmap",
-        "dirty": true,
-        "worktree_dirty_ok": false,
+        "dirty": false,
+        "worktree_dirty_ok": true,
         "required_artifacts_present": true,
         "missing_artifacts": [],
         "output_checksums": {
@@ -285,7 +285,7 @@
         "schema_ok": true
       },
       "scientific_disposition": "INCONCLUSIVE_FOR_1_KCAL_PRECISION",
-      "finalized_at_utc": "2026-08-03T16:45:11.563363+00:00"
+      "finalized_at_utc": "2026-08-03T16:45:18.137854+00:00"
     }
   },
   "current_operational_state": "TECTO_MAIN_LINE_COMPLETE",

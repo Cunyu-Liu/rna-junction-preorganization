@@ -1,3 +1,3 @@
-T3=PARTIAL_ENGINEERING_EVIDENCE
-commit=e596a3f8143cd425bd3b57da5bb9e19650efc3c2
+T3=PASS
+commit=0d97182ee7b81b307f50999f2e2a7da869daef02
 branch=v1.2/tecto-qmap
