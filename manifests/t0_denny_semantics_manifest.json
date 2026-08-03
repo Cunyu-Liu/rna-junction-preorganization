@@ -1,0 +1,189 @@
+{
+  "run_id": "v1_2_tecto_qmap_20260803",
+  "source": "/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/denny/261_SI.xlsx",
+  "source_sha256": "f68ed6049b31750ad044a303fdb157ec64fb1e565cbf56fad247e0bbc1deda20",
+  "header": {
+    "B": "sublibrary",
+    "C": "sublibrary2",
+    "D": "receptor",
+    "E": "length",
+    "F": "helix_one_length",
+    "G": "chip_scaffold",
+    "H": "helix_seq",
+    "I": "junction_seq",
+    "J": "junction_id",
+    "K": "motif_type",
+    "L": "is_junctionmat",
+    "M": "tecto_sequence",
+    "N": "ΔG_fold (kcal/mol)",
+    "O": "ΔG_fold constrained (kcal/mol)",
+    "P": "ΔG 10-bp (kcal/mol)",
+    "Q": "ΔG 9-bp (kcal/mol)",
+    "R": "ΔG 11-bp (kcal/mol)",
+    "S": "ΔG 10-bp, 5mM Mg2+ (kcal/mol)",
+    "T": "error on ΔG 10-bp (kcal/mol)",
+    "U": "error on ΔG 9-bp (kcal/mol)",
+    "V": "error on ΔG  11-bp (kcal/mol)",
+    "W": "error on ΔG 10-bp, 5mM Mg2+ (kcal/mol)",
+    "X": "ΔG 10-bp (kcal/mol)",
+    "Y": "ΔG 9-bp (kcal/mol)",
+    "Z": "ΔG 11-bp (kcal/mol)"
+  },
+  "sublibraries": [
+    {
+      "sublibrary": "“junction_conformations”",
+      "description": "The most basic experiment on chip: motifs were defined as two-way junctions of varying topologies, and were inserted into chip scaffolds of length 8-12 bp, and in three different positions in the length 9 and 10 bp scaffolds. Two different flanking sequences of the junctions were employed.",
+      "num_variants": "12024"
+    },
+    {
+      "sublibrary": "“along”",
+      "description": "A subset of motifs studied in the “junction_conformation” section were put into additional positions within tectoRNA scaffolds. Essentially, motifs were put into each position within scaffolds of length 8-11 bp that preserved the flanking sequence of the motif (“along”).",
+      "num_variants": "1120"
+    },
+    {
+      "sublibrary": " “along_extended”",
+      "description": "Similar to above, with additional positions that did not conserve all of the base pairs of the motif",
+      "num_variants": "256"
+    },
+    {
+      "sublibrary": "“flanking_sequences”",
+      "description": "The two flanking WC base pairs of certain two-way junctions were comprehensively varied at a single position within tectoRNA helices of length 9 and 10 bp.",
+      "num_variants": "3601"
+    },
+    {
+      "sublibrary": "“junction_conformations_pdb”",
+      "description": "Every two-way junction that was crystallized in the PDB crystal structure database was inserted into scaffolds of length 8-12 bp, and in three different positions within length 9 and 10 bp.",
+      "num_variants": "3280"
+    },
+    {
+      "sublibrary": "“along_pdb”",
+      "description": "The same as “along” except with motifs from the PDB crystal structure database.",
+      "num_variants": "3792"
+    },
+    {
+      "sublibrary": "\"tertiary_contacts\"",
+      "description": "Several mutations were made in the tertiary contact receptor, and the effect of these mutations was measured in multiple tectoRNA scaffolds.",
+      "num_variants": null
+    }
+  ],
+  "set_report": {
+    "n_distinct_junction_id_junctionmat": 1636,
+    "n_distinct_junction_id_measured_dg10": 1713,
+    "n_distinct_junction_id_junctionmat_and_measured": 1636,
+    "n_junctionmat_junction_ids": 1636,
+    "n_measured_junction_ids": 1713,
+    "n_junctionmat_and_measured": 1636,
+    "intersection_jm_measured": 1636,
+    "diff_jm_only": 0,
+    "diff_measured_only": 77
+  },
+  "set_mapping": {
+    "SET_1713": {
+      "definition": "all distinct junction_ids in the workbook",
+      "count": 1713,
+      "composed_of": {
+        "designed": 1336,
+        "crystal": 377
+      }
+    },
+    "SET_1636": {
+      "definition": "junctionmat junction_ids (is_junctionmat flagged)",
+      "count": 1636,
+      "composed_of": {
+        "designed_junctionmat": 1328,
+        "crystal_junctionmat": 308
+      }
+    },
+    "SET_1687": {
+      "definition": "paper-reported junction set = 1328 designed junctionmat + 359 crystal (1328+359=1687)",
+      "designed_junctionmat": 1328,
+      "paper_crystal": 359,
+      "reconstructed_total": 1687,
+      "workbook_crystal_available": 377,
+      "note": "designed component exactly reproduced from workbook; crystal figure read from paper text"
+    },
+    "relations": {
+      "junctionmat_subset_of_all": true,
+      "all_minus_junctionmat": 77,
+      "designed_crystal_disjoint": true,
+      "designed_nonjunctionmat_excluded_count": 8,
+      "crystal_nonjunctionmat_count": 69,
+      "all_minus_1687_reconstructed": 26
+    },
+    "designed_exclusion_evidence": [
+      {
+        "junction_id": "1041",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "GCGGC_GCCGC",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      },
+      {
+        "junction_id": "1083",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "GCUGC_GCAGC",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      },
+      {
+        "junction_id": "372",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "CUAAG_CUUAG",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      },
+      {
+        "junction_id": "518",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "CUCAG_CUGAG",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      },
+      {
+        "junction_id": "560",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "CUGAG_CUCAG",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      },
+      {
+        "junction_id": "602",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "CUUAG_CUAAG",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      },
+      {
+        "junction_id": "835",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "GCAGC_GCUGC",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      },
+      {
+        "junction_id": "914",
+        "sublibrary": "junction_conformations",
+        "motif_type": "wc1",
+        "junction_seq": "GCCGC_GCGGC",
+        "reason": "wc1 paired (no unpaired residues); not a folding junction"
+      }
+    ],
+    "note": "18 crystal exclusion memberships (377 workbook vs 359 paper) require the paper's supplementary methods; recorded as residual evidence gap"
+  },
+  "attrition": {
+    "raw_rows": 28935,
+    "with_sublibrary": 28935,
+    "junctionmat_yes": 14724,
+    "dg10_measured": 28157,
+    "dg10_at_cap_minus7_1": 5865,
+    "dg10_not_cap": 22292,
+    "dg10_interpolated_only": 216,
+    "dg10_missing_both": 562,
+    "distinct_junction_id": 1713,
+    "distinct_tecto_sequence": 28873,
+    "distinct_motif_type": 62,
+    "distinct_chip_scaffold": 9,
+    "distinct_sublibrary": 7
+  },
+  "n_records": 28935
+}
