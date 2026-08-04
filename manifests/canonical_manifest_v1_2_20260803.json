@@ -439,7 +439,7 @@
       "finalized_at_utc": "2026-08-04T04:34:46.534054+00:00"
     }
   },
-  "current_operational_state": "QMAP_Q5_COMPLETE_QMAP_TRANSFER_SUPPORTED",
+  "current_operational_state": "PROJECT_COMPLETE_QMAP_TRANSFER_SUPPORTED",
   "current_scientific_disposition": "INCONCLUSIVE_FOR_1_KCAL_PRECISION",
   "scientific_unlock": "NO_UNLOCK",
   "qmap_terminal_disposition": "QMAP_READY_FOR_Q3",
@@ -449,6 +449,30 @@
   "derived_manifest_freshness": {
     "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e"
   },
-  "last_updated_utc": "2026-08-04T05:07:46.882214+00:00",
-  "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED"
+  "last_updated_utc": "2026-08-04T05:09:31.307301+00:00",
+  "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED",
+  "final_claim_adjudication": {
+    "max_allowable_claim": "STRONG_CROSS_SYSTEM_RESTRICTED",
+    "terminal_state": "QMAP_TRANSFER_SUPPORTED",
+    "b4_rmse_kcal_mol": 0.1951,
+    "preregistered_gain": 0.5105,
+    "gain_ci_95": [
+      0.4027,
+      0.6184
+    ],
+    "label_permutation_p": 0.0,
+    "mutation_class_bootstrap_ci_95": [
+      0.3586,
+      0.6304
+    ],
+    "n_variants": 98,
+    "k_folds": 4,
+    "restrictions": [
+      "mttr6 TTR mutants only",
+      "no extrapolation to arbitrary TLR families",
+      "requires pre-existing tecto model"
+    ],
+    "adjudication_report": "reports/final_claim_adjudication_q3_q5.md",
+    "timestamp_utc": "2026-08-04T05:09:31.307272+00:00"
+  }
 }
