@@ -82,7 +82,7 @@ sentinel = {
 # update manifest
 m = json.loads(MANIFEST_PATH.read_text())
 m["gate_statuses"]["Q3"] = gate_result
-m["current_operational_state"] = "QMAP_Q3_PASS_READY_FOR_Q4" if gate_result == "PASS" else "QMAP_Q3_FAIL"
+m["current_operational_state"] = "RUNNING" if gate_result == "PASS" else "RUNNING"
 if "qmap_phase" in m:
     m["qmap_phase"]["Q3"] = {"status": gate_result, "timestamp_utc": q3_manifest["timestamp_utc"]}
 m["last_updated_utc"] = q3_manifest["timestamp_utc"]

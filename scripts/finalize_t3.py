@@ -129,7 +129,7 @@ def main():
             mf = json.load(f)
         mf["gate_statuses"]["T3"] = decision["decision"]
         mf["gate_decisions"]["T3"] = decision
-        mf["current_operational_state"] = "TECTO_MAIN_LINE_COMPLETE"
+        mf["current_operational_state"] = "RUNNING"
         mf["updated_at_utc"] = decision["finalized_at_utc"]
         mf["code_commit"] = commit
         with open(MANIFEST_PATH, "w") as f:

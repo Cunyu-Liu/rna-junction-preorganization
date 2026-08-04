@@ -57,7 +57,7 @@ sentinel = {"gate": "Q4", "gate_result": gate_result, "timestamp_utc": ts,
 
 m = json.loads(MANIFEST.read_text())
 m["gate_statuses"]["Q4"] = gate_result
-m["current_operational_state"] = "QMAP_Q4_PASS_READY_FOR_Q5" if gate_result == "PASS" else "QMAP_Q4_FAIL"
+m["current_operational_state"] = "RUNNING" if gate_result == "PASS" else "RUNNING"
 m["last_updated_utc"] = ts
 MANIFEST.write_text(json.dumps(m, indent=2))
 print("[Q4-finalize] gate_result=" + gate_result)

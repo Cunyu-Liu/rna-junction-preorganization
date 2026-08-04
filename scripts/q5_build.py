@@ -353,7 +353,8 @@ sentinel = {"gate": "Q5", "gate_result": q5_manifest["gate_result"], "terminal_s
 # update manifest
 m = json.loads(MANIFEST.read_text())
 m["gate_statuses"]["Q5"] = q5_manifest["gate_result"]
-m["current_operational_state"] = "QMAP_Q5_COMPLETE_" + terminal_state
+m["current_operational_state"] = "IMPLEMENTATION_COMPLETE" if terminal_state in ("QMAP_TRANSFER_SUPPORTED", "QMAP_TRANSFER_NOT_SUPPORTED", "QMAP_INCONCLUSIVE") else "RUNNING"
+m["qmap_terminal_disposition"] = terminal_state
 m["qmap_terminal_state"] = terminal_state
 m["last_updated_utc"] = ts_now
 MANIFEST.write_text(json.dumps(m, indent=2))

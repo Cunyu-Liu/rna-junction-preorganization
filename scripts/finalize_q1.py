@@ -112,7 +112,7 @@ def main():
         mf["gate_statuses"]["Q1"] = decision
         mf["gate_decisions"]["Q1"] = q1_decision
         if q1_ok:
-            mf["qmap_terminal_disposition"] = "QMAP_READY_FOR_Q2"
+            mf["qmap_terminal_disposition"] = "NOT_ADJUDICATED"
         mf["updated_at_utc"] = q1_decision["finalized_at_utc"]
         with open(MANIFEST_PATH, "w") as f:
             json.dump(mf, f, indent=2)
