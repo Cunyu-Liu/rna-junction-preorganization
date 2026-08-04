@@ -7,7 +7,7 @@
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-04T05:28:01.920775+00:00",
+  "updated_at_utc": "2026-08-04T06:36:45.924328+00:00",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -24,11 +24,15 @@
     "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/s0_spec_manifest.json",
     "reports/final/claim_adjudication.md",
     "reports/final/claim_matrix.json",
-    "reports/final/final_delivery_report.md"
+    "reports/final/final_delivery_report.md",
+    "specs/exposure_registry.json",
+    "specs/uncertainty_set_registry.json"
   ],
   "output_checksums": {
     "t0_denny_canonical_records.jsonl": "0989ddc00bb230fdb00bbc65433c943a0419e35c3d0799b481e741c4a24defe2",
-    "t0_denny_semantics_manifest.json": "51f6645a9029570fd528f2a3741e662410907011c3ab526c437444d474b5c4da"
+    "t0_denny_semantics_manifest.json": "51f6645a9029570fd528f2a3741e662410907011c3ab526c437444d474b5c4da",
+    "exposure_registry.json": "fd1be3df8ae3ae5a5ccb0197caa1586332cb09e8be4247e4c4bdbc48e5e6ef5b",
+    "uncertainty_set_registry.json": "7fc4eee21c56d9d4fdb6d5af2aeeec34e5569de3d49a40938ad7ebf5ccad2776"
   },
   "gate_statuses": {
     "T0": "PASS",
@@ -677,9 +681,11 @@
   "finalizer_status": "PASS",
   "sentinel_status": "PASS",
   "derived_manifest_freshness": {
-    "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e"
+    "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e",
+    "exposure_registry": "fd1be3df8ae3ae5a5ccb0197caa1586332cb09e8be4247e4c4bdbc48e5e6ef5b",
+    "uncertainty_set_registry": "7fc4eee21c56d9d4fdb6d5af2aeeec34e5569de3d49a40938ad7ebf5ccad2776"
   },
-  "last_updated_utc": "2026-08-04T05:28:01.920775+00:00",
+  "last_updated_utc": "2026-08-04T06:36:45.924328+00:00",
   "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED",
   "final_claim_adjudication": {
     "max_allowable_claim": "STRONG_CROSS_SYSTEM_RESTRICTED",

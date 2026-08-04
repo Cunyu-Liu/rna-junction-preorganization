@@ -1,0 +1,144 @@
+{
+  "schema_version": "uncertainty-set-registry-v1",
+  "spec_version": "1.0.0",
+  "run_id": "v1_2_tecto_qmap_20260803",
+  "frozen_at_utc": "2026-08-04T06:36:12.822790+00:00",
+  "code_commit": "3aa076f86d689f9941beae08d3e4d94f85a3b645",
+  "contract_reference": "§8.8 UncertaintySetRegistry",
+  "source_spec": "specs/operator_uncertainty_spec.json",
+  "required_fields_per_operator": [
+    "external_basis",
+    "calibration_basis",
+    "set_construction",
+    "range",
+    "units",
+    "sensitivity",
+    "rejected_alternatives",
+    "holdout",
+    "result",
+    "checksum"
+  ],
+  "tecto_operators": [
+    {
+      "operator": "Delta G 10-bp scaffold (kcal/mol)",
+      "external_basis": "Denny et al. 2018 Cell, supplementary workbook 261_SI.xlsx (doi:10.1016/j.cell.2018.05.038)",
+      "calibration_basis": "M0 synthetic fixtures with known ground-truth functional (point + partial identification)",
+      "set_construction": "Bootstrap 95%% CI from cluster fluorescence (paper Figure 1H); per-row err columns; NOT independent replicate noise (T0 replicate_semantics.covariance_default = NOT independent)",
+      "range": "measured range to -7.1 kcal/mol cap (left-censored floor)",
+      "units": "kcal/mol",
+      "sensitivity": {
+        "width_median_kcal_mol": 1.3487273531661108,
+        "width_p90_kcal_mol": 1.6621912911227974
+      },
+      "rejected_alternatives": [
+        "subjective single-point estimate without calibration (contract §8.2 forbidden)",
+        "treating err as independent replicate noise (T0 replicate_semantics.covariance_default = NOT independent)"
+      ],
+      "holdout": "M0 synthetic holdout (calibration); T2/T3 frozen motif-family holdout (sensitivity); holdout motifs: 0x1, 2x1, 2x2",
+      "result": {
+        "width_median_kcal_mol": 1.3487273531661108,
+        "width_p90_kcal_mol": 1.6621912911227974,
+        "source": "t3_results.functional_interval_width_* (primary dg10 functional)"
+      },
+      "t2_junction_interval_width_median_kcal_mol": 1.3487273531661108,
+      "checksum": "85a378e423b5cddd42cacac0f360b6f7c7c317556c1f0bfa133e279c6110c021"
+    },
+    {
+      "operator": "Delta G 9-bp and 11-bp scaffold (kcal/mol)",
+      "external_basis": "Denny et al. 2018 Cell, supplementary workbook 261_SI.xlsx (doi:10.1016/j.cell.2018.05.038)",
+      "calibration_basis": "M0 synthetic fixtures with known ground-truth functional (point + partial identification)",
+      "set_construction": "Bootstrap 95%% CI from cluster fluorescence (paper Figure 1H); per-row err columns; NOT independent replicate noise (T0 replicate_semantics.covariance_default = NOT independent)",
+      "range": "measured range to -7.1 kcal/mol cap",
+      "units": "kcal/mol",
+      "sensitivity": {
+        "dg9": {
+          "width_median_kcal_mol": 1.233667167568102,
+          "width_p90_kcal_mol": 1.7495786953496704
+        },
+        "dg11": {
+          "width_median_kcal_mol": 0.5491309860615458,
+          "width_p90_kcal_mol": 0.9666047250779075
+        }
+      },
+      "rejected_alternatives": [
+        "subjective single-point estimate without calibration (contract §8.2 forbidden)",
+        "treating err as independent replicate noise (T0 replicate_semantics.covariance_default = NOT independent)"
+      ],
+      "holdout": "M0 synthetic holdout (calibration); T2/T3 frozen motif-family holdout (sensitivity); holdout motifs: 0x1, 2x1, 2x2",
+      "result": {
+        "dg9": {
+          "width_median_kcal_mol": 1.233667167568102,
+          "width_p90_kcal_mol": 1.7495786953496704,
+          "n_identifiable": 1333,
+          "n_not_identifiable": 3
+        },
+        "dg11": {
+          "width_median_kcal_mol": 0.5491309860615458,
+          "width_p90_kcal_mol": 0.9666047250779075,
+          "n_identifiable": 1317,
+          "n_not_identifiable": 19
+        }
+      },
+      "t2_junction_interval_width_median_kcal_mol": 1.3487273531661108,
+      "checksum": "b2647312f2ae193e3a6d70a6483d3b43d985b873981543efb16ce8bfe1bc40f7"
+    },
+    {
+      "operator": "Delta G 10-bp 5mM Mg2+ (kcal/mol)",
+      "external_basis": "Denny et al. 2018 Cell, supplementary workbook 261_SI.xlsx (doi:10.1016/j.cell.2018.05.038)",
+      "calibration_basis": "M0 synthetic fixtures with known ground-truth functional (point + partial identification)",
+      "set_construction": "Bootstrap 95%% CI from cluster fluorescence (paper Figure 1H); per-row err columns; NOT independent replicate noise (T0 replicate_semantics.covariance_default = NOT independent)",
+      "range": "measured range to -7.1 kcal/mol cap",
+      "units": "kcal/mol",
+      "sensitivity": {
+        "dg10_5mM": {
+          "width_median_kcal_mol": 0.7664186583678331,
+          "width_p90_kcal_mol": 1.2359268706567215
+        }
+      },
+      "rejected_alternatives": [
+        "subjective single-point estimate without calibration (contract §8.2 forbidden)",
+        "treating err as independent replicate noise (T0 replicate_semantics.covariance_default = NOT independent)"
+      ],
+      "holdout": "M0 synthetic holdout (calibration); T2/T3 frozen motif-family holdout (sensitivity); holdout motifs: 0x1, 2x1, 2x2",
+      "result": {
+        "dg10_5mM": {
+          "width_median_kcal_mol": 0.7664186583678331,
+          "width_p90_kcal_mol": 1.2359268706567215,
+          "n_identifiable": 1319,
+          "n_not_identifiable": 17
+        }
+      },
+      "t2_junction_interval_width_median_kcal_mol": 1.3487273531661108,
+      "checksum": "c8ee56ee81d8ae813b68e7debf9b56526e059804d4063794ab5c672dcf6d6a71"
+    }
+  ],
+  "qmap_transport": {
+    "operator": "qMaPseq TL/TLR-Mg2+ transport (rna_map reference ΔG)",
+    "external_basis": "qMaPseq TL/TLR-Mg2+ (NAR 2024, doi:10.1093/nar/gkae633) (doi:10.1093/nar/gkae633)",
+    "calibration_basis": "Q3 endpoint replay tolerances frozen before run; Q5 locked transfer test (4 baselines, label permutation)",
+    "set_construction": "per-variant uncertainty from the qMaP fit; censored cases ([Mg2+]1/2 > 40 mM) enter a censored likelihood",
+    "range": "per-variant mg_1_2 and rna_map_dg; censored cases ([Mg2+]1/2 > 40 mM) enter censored likelihood",
+    "units": "kcal/mol (rna_map_dg); mM (mg_1_2)",
+    "sensitivity": {
+      "q5_b4_rmse_kcal_mol": 0.19507323591843584,
+      "q5_gain_mean": 0.5105349131930977,
+      "q5_gain_ci_95": [
+        0.4026500832431359,
+        0.6184197431430596
+      ],
+      "note": "filled from Q5 locked transfer test in canonical manifest"
+    },
+    "rejected_alternatives": [
+      "qMaPseq as independent replication of junction preorganization (forbidden by transport spec)",
+      "junction equivalence across systems without Q5 transfer evidence (forbidden)"
+    ],
+    "holdout": "Q4 mutation-graph K=4 fold holdout (0 leakage); Q5 locked before viewing transfer outcome",
+    "result": {
+      "q5_terminal_state": "QMAP_TRANSFER_SUPPORTED",
+      "q5_b4_rmse_kcal_mol": 0.19507323591843584,
+      "n_variants": 98
+    },
+    "checksum": "673dd958fb71e25062cd794a34aef8638ae1a01d0df371fde6d50f6325bfb2d7"
+  },
+  "note": "Each operator carries external basis, calibration, holdout, observed sensitivity, and rejected alternatives per contract §8.8."
+}
