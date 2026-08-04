@@ -68,7 +68,7 @@
     },
     "qmap_terminal_disposition": {
       "type": "string",
-      "enum": ["NOT_STARTED", "NOT_ADJUDICATED", "QMAP_TRANSFER_SUPPORTED", "QMAP_TRANSFER_NOT_SUPPORTED", "QMAP_INCONCLUSIVE", "QMAP_NOT_ADMITTED"]
+      "enum": ["NOT_STARTED", "NOT_ADJUDICATED", "QMAP_TRANSFER_SUPPORTED", "QMAP_TRANSFER_NOT_SUPPORTED", "QMAP_INCONCLUSIVE", "QMAP_NOT_ADMITTED", "QMAP_READY_FOR_Q1"]
     },
     "claim_class": {
       "type": "string",

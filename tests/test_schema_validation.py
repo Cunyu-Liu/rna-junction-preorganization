@@ -43,7 +43,7 @@ def test_output_artifacts_are_strings():
 def test_cross_field_consistency():
     """Key cross-field invariants that must hold."""
     m = json.load(open(MANIFEST))
-    assert m['qmap_terminal_disposition'] in {'NOT_STARTED', 'NOT_ADJUDICATED', 'QMAP_TRANSFER_SUPPORTED', 'QMAP_TRANSFER_NOT_SUPPORTED', 'QMAP_INCONCLUSIVE', 'QMAP_NOT_ADMITTED'}
+    assert m['qmap_terminal_disposition'] in {'NOT_STARTED', 'NOT_ADJUDICATED', 'QMAP_TRANSFER_SUPPORTED', 'QMAP_TRANSFER_NOT_SUPPORTED', 'QMAP_INCONCLUSIVE', 'QMAP_NOT_ADMITTED', 'QMAP_READY_FOR_Q1'}
     assert m['scientific_unlock'] == 'NO_UNLOCK' or m['current_scientific_disposition'] == 'ADJUDICATED'
     top_cc = m['code_commit']
     for g in ['Q3', 'Q4', 'Q5']:
