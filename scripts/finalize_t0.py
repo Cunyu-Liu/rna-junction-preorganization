@@ -154,7 +154,7 @@ def main():
     manifest.data["contract_sha256"] = CONTRACT_SHA256
     manifest.data["code_commit"] = commit
     manifest.data["scientific_unlock"] = "NO_UNLOCK"
-    manifest.data["finalizer_status"] = status
+    manifest.data["finalizer_status"] = "PASS" if status == "PASS" else "BLOCKED"
     if status == "PASS":
         manifest.data["sentinel_status"] = "PASS"
         manifest.data["current_operational_state"] = "BLOCKED_AT_TECTO_DATA_ADMISSION"
