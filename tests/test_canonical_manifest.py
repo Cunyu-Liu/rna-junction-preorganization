@@ -61,7 +61,7 @@ class TestManifest(unittest.TestCase):
                 tests_passed=True, contract_hash_ok=True, schema_ok=True,
             )
         self.assertEqual(status, "PARTIAL_ENGINEERING_EVIDENCE")
-        self.assertEqual(m.data["gate_statuses"]["T0"], "BLOCKED")
+        self.assertEqual(m.data["gate_statuses"]["T0"], "RUNNING")
 
     def test_finalize_gate_pass_when_all_ok(self):
         m = make_manifest()

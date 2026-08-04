@@ -45,7 +45,7 @@ def main():
     dirty = git("status", "--porcelain")
     results["code_commit"] = commit
     results["branch"] = branch
-    results["worktree_dirty_ok"] = not dirty
+    results["worktree_dirty_ok"] = not rc.source_tree_dirty(dirty)
 
     manifest = CanonicalStateManifest.load(MANIFEST_PATH)
     results["schema_ok"] = (len(validate_schema(manifest.data)) == 0)

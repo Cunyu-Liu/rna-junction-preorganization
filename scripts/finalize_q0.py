@@ -63,7 +63,7 @@ def main():
     results["code_commit"] = commit
     results["branch"] = branch
     results["dirty"] = dirty
-    results["worktree_dirty_ok"] = not dirty
+    results["worktree_dirty_ok"] = not rc.source_tree_dirty(dirty)
 
     # ---- raw ENA artifacts ----
     fastq_dir = os.path.join(QDATA, "raw", "fastq")

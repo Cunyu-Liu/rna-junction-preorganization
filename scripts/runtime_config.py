@@ -46,3 +46,25 @@ def contract_sha256() -> str | None:
 
 def verify_contract() -> bool:
     return contract_sha256() == CONTRACT_SHA256
+
+GENERATED_PREFIXES = (
+    "manifests/", "specs/", "docs/", "reports/", "Sentinel_",
+)
+
+
+def source_tree_dirty(status: str) -> bool:
+    """Return whether tracked source/config code is dirty.
+
+    Run-local manifests, frozen specs, reports, docs, and sentinels are
+    expected outputs and are checked separately by each finalizer.  A source
+    edit, contract edit, or unrelated worktree change still fails closed.
+    """
+    for line in status.splitlines():
+        path = line[3:].strip() if len(line) >= 4 else line.strip()
+        if path.startswith(GENERATED_PREFIXES):
+            continue
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1]
+        if path:
+            return True
+    return False

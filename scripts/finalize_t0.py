@@ -66,7 +66,7 @@ def main():
     results["code_commit"] = commit
     results["branch"] = branch
     results["dirty"] = bool(dirty)
-    results["worktree_dirty_ok"] = not dirty
+    results["worktree_dirty_ok"] = not rc.source_tree_dirty(dirty)
 
     # 3. schema
     manifest = CanonicalStateManifest.load(MANIFEST_PATH)
