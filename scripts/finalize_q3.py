@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Q3 finalize: verify pass criteria, write sentinel, update manifest."""
 from __future__ import annotations
+import runtime_config as rc
 import json
 import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 
-WT = Path("/home/cunyuliu/rna_junction_preorganization_v1_2_20260803")
-QDATA = Path("/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap")
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
 Q3DIR = QDATA / "q3"
-MANIFEST_PATH = WT / "manifests" / "canonical_manifest_v1_2_20260803.json"
+MANIFEST_PATH = Path(rc.MANIFEST_PATH)
 SPEC_PATH = WT / "specs" / "q3_endpoint_replay_spec.json"
 
 summary = json.loads((Q3DIR / "q3_replay_summary.json").read_text())
@@ -17,6 +18,7 @@ spec = json.loads(SPEC_PATH.read_text())
 
 # verify pass criteria
 checks = {
+    "contract_hash_ok": rc.verify_contract(),
     "tolerances_frozen_before_run": summary["tolerances_frozen_before_run"] is True,
     "all_records_pass_or_not_applicable": summary["all_records_pass_or_not_applicable"] is True,
     "all_variants_all_endpoints_pass_or_na": summary["all_variants_all_endpoints_pass_or_na"] is True,

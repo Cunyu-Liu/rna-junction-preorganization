@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # Q4 build: mutation graph, fold assignment, freeze artifacts.
 from __future__ import annotations
+import runtime_config as rc
 import json, hashlib, itertools, collections
 from pathlib import Path
 import numpy as np
 import pandas as pd
 from datetime import datetime, timezone
 
-WT = Path("/home/cunyuliu/rna_junction_preorganization_v1_2_20260803")
-QDATA = Path("/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap")
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
 Q4DIR = QDATA / "q4"; Q4DIR.mkdir(parents=True, exist_ok=True)
 (Q4DIR / "input").mkdir(exist_ok=True)
 

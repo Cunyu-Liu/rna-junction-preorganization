@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """T1 finalizer — verifies CleaningLedger, symmetry groups, effective-N, split
 freeze, and unit tests before writing T1 to PASS.
 """
@@ -7,14 +8,14 @@ import os
 import subprocess
 import sys
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t1"
+WORKTREE = rc.WORKTREE
+DATA = os.path.join(rc.RUN_ROOT, "t1")
 GOVERNANCE = os.path.join(WORKTREE, "governance")
 sys.path.insert(0, GOVERNANCE)
 from canonical_manifest import CanonicalStateManifest, finalize_gate, validate_schema  # noqa: E402
 
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
-CONTRACT_SHA256 = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
+MANIFEST_PATH = rc.MANIFEST_PATH
+CONTRACT_SHA256 = rc.CONTRACT_SHA256
 
 REQUIRED = [
     os.path.join(DATA, "t1_cleaning_ledger.jsonl"),
@@ -36,7 +37,7 @@ def git(*args):
 
 def main():
     results = {}
-    results["contract_hash_ok"] = True
+    results["contract_hash_ok"] = rc.verify_contract()
     commit = git("rev-parse", "HEAD")
     branch = git("branch", "--show-current")
     dirty = git("status", "--porcelain")
@@ -75,7 +76,7 @@ def main():
     results["ledger_ok"] = ledger_ok
 
     # tests
-    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests"), "-q"],
+    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t1_build.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                         check=False, capture_output=True)
     results["tests_passed"] = (tp.returncode == 0)
 

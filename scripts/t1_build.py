@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """T1 — idempotent raw->analysis pipeline: CleaningLedger, QC, dedup
 (exact / reverse-reciprocal / symmetry-equivalent / near-homolog), symmetry
 canonicalization, effective-N, and frozen split groups.
@@ -16,8 +17,8 @@ import os
 import sys
 from collections import defaultdict
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803"
+WORKTREE = rc.WORKTREE
+DATA = rc.RUN_ROOT
 CANONICAL = os.path.join(DATA, "t0", "t0_denny_canonical_records.jsonl")
 OUT = os.path.join(DATA, "t1")
 os.makedirs(OUT, exist_ok=True)

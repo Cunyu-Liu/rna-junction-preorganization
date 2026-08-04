@@ -11,12 +11,13 @@ manifests/sentinels but never populated canonical_manifest.gate_decisions,
 leaving Q3/Q4/Q5 entries as {} while Q0/Q1/Q2 were fully populated.
 """
 from __future__ import annotations
+import runtime_config as rc
 import json, hashlib, subprocess
 from pathlib import Path
 
-WT = Path('/home/cunyuliu/rna_junction_preorganization_v1_2_20260803')
-QDATA = Path('/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap')
-MANIFEST_PATH = WT / 'manifests' / 'canonical_manifest_v1_2_20260803.json'
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
+MANIFEST_PATH = Path(rc.MANIFEST_PATH)
 
 def git(args):
     return subprocess.run(['git','-C',str(WT)]+args, capture_output=True, text=True, check=True).stdout.strip()

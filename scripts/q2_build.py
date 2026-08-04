@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """Q2 — Attrition and censoring reconstruction builder.
 
 Classifies the 98 qMaPseq variants into:
@@ -26,8 +27,8 @@ import sys
 import zipfile
 from datetime import datetime, timezone
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-QDATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap"
+WORKTREE = rc.WORKTREE
+QDATA = rc.QDATA
 ZENODO_ZIP = os.path.join(WORKTREE, "2024_qmap_paper-main.zip")
 FIGSHARE_ZIP = os.path.join(QDATA, "raw", "figshare", "data.zip")
 Q1_DIR = os.path.join(QDATA, "q1")

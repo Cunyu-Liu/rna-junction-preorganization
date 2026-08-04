@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Q3 endpoint replay builder (v2 — frozen tolerances with censored-variant rule)."""
 from __future__ import annotations
+import runtime_config as rc
 import json, os, sys, math, copy, shutil
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-WT = Path("/home/cunyuliu/rna_junction_preorganization_v1_2_20260803")
-QDATA = Path("/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap")
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
 Q3DIR = QDATA / "q3"
 Q3DIR.mkdir(parents=True, exist_ok=True)
 (Q3DIR / "evidence").mkdir(exist_ok=True)
@@ -19,8 +20,8 @@ TOL = spec["tolerances"]
 CENSORED_CATS = set(spec["censored_variants_rule"]["censored_categories"])
 EXEMPT_EPS = set(spec["censored_variants_rule"]["numerical_endpoints_exempt"])
 
-PROCESSED = Path("/tmp/qmap_combined/data/sequencing_runs/processed/mttr6_data_full.json")
-PUB_FITS  = Path("/tmp/qmap_combined/data/mg_1_2_fits/mtt6_data_mg_1_2.csv")
+PROCESSED = Path(os.environ.get("RNA_V12_QMAP_PROCESSED", str(QDATA / "raw" / "processed" / "mttr6_data_full.json")))
+PUB_FITS  = Path(os.environ.get("RNA_V12_QMAP_PUBLISHED_FITS", str(QDATA / "raw" / "published" / "mtt6_data_mg_1_2.csv")))
 Q1_REG    = QDATA / "q1" / "q1_variant_registry.jsonl"
 Q2_ATTR   = QDATA / "q2" / "q2_attrition.jsonl"
 

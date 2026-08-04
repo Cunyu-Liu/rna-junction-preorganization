@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """Build specs/uncertainty_set_registry.json (contract §8.8 UncertaintySetRegistry).
 
 Completes the existing operator_uncertainty_spec.json by filling the 10
@@ -17,8 +18,8 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803"
+WORKTREE = rc.WORKTREE
+DATA = rc.RUN_ROOT
 SPEC_OUT = os.path.join(WORKTREE, "specs", "uncertainty_set_registry.json")
 OP_SPEC = os.path.join(WORKTREE, "specs", "operator_uncertainty_spec.json")
 

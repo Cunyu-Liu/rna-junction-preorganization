@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """Q1 finalizer — verifies the 98-variant registry artifacts before writing Q1 to PASS.
 
 Checks: source archive MD5s, required artifacts present, variant count (>=99),
@@ -10,12 +11,12 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-QDATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap"
+WORKTREE = rc.WORKTREE
+QDATA = rc.QDATA
 DATA = os.path.join(QDATA, "q1")
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
+MANIFEST_PATH = rc.MANIFEST_PATH
 SENTINEL_PATH = os.path.join(WORKTREE, "manifests", "sentinel_Q1.txt")
-CONTRACT_SHA = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
+CONTRACT_SHA = rc.CONTRACT_SHA256
 
 REQUIRED = [
     os.path.join(DATA, "q1_variant_registry.jsonl"),
@@ -32,7 +33,7 @@ def git(*args):
 def main():
     results = {}
     results["contract_sha256"] = CONTRACT_SHA
-    results["contract_hash_ok"] = True
+    results["contract_hash_ok"] = rc.verify_contract()
 
     commit = git("rev-parse", "HEAD")
     branch = git("branch", "--show-current")

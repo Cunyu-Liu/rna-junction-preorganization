@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """S0 — freeze estimand, operator, symmetry, assay-transport, primary-analysis,
 and negative-control specifications. Registers frozen specs and their hashes.
 
@@ -12,14 +13,14 @@ import os
 import subprocess
 import sys
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
+WORKTREE = rc.WORKTREE
 SPEC_DIR = os.path.join(WORKTREE, "specs")
 GOVERNANCE = os.path.join(WORKTREE, "governance")
 sys.path.insert(0, GOVERNANCE)
 from canonical_manifest import CanonicalStateManifest, validate_schema  # noqa: E402
 
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
-CONTRACT_SHA256 = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
+MANIFEST_PATH = rc.MANIFEST_PATH
+CONTRACT_SHA256 = rc.CONTRACT_SHA256
 
 
 def sha256_text(text: str) -> str:

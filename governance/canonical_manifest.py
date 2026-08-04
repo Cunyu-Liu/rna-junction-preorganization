@@ -131,7 +131,7 @@ class CanonicalStateManifest:
             "output_artifacts": [],
             "output_checksums": {},
             "gate_statuses": {
-                "T0": "RUNNING", "S0": "NOT_STARTED", "T1": "NOT_STARTED",
+                "T0": "BLOCKED", "S0": "NOT_STARTED", "T1": "NOT_STARTED",
                 "M0": "NOT_STARTED", "T2": "NOT_STARTED", "T3": "NOT_STARTED",
                 "Q0": "NOT_STARTED", "Q1": "NOT_STARTED", "Q2": "NOT_STARTED",
                 "Q3": "NOT_STARTED", "Q4": "NOT_STARTED", "Q5": "NOT_STARTED",
@@ -140,10 +140,10 @@ class CanonicalStateManifest:
             "current_operational_state": "BLOCKED_AT_TECTO_DATA_ADMISSION",
             "current_scientific_disposition": "CONDITIONAL_CANDIDATE",
             "scientific_unlock": "NO_UNLOCK",
-            "qmap_terminal_disposition": "NOT_STARTED",
+            "qmap_terminal_disposition": "NOT_ADJUDICATED",
             "claim_class": "NOT_ADJUDICATED",
             "finalizer_status": "NOT_RUN",
-            "sentinel_status": "RUNNING",
+            "sentinel_status": "NOT_STARTED",
             "derived_manifest_freshness": {},
         }
         return cls(data)

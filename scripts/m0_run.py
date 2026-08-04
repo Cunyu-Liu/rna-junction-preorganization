@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """M0 — synthetic and operator-identification Gate.
 
 Proves the math/software/identification flow works on known synthetic conditions
@@ -30,8 +31,8 @@ except Exception:
     DEVICE = None
     HAS_TORCH = False
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/m0"
+WORKTREE = rc.WORKTREE
+DATA = os.path.join(rc.RUN_ROOT, "m0")
 os.makedirs(DATA, exist_ok=True)
 
 CAP = -7.1

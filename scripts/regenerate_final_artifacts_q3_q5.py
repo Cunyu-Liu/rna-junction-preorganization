@@ -1,3 +1,5 @@
+# LEGACY HISTORICAL REPORT GENERATOR: disabled for the active v1.2 run.
+# Preserved for historical audit only; never use it to promote a report or gate.
 #!/usr/bin/env python3
 """Regenerate reports/final/ artifacts to reflect QMAP_TRANSFER_SUPPORTED.
 
@@ -9,15 +11,16 @@ Also fixes code_commit in Q3/Q4/Q5 gate_decisions (was 7b0a7b7 = post-
 adjudication; correct = 0874c88 where gate code+results live).
 """
 from __future__ import annotations
+import runtime_config as rc
 import json, subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 
-WT = Path('/home/cunyuliu/rna_junction_preorganization_v1_2_20260803')
-QDATA = Path('/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap')
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
 FIN = WT / 'reports' / 'final'
-MANIFEST_PATH = WT / 'manifests' / 'canonical_manifest_v1_2_20260803.json'
-CONTRACT_SHA = '32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252'
+MANIFEST_PATH = Path(rc.MANIFEST_PATH)
+CONTRACT_SHA = rc.CONTRACT_SHA256
 RUN_ID = 'v1_2_tecto_qmap_20260803'
 GATE_CODE_COMMIT = '0874c88'
 now_iso = datetime.now(timezone.utc).isoformat()
@@ -228,7 +231,7 @@ MAX_ALLOWABLE_CLAIM = STRONG_CROSS_SYSTEM_RESTRICTED
 **Run**: `{RUN_ID}`
 
 ## Admitted tecto data (raw, read-only)
-- Location: `/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/`
+- Location: `<historical-v1.2-runroot>/`
 - T0 admission: Denny et al. 2018 tectoRNA source, supplements, public code; 1,687/1,713/1,636 set reconstruction. Manifests: `manifests/t0_admission_analysis.json`, `manifests/t0_source_pin.json`.
 - All source files have URL, license, size, download time, SHA-256 in the data registry.
 
@@ -248,7 +251,7 @@ MAX_ALLOWABLE_CLAIM = STRONG_CROSS_SYSTEM_RESTRICTED
 
 ## Status notes
 - All raw data is read-only and never overwritten.
-- Derived artifacts run-isolated under `/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/`.
+- Derived artifacts run-isolated under `<historical-v1.2-runroot>/`.
 - current 7,500-construct DMS permanently `NOT_ADMITTED_FINAL_V1_2`.
 """)
 
@@ -259,7 +262,7 @@ MAX_ALLOWABLE_CLAIM = STRONG_CROSS_SYSTEM_RESTRICTED
 
 ## Provenance & checksums
 - Contract: `rna 三级.md` SHA-256 `{CONTRACT_SHA}`.
-- Canonical manifest: `manifests/canonical_manifest_v1_2_20260803.json` (schema 1.0.0), single source of execution state. All 12 gates PASS; `gate_decisions` populated for all 12 gates.
+- Canonical manifest: `manifests/<historical-manifest>` (schema 1.0.0), single source of execution state. All 12 gates PASS; `gate_decisions` populated for all 12 gates.
 - Gate sentinels: `manifests/sentinel_{{T0,S0,T1,M0,T2,T3,Q0,Q1,Q2}}.txt`, `Sentinel_{{Q3,Q4,Q5}}.txt`.
 - All artifacts recorded with absolute paths and SHA-256; raw data read-only.
 
@@ -380,10 +383,10 @@ Every claim is bounded: transfer is restricted to 98 mttr6 TTR mutants with 4-fo
 **Date**: {now}
 
 ## 1. Preflight summary
-- Host: `bms-18937653-012` (A100, 8× GPU). Worktree `/home/cunyuliu/rna_junction_preorganization_v1_2_20260803` (branch `v1.2/tecto-qmap`), clean.
+- Host: `bms-18937653-012` (A100, 8× GPU). Worktree `<historical-v1.2-worktree>` (branch `v1.2/tecto-qmap`), clean.
 - **All 12 gates PASS**: T0–S0–T1–M0–T2–T3–Q0–Q1–Q2–Q3–Q4–Q5.
 - qMaP terminal state: `QMAP_TRANSFER_SUPPORTED`. Max allowable claim: `STRONG_CROSS_SYSTEM_RESTRICTED`.
-- Raw data / artifacts under `/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/`; code in isolated worktree; no unrelated processes killed.
+- Raw data / artifacts under `<historical-v1.2-runroot>/`; code in isolated worktree; no unrelated processes killed.
 
 ## 2. What was executed end-to-end
 - **T0** data admission: Denny sources/versions fixed; 1,687/1,713/1,636 sets reconstructed.

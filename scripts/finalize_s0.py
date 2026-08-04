@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """S0 finalizer — verifies all 7 required frozen specifications exist, are
 schema-consistent, and are recorded in the spec manifest with hashes. Only the
 finalizer may write S0 to PASS.
@@ -9,14 +10,14 @@ import os
 import subprocess
 import sys
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
+WORKTREE = rc.WORKTREE
 SPEC_DIR = os.path.join(WORKTREE, "specs")
 GOVERNANCE = os.path.join(WORKTREE, "governance")
 sys.path.insert(0, GOVERNANCE)
 from canonical_manifest import CanonicalStateManifest, finalize_gate, validate_schema  # noqa: E402
 
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
-CONTRACT_SHA256 = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
+MANIFEST_PATH = rc.MANIFEST_PATH
+CONTRACT_SHA256 = rc.CONTRACT_SHA256
 
 REQUIRED_SPECS = [
     "estimand_spec.json",
@@ -50,7 +51,7 @@ def git(*args):
 def main():
     results = {}
     results["contract_sha256"] = CONTRACT_SHA256
-    results["contract_hash_ok"] = True
+    results["contract_hash_ok"] = rc.verify_contract()
     commit = git("rev-parse", "HEAD")
     branch = git("branch", "--show-current")
     dirty = git("status", "--porcelain")

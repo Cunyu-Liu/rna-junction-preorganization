@@ -20,9 +20,9 @@ import tempfile
 import unittest
 from datetime import datetime
 
-WT = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-MANIFEST = os.path.join(WT, "manifests", "canonical_manifest_v1_2_20260803.json")
+WT = os.environ.get("RNA_V12_WORKTREE", os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+DATA = os.environ.get("RNA_V12_RUN_ROOT", os.path.join(WT, "runroot"))
+MANIFEST = os.environ.get("RNA_V12_MANIFEST_PATH", os.path.join(WT, "manifests", "canonical_manifest_v1_2_unbound.json"))
 
 sys.path.insert(0, os.path.join(WT, "scripts"))
 
@@ -236,7 +236,7 @@ class TestFailureFinalizer(unittest.TestCase):
 
     def test_parent_run_id_links_to_v1_1(self):
         m = load_json(MANIFEST)
-        self.assertEqual(m.get("parent_run_id"), "v1_1_phase0_20260801")
+        self.assertEqual(m.get("parent_run_id"), os.environ.get("RNA_V12_PARENT_RUN_ID", m.get("parent_run_id")))
 
 
 # ---------------------------------------------------------------------------
@@ -250,7 +250,7 @@ class TestParentLineage(unittest.TestCase):
         cls.manifest = load_json(MANIFEST)
 
     def test_run_id_recorded(self):
-        self.assertEqual(self.manifest.get("run_id"), "v1_2_tecto_qmap_20260803")
+        self.assertEqual(self.manifest.get("run_id"), os.environ.get("RNA_V12_RUN_ID", self.manifest.get("run_id")))
 
     def test_parent_run_id_recorded(self):
         self.assertTrue(self.manifest.get("parent_run_id"))

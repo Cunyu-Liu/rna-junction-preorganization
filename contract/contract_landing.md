@@ -1,49 +1,49 @@
 # RNA Junction Preorganization v1.2 — Contract Landing
 
-**Date (UTC)**: 2026-08-03
-**Contract version**: v1.2
-**Primary agent**: 本项目首席科学家 / 数据负责人 / ML 工程负责人 / 可复现性审计负责人
+Landing date: 2026-08-04 (Asia/Shanghai)
+Landing status: `CLEAN_V1_2_BOUND_NEW_RUN_IN_PROGRESS`
 
-## 1. 合同哈希与权威顺序
+## Authority
 
-| 文件 | 状态 | SHA-256 |
-|---|---|---|
-| clean `1.2.docx` | **缺失**（本地与远端均未找到） | 预期 `3ad0c999...`（未核验） |
-| `1.1_to_1.2_redline.docx` | **缺失**（本地与远端均未找到） | 预期 `c77d647d...`（未核验） |
-| `v1.2_decision_and_claim_log.md` | 存在，已核验 | `372e37a159195f6d5b21d57aca32cf1d679b4408d6ce9b43b079974a87adcf92` |
-| 执行提示词 `rna 三级.md` | 存在（本次执行依据） | 见读取快照 |
-| `1.1.docx`（远端 `contract/1.1.docx`） | 存在（678,936 bytes） | 历史 1.1，不作为 v1.2 权威 |
+The clean v1.2 DOCX is the scientific and engineering authority. The redline is
+decision context only; it cannot override the clean document. Historical v1.1
+contracts, the 2026-08-03 v1.2 worktree, its manifest, reports, and replay outputs
+are preserved as historical context and are `STALE_NOT_AUTHORITATIVE` for this run.
 
-**权威顺序**（本执行约束）：
+| Artifact | Source / remote landing | SHA-256 | Status |
+|---|---|---|---|
+| clean v1.2 contract | `contract/1.2.docx` | `3ad0c9997cdea8e510f80424c4b011062f0f95a8bf8879a4659a847adcab22a0` | `HASH_MATCH` |
+| decision redline | `contract/1.1_to_1.2_redline.docx` | `c77d647de7f644eafe10292aa2474d230de4a9483952ee390b45c75983bca7a5` | `HASH_MATCH` |
+| decision/claim log | `contract/v1.2_decision_and_claim_log.md` | `372e37a159195f6d5b21d57aca32cf1d679b4408d6ce9b43b079974a87adcf92` | `HASH_MATCH` |
+
+The clean contract was fully extracted before implementation: 373 paragraphs,
+81 tables, and 454 body-level blocks. Local render QA sampled the rendered
+pages; no clipping or overlap was observed. CJK fallback glyphs in the bundled
+render environment are an environment/font note, not a byte or text-authority
+change.
+
+## This run
+
+```text
+run_id = v1_2_tecto_qmap_codex_20260804T074900Z
+parent_run_id = v1_2_tecto_qmap_20260803
+host = bms-18937653-012
+worktree = /home/cunyuliu/v1_2_tecto_qmap_codex_20260804T074900Z
+branch = codex/v1_2_tecto_qmap_codex_20260804T074900Z
+base_commit = d4768817c4d4bc5fe469762fd0d4fa921a4e7c11
+run_root = /mnt/cunyuliu/v1_2_tecto_qmap_codex_20260804T074900Z
+manifest = manifests/canonical_manifest_v1_2_tecto_qmap_codex_20260804T074900Z.json
 ```
-执行提示词 `rna 三级.md`（科学/工程规则全文）
-  > v1.2_decision_and_claim_log.md（决策日志）
-  > gate-specific frozen specifications
-  > 历史 1.1、旧 registry、旧 report、旧 replay
-```
 
-**重要记录**：clean `1.2.docx` 与 redline `.docx` 在本次 landing 时缺失，无法做 §4.1 要求的逐字节哈希核验。因此本次执行以执行提示词 `rna 三级.md` 的完整正文作为权威科学合同，并以 `v1.2_decision_and_claim_log.md` 作为其决策记录。缺失 DOCX 已记入 `contract_issue_register.md`，不阻塞 T0/Q0 只读与数据发现工作。
+The worktree was created from the historical v1.2 code commit but does not use
+the historical worktree or its outputs as current evidence. Builders and
+finalizers are rebound through `scripts/runtime_config.py` to the run-specific
+worktree, run root, manifest, and clean-contract hash. The actual clean DOCX
+hash is checked before a formal gate can pass.
 
-## 2. 远端只读 preflight 快照（2026-08-03 UTC）
+## Frozen initial machine state
 
-- 连接目标：`ssh -p 22 cunyuliu@36.137.135.49`（alias `A100`）
-- 主机名：`bms-18937653-012`（Linux，Ubuntu 5.15.0-173）
-- 仓库实际 Git root：`/home/cunyuliu/rna_junction_preorganization_v1_1_20260801`
-- 分支：`main`；HEAD：`5aa0da6`（`audit: close engineering replay handoff`）
-- remote：`origin git@github.com:Cunyu-Liu/rna-junction-preorganization.git`
-- working tree dirty：是（5 个未跟踪文件，均在 `manifests/history/` 与 `reports/`，属 v1.1 历史产物）
-- 已有 worktrees：1（主 checkout）
-- 运行进程：存在多个其他用户进程（yihaozh / af3_bosun / shenxin / chenyuj），**本任务不触碰**；未发现本任务专属活跃 job
-- GPU：8× NVIDIA A100-PCIE-40GB；空闲显存（MiB）：GPU6=38753、GPU1=22118、GPU4=26342、GPU3=21383、GPU7=19358、GPU0=5379、GPU5=25449、GPU2=11151
-- GPU 约束：`GPU4` 按项目记忆保留（calibrate），避免占用；其余 GPU 按显存空闲度选择
-- 磁盘：`/home` 7.0T（5.3T avail）；`/mnt` 18T（13T avail）
-- Python：系统 `python3` 3.10.12；conda env `rna_junction_preorganization_v1_1` = Python 3.10.20, torch 2.9.0+cu126（CUDA 可用，8 devices）, numpy 2.2.6, pandas 2.3.3, scipy 1.15.2, biopython 1.87；缺 openpyxl/xlrd
-- 已有数据：`/mnt/cunyuliu/rna_junction_preorganization_v1_1_20260801/phase0/source_payloads/`（denny + dms_sra + dms_pmc + dms_processed + dms_figshare + nar_gkag672 + author_release）
-- 历史 auditors：v1.1 完成大量 Phase 0 crosswalk 恢复审计，结论为 crosswalk 永久不可得（见 reports/phase0_handoff_20260803.md）
-
-## 3. 初始冻结状态（v1.2 起点）
-
-```
+```text
 CURRENT_OPERATIONAL_STATE = BLOCKED_AT_TECTO_DATA_ADMISSION
 CURRENT_SCIENTIFIC_DISPOSITION = CONDITIONAL_CANDIDATE
 CURRENT_DMS_CROSSWALK = ASSUMED_PERMANENTLY_UNAVAILABLE_V1_2
@@ -52,29 +52,46 @@ CURRENT_DMS_REPLAY = ENGINEERING_EVIDENCE_ONLY
 CURRENT_DMS_JOINT_TRANSPORT = CLOSED_NOT_AUTHORIZED
 QMAPSEQ_ROLE = MANDATORY_COMPLETION_GATE_FOR_STRONG_MANUSCRIPT
 SCIENTIFIC_UNLOCK = NO_UNLOCK
+T0 = BLOCKED
+S0/T1/M0/T2/T3 = NOT_STARTED
+Q0/Q1/Q2/Q3/Q4/Q5 = NOT_STARTED
+qmap_terminal_disposition = NOT_ADJUDICATED
+claim_class = NOT_ADJUDICATED
 ```
 
-任何正式 Gate 通过前：`admitted tecto labels = 0`，`scientific unlock = NO_UNLOCK`，`model-stage authorization = NOT_GRANTED`，`publication claim = NOT_ADJUDICATED`。
+No current-DMS primary labels, fitting, split/threshold/feature selection,
+effect-size claim, joint model, test-time input, or scientific claim is allowed
+in v1.2. Tecto and qMaPseq remain independent DAGs; qMaPseq does not unlock
+tecto, and Q4/Q5 cannot retroactively change frozen tecto choices.
 
-## 4. 隔离执行环境
+## Scientific boundary
 
-- 唯一 `run_id`：`v1_2_tecto_qmap_20260803`
-- `parent_run_id`：`v1_1_phase0_20260801`（历史分支，仅作 parent 记录）
-- 隔离 worktree：`/home/cunyuliu/rna_junction_preorganization_v1_2_20260803`
-- 分支：`v1.2/tecto-qmap`（从 HEAD `5aa0da6` 创建）
-- 数据/运行根：`/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/`
-- 大体积 raw/intermediate 数据放 `/mnt`；代码放隔离 worktree；raw 只读、不可覆盖
-- 未修改主 checkout、未修改历史 run/manifest/registry/evidence、未 push
+- Primary estimand: one target-specific thermodynamic functional `Φ*` for one
+  frozen `K*` and condition `c*`.
+- Partial identification is first-class: report identified intervals/sets,
+  coverage, width, and dominant uncertainty source whenever point identification
+  fails.
+- Tecto DAG: `T0 → S0 → T1 → M0 → T2 → T3 → optional sequence-only → claim adjudication`.
+- qMaPseq DAG: `Q0 → Q1 → Q2 → Q3 → Q4 → Q5 → claim adjudication`.
+- Primary split: motif-family outer holdout with component closure; random row,
+  nucleotide, replicate, condition-crossing, and giant-component-breaking splits
+  are prohibited.
+- The qMaPseq attrition contract preserves `98 = 84 fitted + 11 right-censored
+  + 2 closing-pair structural-QC + 1 alternate/unknown`; censored rows are not
+  deleted.
 
-## 5. 计划并行推进的 DAG
+## Source snapshot policy
 
-- **tecto 主线**：T0 data admission → S0 estimand/operator/symmetry freeze → T1 cleaning/QC/effective-N/split freeze → M0 synthetic/operator-identification → T2 tecto-only inference → T3 target-specific functional →（可选）sequence-only deployment → manuscript adjudication
-- **qMaPseq 第二系统**：Q0 integrity/license freeze → Q1 98-variant registry → Q2 attrition/censoring reconstruction → Q3 endpoint replay → Q4 selection/split/analysis freeze → Q5 locked transfer test → claim adjudication
-- 硬依赖：T0–T3 不依赖 current DMS 与 qMaPseq；Q0–Q3 可与 T0/S0/T1 并行；Q4/Q5 不得反向修改已冻结的 tecto 规格
+Source artifacts are copied into the new run root before rebuilding. Their
+checksums and original locations are recorded in a run-local source snapshot
+manifest. Historical derived outputs may be used only as a route or checksum
+cross-check; they cannot satisfy a current gate without regeneration and
+current-run provenance.
 
-## 6. 当前没有解锁的内容
+## Finalizer policy
 
-- 真实 tecto 标签建模（需 T0、S0、T1、M0 依次 PASS）
-- current DMS 任何准入（永久 `NOT_ADMITTED_FINAL_V1_2`）
-- qMaPseq Q4/Q5 outcome-adaptive 分析（需先完成 Q0–Q3）
-- 任何 publication claim（`NOT_ADJUDICATED`）
+Only the finalizer may write `PASS`. Every formal gate must bind the clean
+contract hash, current code commit, current run ID, schema-valid canonical
+manifest, required artifacts, checksums, and gate-specific tests. Failed or
+incomplete criteria remain `RUNNING`/`BLOCKED` with an explicit
+`PARTIAL_ENGINEERING_EVIDENCE` or failure decision; no stale report is promoted.

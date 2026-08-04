@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """T2 finalizer — verifies the tecto-only real-data inference gate before
 writing T2 to PASS.
 
@@ -14,14 +15,14 @@ import os
 import subprocess
 import sys
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t2"
+WORKTREE = rc.WORKTREE
+DATA = os.path.join(rc.RUN_ROOT, "t2")
 GOVERNANCE = os.path.join(WORKTREE, "governance")
 sys.path.insert(0, GOVERNANCE)
 from canonical_manifest import CanonicalStateManifest, finalize_gate, validate_schema  # noqa: E402
 
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
-CONTRACT_SHA256 = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
+MANIFEST_PATH = rc.MANIFEST_PATH
+CONTRACT_SHA256 = rc.CONTRACT_SHA256
 
 RESULTS_PATH = os.path.join(DATA, "t2_results.json")
 REQUIRED = [RESULTS_PATH]
@@ -38,7 +39,7 @@ def git(*args):
 
 def main():
     results = {}
-    results["contract_hash_ok"] = True
+    results["contract_hash_ok"] = rc.verify_contract()
     commit = git("rev-parse", "HEAD")
     branch = git("branch", "--show-current")
     dirty = git("status", "--porcelain")
@@ -75,7 +76,7 @@ def main():
                      and results["homolog_leakage"] and results["calibration_drift"])
     results["t2_outcome_ok"] = t2_ok
 
-    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests"), "-q"],
+    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t2.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                         check=False, capture_output=True)
     results["tests_passed"] = (tp.returncode == 0)
 

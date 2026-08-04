@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """T3 finalizer — only the finalizer may mark T3 PASS.
 
 Verifies: contract hash, code commit, schema, required artifacts/checksums,
@@ -9,10 +10,10 @@ import json
 import os
 import sys
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t3"
-CONTRACT_SHA = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
+WORKTREE = rc.WORKTREE
+DATA = os.path.join(rc.RUN_ROOT, "t3")
+CONTRACT_SHA = rc.CONTRACT_SHA256
+MANIFEST_PATH = rc.MANIFEST_PATH
 SENTINEL_PATH = os.path.join(WORKTREE, "manifests", "sentinel_T3.txt")
 
 
@@ -28,9 +29,7 @@ def main():
     import subprocess
     results = {}
     results["contract_sha256"] = CONTRACT_SHA
-    results["contract_hash_ok"] = True
-
-    # code commit / branch / dirty
+    results["contract_hash_ok"] = rc.verify_contract()
     def git(*args):
         return subprocess.run(["git", "-C", WORKTREE, *args],
                               capture_output=True, text=True).stdout.strip()

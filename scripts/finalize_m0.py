@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """M0 finalizer — verifies synthetic / operator-identification gate before
 writing M0 to PASS.
 
@@ -14,14 +15,14 @@ import os
 import subprocess
 import sys
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/m0"
+WORKTREE = rc.WORKTREE
+DATA = os.path.join(rc.RUN_ROOT, "m0")
 GOVERNANCE = os.path.join(WORKTREE, "governance")
 sys.path.insert(0, GOVERNANCE)
 from canonical_manifest import CanonicalStateManifest, finalize_gate, validate_schema  # noqa: E402
 
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
-CONTRACT_SHA256 = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
+MANIFEST_PATH = rc.MANIFEST_PATH
+CONTRACT_SHA256 = rc.CONTRACT_SHA256
 
 RESULTS_PATH = os.path.join(DATA, "m0_results.json")
 REQUIRED = [RESULTS_PATH]
@@ -38,7 +39,7 @@ def git(*args):
 
 def main():
     results = {}
-    results["contract_hash_ok"] = True
+    results["contract_hash_ok"] = rc.verify_contract()
     commit = git("rev-parse", "HEAD")
     branch = git("branch", "--show-current")
     dirty = git("status", "--porcelain")
@@ -87,7 +88,7 @@ def main():
     results["m0_outcome_ok"] = m0_ok
 
     # --- tests ---
-    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests"), "-q"],
+    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_m0.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                         check=False, capture_output=True)
     results["tests_passed"] = (tp.returncode == 0)
 

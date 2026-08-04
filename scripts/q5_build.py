@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Q5 orchestrator: write spec, build, finalize; run all."""
 from __future__ import annotations
+import runtime_config as rc
 import json, os, sys, math, hashlib, shutil, random, statistics, collections
 from pathlib import Path
 from datetime import datetime, timezone
@@ -10,12 +11,12 @@ from scipy import stats
 from sklearn.linear_model import LinearRegression
 from sklearn.isotonic import IsotonicRegression
 
-WT = Path("/home/cunyuliu/rna_junction_preorganization_v1_2_20260803")
-QDATA = Path("/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap")
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
 Q5DIR = QDATA / "q5"; Q5DIR.mkdir(parents=True, exist_ok=True)
 (Q5DIR / "input").mkdir(exist_ok=True)
 (Q5DIR / "evidence").mkdir(exist_ok=True)
-MANIFEST = WT / "manifests" / "canonical_manifest_v1_2_20260803.json"
+MANIFEST = Path(rc.MANIFEST_PATH)
 ts_now = datetime.now(timezone.utc).isoformat()
 
 # ============================================================ Q5 SPEC

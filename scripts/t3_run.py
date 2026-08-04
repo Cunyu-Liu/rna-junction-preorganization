@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """T3 — target-specific thermodynamic functional.
 
 Final tecto main-line stage. Builds the target-specific thermodynamic functional
@@ -43,11 +44,11 @@ except Exception:
     DEVICE = None
     HAS_TORCH = False
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-DATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t3"
+WORKTREE = rc.WORKTREE
+DATA = os.path.join(rc.RUN_ROOT, "t3")
 os.makedirs(DATA, exist_ok=True)
 
-CANONICAL = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t0/t0_denny_canonical_records.jsonl"
+CANONICAL = os.path.join(rc.RUN_ROOT, "t0", "t0_denny_canonical_records.jsonl")
 CAP = -7.1
 MIN_EFFECT = 1.0
 WIDTH_MAX = 1.0

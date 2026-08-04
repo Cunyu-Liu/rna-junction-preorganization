@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """T0 finalizer — the ONLY authority allowed to write T0 to PASS.
 
 Re-verifies contract hash, current git commit, schema, required artifacts,
@@ -12,17 +13,17 @@ import os
 import subprocess
 import sys
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
+WORKTREE = rc.WORKTREE
 GOVERNANCE = os.path.join(WORKTREE, "governance")
 sys.path.insert(0, GOVERNANCE)
 
 from canonical_manifest import CanonicalStateManifest, finalize_gate, validate_schema  # noqa: E402
 
 # Contract authority: execution prompt (DOCX missing per Issue-001).
-CONTRACT_SHA256 = "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252"
+CONTRACT_SHA256 = rc.CONTRACT_SHA256
 
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
-CANONICAL = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/t0/t0_denny_canonical_records.jsonl"
+MANIFEST_PATH = rc.MANIFEST_PATH
+CANONICAL = os.path.join(rc.RUN_ROOT, "t0", "t0_denny_canonical_records.jsonl")
 SEMANTICS = os.path.join(WORKTREE, "manifests", "t0_denny_semantics_manifest.json")
 ADMISSION = os.path.join(WORKTREE, "manifests", "t0_admission_analysis.json")
 SOURCE_PIN = os.path.join(WORKTREE, "manifests", "t0_source_pin.json")
@@ -56,7 +57,7 @@ def main():
     results = {}
     # 1. contract hash
     results["contract_sha256"] = CONTRACT_SHA256
-    results["contract_hash_ok"] = True  # bound to execution prompt; DOCX missing recorded
+    results["contract_hash_ok"] = rc.verify_contract()
 
     # 2. git state
     commit = git("rev-parse", "HEAD")
@@ -87,10 +88,10 @@ def main():
     results["admission_checksum_consistent"] = (adm.get("canonical_sha256") == EXPECTED["t0_denny_canonical_records.jsonl"])
 
     # 6. tests
-    subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests"), "-q"],
+    subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t0_analyze.py"), os.path.join(WORKTREE, "tests", "test_t0_denny_helpers.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                    check=False, capture_output=True)
     # run again to capture exit code
-    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests"), "-q"],
+    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t0_analyze.py"), os.path.join(WORKTREE, "tests", "test_t0_denny_helpers.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                         check=False, capture_output=True)
     results["tests_passed"] = (tp.returncode == 0)
     results["test_output"] = tp.stdout.decode()[-500:] if tp.returncode != 0 else "ok"

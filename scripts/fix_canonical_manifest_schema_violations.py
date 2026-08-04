@@ -16,7 +16,7 @@ Gate decisions remain PASS backed by frozen evidence files.
 """
 import json, jsonschema, datetime, sys, os
 
-MANIFEST = 'manifests/canonical_manifest_v1_2_20260803.json'
+MANIFEST = os.environ.get('RNA_V12_MANIFEST_PATH', 'manifests/canonical_manifest_v1_2_unbound.json')
 SCHEMA = 'schemas/canonical_manifest.schema.json'
 GATE_CODE_COMMIT = '0874c88'  # commit that produced Q3-Q5 gate results
 

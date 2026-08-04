@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # Q4 finalize.
 from __future__ import annotations
+import runtime_config as rc
 import json, hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 
-WT = Path("/home/cunyuliu/rna_junction_preorganization_v1_2_20260803")
-QDATA = Path("/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap")
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
 Q4DIR = QDATA / "q4"
-MANIFEST = WT / "manifests" / "canonical_manifest_v1_2_20260803.json"
+MANIFEST = Path(rc.MANIFEST_PATH)
 
 summary = json.loads((Q4DIR / "q4_freeze_summary.json").read_text())
 checks = {
+    "contract_hash_ok": rc.verify_contract(),
     "frozen_before_viewing_transfer_outcome": summary["frozen_before_viewing_transfer_outcome"],
     "n_variants_is_98": summary["n_variants"] == 98,
     "leakage_violations_zero": summary["leakage_violations"] == 0,

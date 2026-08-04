@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """
 End-to-end validation of canonical manifest after audit-round-3 fix.
 Covers: schema, required fields, enums, cross-field consistency, artifact
@@ -10,11 +11,11 @@ Exit code 0 = no errors (warnings allowed); non-zero = errors found.
 import json, jsonschema, os, sys, subprocess
 from pathlib import Path
 
-WT = Path('/home/cunyuliu/rna_junction_preorganization_v1_2_20260803')
-QDATA = Path('/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap')
-MANIFEST = WT / 'manifests/canonical_manifest_v1_2_20260803.json'
+WT = Path(rc.WORKTREE)
+QDATA = Path(rc.QDATA)
+MANIFEST = Path(rc.MANIFEST_PATH)
 SCHEMA = WT / 'schemas/canonical_manifest.schema.json'
-CONTRACT_SHA256 = '32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252'
+CONTRACT_SHA256 = rc.CONTRACT_SHA256
 
 errors = []
 warnings = []

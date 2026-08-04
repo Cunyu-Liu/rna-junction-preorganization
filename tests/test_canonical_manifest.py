@@ -32,8 +32,10 @@ class TestManifest(unittest.TestCase):
         self.assertEqual(m.data["current_operational_state"], "BLOCKED_AT_TECTO_DATA_ADMISSION")
         self.assertEqual(m.data["scientific_unlock"], "NO_UNLOCK")
         self.assertEqual(m.data["claim_class"], "NOT_ADJUDICATED")
-        self.assertEqual(m.data["gate_statuses"]["T0"], "RUNNING")
+        self.assertEqual(m.data["gate_statuses"]["T0"], "BLOCKED")
         self.assertEqual(m.data["gate_statuses"]["Q0"], "NOT_STARTED")
+        self.assertEqual(m.data["qmap_terminal_disposition"], "NOT_ADJUDICATED")
+        self.assertEqual(m.data["sentinel_status"], "NOT_STARTED")
 
     def test_schema_valid(self):
         m = make_manifest()
@@ -59,7 +61,7 @@ class TestManifest(unittest.TestCase):
                 tests_passed=True, contract_hash_ok=True, schema_ok=True,
             )
         self.assertEqual(status, "PARTIAL_ENGINEERING_EVIDENCE")
-        self.assertEqual(m.data["gate_statuses"]["T0"], "RUNNING")
+        self.assertEqual(m.data["gate_statuses"]["T0"], "BLOCKED")
 
     def test_finalize_gate_pass_when_all_ok(self):
         m = make_manifest()

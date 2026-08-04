@@ -7,19 +7,27 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from canonical_manifest import CanonicalStateManifest, validate_schema, sha256_file  # noqa: E402
 
+EXPECTED_CONTRACT_SHA256 = "3ad0c9997cdea8e510f80424c4b011062f0f95a8bf8879a4659a847adcab22a0"
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--worktree", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--contract-path", required=True)
     ap.add_argument("--contract-version", default="v1.2")
-    ap.add_argument("--contract-sha256", default="")
+    ap.add_argument("--contract-sha256", default=EXPECTED_CONTRACT_SHA256)
     ap.add_argument("--code-commit", default="")
-    ap.add_argument("--run-id", default="v1_2_tecto_qmap_20260803")
-    ap.add_argument("--parent-run-id", default="v1_1_phase0_20260801")
+    ap.add_argument("--run-id", default="v1_2_tecto_qmap_unbound")
+    ap.add_argument("--parent-run-id", default="v1_2_tecto_qmap_20260803")
     ap.add_argument("--host", default="")
     ap.add_argument("--env-lock-hash", default="")
     args = ap.parse_args()
+
+    actual_contract_sha256 = sha256_file(args.contract_path)
+    if actual_contract_sha256 != EXPECTED_CONTRACT_SHA256 or actual_contract_sha256 != args.contract_sha256:
+        print(f"CONTRACT_HASH_ERROR expected={EXPECTED_CONTRACT_SHA256} actual={actual_contract_sha256}")
+        return 2
 
     m = CanonicalStateManifest.new(
         contract_version=args.contract_version,

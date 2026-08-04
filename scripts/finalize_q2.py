@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import runtime_config as rc
 """Q2 finalizer — verifies attrition artifacts before writing Q2 to PASS.
 
 Checks: source archive MD5s, required artifacts present, classification counts
@@ -11,10 +12,10 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 
-WORKTREE = "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803"
-QDATA = "/mnt/cunyuliu/rna_junction_preorganization_v1_2_20260803/qmap"
+WORKTREE = rc.WORKTREE
+QDATA = rc.QDATA
 DATA = os.path.join(QDATA, "q2")
-MANIFEST_PATH = os.path.join(WORKTREE, "manifests", "canonical_manifest_v1_2_20260803.json")
+MANIFEST_PATH = rc.MANIFEST_PATH
 SENTINEL_PATH = os.path.join(WORKTREE, "manifests", "sentinel_Q2.txt")
 
 REQUIRED = [
