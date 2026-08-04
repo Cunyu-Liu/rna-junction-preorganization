@@ -303,8 +303,8 @@
       "gate": "Q0",
       "decision": "PASS",
       "disposition": "QMAP_READY_FOR_Q1",
-      "summary": "Q0 integrity & license freeze. ENA PRJNA1086549 8 runs / 16 FASTQ downloaded with SHA-256 verified; YesselmanLab/rna_map cloned at 2d7337d (Apache-2.0). Figshare (10.6084/m9.figshare.25331758) data.zip verified (502061658 bytes, md5=7a080dc74bb3433e57fcdd885b5b7a56, downloaded via API endpoint api.figshare.com/v2/file/download/44981896); Zenodo (10.5281/zenodo.11672684) 2024_qmap_paper-main.zip verified (md5=48da131a78f5027d4b1f31a58c08007b, contains rna_map_dg.csv with 99 variant \u0394G labels). All core sources accessible => QMAP_READY_FOR_Q1.",
-      "fake_claim_guard": "Q0 PASS verifies data provenance and integrity (Figshare data.zip MD5 verified, Zenodo analysis code MD5 verified, ENA FASTQ SHA-256 verified, GitHub rna_map Apache-2.0). It does NOT claim cross-measurement-system equivalence or \u0394G accuracy beyond source labels; Q1-Q5 required for scientific claims.",
+      "summary": "Q0 integrity & license freeze. ENA PRJNA1086549 8 runs / 16 FASTQ downloaded with SHA-256 verified; YesselmanLab/rna_map cloned at 2d7337d (Apache-2.0). Figshare (10.6084/m9.figshare.25331758) data.zip verified (502061658 bytes, md5=7a080dc74bb3433e57fcdd885b5b7a56, downloaded via API endpoint api.figshare.com/v2/file/download/44981896); Zenodo (10.5281/zenodo.11672684) 2024_qmap_paper-main.zip verified (md5=48da131a78f5027d4b1f31a58c08007b, contains rna_map_dg.csv with 99 variant ΔG labels). All core sources accessible => QMAP_READY_FOR_Q1.",
+      "fake_claim_guard": "Q0 PASS verifies data provenance and integrity (Figshare data.zip MD5 verified, Zenodo analysis code MD5 verified, ENA FASTQ SHA-256 verified, GitHub rna_map Apache-2.0). It does NOT claim cross-measurement-system equivalence or ΔG accuracy beyond source labels; Q1-Q5 required for scientific claims.",
       "evidence": {
         "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
         "contract_hash_ok": true,
@@ -334,7 +334,7 @@
         "zenodo_access": "HTTP_200_MD5_VERIFIED",
         "zenodo_acquisition_method": "Downloaded directly from zenodo.org/records/11672684/files/2024_qmap_paper-main.zip",
         "core_source_accessible": true,
-        "core_source_verified": "Figshare data.zip (502061658 bytes, md5=7a080dc74bb3433e57fcdd885b5b7a56); Zenodo 2024_qmap_paper-main.zip (2509162 bytes, md5=48da131a78f5027d4b1f31a58c08007b, contains rna_map_dg.csv with 99 \u0394G labels)",
+        "core_source_verified": "Figshare data.zip (502061658 bytes, md5=7a080dc74bb3433e57fcdd885b5b7a56); Zenodo 2024_qmap_paper-main.zip (2509162 bytes, md5=48da131a78f5027d4b1f31a58c08007b, contains rna_map_dg.csv with 99 ΔG labels)",
         "core_source_barrier": null,
         "schema_ok": true,
         "schema_errors": [],
@@ -437,6 +437,245 @@
         "strata_comparison_complete": true
       },
       "finalized_at_utc": "2026-08-04T04:34:46.534054+00:00"
+    },
+    "Q3": {
+      "gate": "Q3",
+      "decision": "PASS",
+      "summary": "Q3 endpoint replay: 98 variants x 8 endpoints, tolerances frozen BEFORE run. 1600 PASS + 66 NOT_APPLICABLE (11 right-censored variants exempt from E2/E3 numerical mg_1_2; authoritative endpoint = E7 censoring reason) + 0 FAIL. No trend-only pass; categorical exact string match; numerical abs<=tol OR rel<=tol.",
+      "evidence": {
+        "code_commit": "7b0a7b7d1fae2a7815326a5f2640ff63c0497999",
+        "branch": "v1.2/tecto-qmap",
+        "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+        "required_artifacts_present": true,
+        "missing_artifacts": [],
+        "spec_path": "specs/q3_endpoint_replay_spec.json",
+        "build_script": "scripts/q3_build.py",
+        "finalize_script": "scripts/finalize_q3.py",
+        "spec_sha256": "6e26cd1440281b7b852ea3a8bd4230f6e7eb7652a154f0647e3fcb21e9e22611",
+        "build_script_sha256": "6c806621f2d7dfb91567a2850c6e948962eb9c0e4ec29bbabf3721844bf39f5a",
+        "n_variants": 98,
+        "n_endpoints": 8,
+        "total_comparison_records": 1666,
+        "n_pass": 1600,
+        "n_fail": 0,
+        "n_not_applicable": 66,
+        "tolerances_frozen_before_run": true,
+        "all_records_pass_or_not_applicable": true,
+        "all_variants_all_endpoints_pass_or_na": true,
+        "no_trend_only_pass": true,
+        "categorical_exact_match_required": true,
+        "censored_variants_rule_applied": true,
+        "n_censored_variants_exempt_from_E2_E3": 11,
+        "per_endpoint": {
+          "E1_dms_titration_curve": {
+            "n_records": 98,
+            "n_pass": 98,
+            "n_fail": 0,
+            "n_not_applicable": 0
+          },
+          "E2_mg_1_2": {
+            "n_records": 294,
+            "n_pass": 261,
+            "n_fail": 0,
+            "n_not_applicable": 33
+          },
+          "E3_uncertainty": {
+            "n_records": 294,
+            "n_pass": 261,
+            "n_fail": 0,
+            "n_not_applicable": 33
+          },
+          "E4_dms_summary": {
+            "n_records": 490,
+            "n_pass": 490,
+            "n_fail": 0,
+            "n_not_applicable": 0
+          },
+          "E5_rna_map_dg_mapping": {
+            "n_records": 196,
+            "n_pass": 196,
+            "n_fail": 0,
+            "n_not_applicable": 0
+          },
+          "E6_failure_reason": {
+            "n_records": 98,
+            "n_pass": 98,
+            "n_fail": 0,
+            "n_not_applicable": 0
+          },
+          "E7_censoring_reason": {
+            "n_records": 98,
+            "n_pass": 98,
+            "n_fail": 0,
+            "n_not_applicable": 0
+          },
+          "E8_structural_qc_reason": {
+            "n_records": 98,
+            "n_pass": 98,
+            "n_fail": 0,
+            "n_not_applicable": 0
+          }
+        },
+        "acceptance": {
+          "tolerances_frozen_before_run": true,
+          "all_records_pass_or_not_applicable": true,
+          "all_variants_all_endpoints_pass_or_na": true,
+          "no_trend_only_pass": true,
+          "categorical_exact_match_required": true,
+          "censored_variants_rule_applied": true,
+          "n_fail_zero": true,
+          "n_variants_is_98": true,
+          "n_endpoints_is_8": true,
+          "all_required_comparison_fields_present": true,
+          "evidence_per_variant_written": true
+        }
+      },
+      "finalized_at_utc": "2026-08-04T05:00:26.120799+00:00"
+    },
+    "Q4": {
+      "gate": "Q4",
+      "decision": "PASS",
+      "summary": "Q4 selection/split/analysis freeze: 98 mttr6 TTR mutants (no extrapolation to arbitrary TLR). Mutation graph 193 edges, 4 connected components (sizes [83, 11, 2, 2]); K=4 folds, 0 leakage. All 12 freeze items locked before viewing transfer outcome.",
+      "evidence": {
+        "code_commit": "7b0a7b7d1fae2a7815326a5f2640ff63c0497999",
+        "branch": "v1.2/tecto-qmap",
+        "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+        "required_artifacts_present": true,
+        "missing_artifacts": [],
+        "spec_path": "specs/q4_selection_split_freeze_spec.json",
+        "build_script": "scripts/q4_build.py",
+        "finalize_script": "scripts/finalize_q4.py",
+        "spec_sha256": "e49dd41648a646dead79515b8501a1a7d2c1e2dc757d6a6385d2b18b5dfdf4a2",
+        "build_script_sha256": "e2c17ed77bc715b290ddb8fee7b436198d5139038a69ee5398127bb5320d93d3",
+        "n_variants": 98,
+        "k_folds": 4,
+        "fold_sizes": [
+          83,
+          11,
+          2,
+          2
+        ],
+        "n_mutation_graph_edges": 193,
+        "n_connected_components": 4,
+        "leakage_violations": 0,
+        "same_variant_all_rows_same_fold": true,
+        "cannot_extrapolate_to_arbitrary_TLR_family": true,
+        "frozen_before_viewing_transfer_outcome": true,
+        "qmap_outcome_cannot_modify": [
+          "tecto_model",
+          "operator",
+          "transport",
+          "thresholds",
+          "split",
+          "primary_metric"
+        ],
+        "acceptance": {
+          "frozen_before_viewing_transfer_outcome": true,
+          "n_variants_is_98": true,
+          "leakage_violations_zero": true,
+          "same_variant_all_rows_same_fold": true,
+          "selection_boundary_locked": true,
+          "mutation_graph_locked": true,
+          "outer_groups_locked": true,
+          "baseline_locked": true,
+          "primary_metric_locked": true,
+          "secondary_metrics_locked": true,
+          "minimum_meaningful_effect_locked": true,
+          "power_rule_locked": true,
+          "negative_controls_locked": true,
+          "calibration_rule_locked": true,
+          "interval_rule_locked": true,
+          "outcome_adjudication_rule_locked": true
+        }
+      },
+      "finalized_at_utc": "2026-08-04T05:05:07.217130+00:00"
+    },
+    "Q5": {
+      "gate": "Q5",
+      "decision": "PASS",
+      "summary": "Q5 locked transfer test: 4 baselines compared. B4 (tecto old_dg + isotonic calibration) RMSE=0.1951 kcal/mol, gain over B1=0.511 (95%CI [0.403,0.618]), 68% coverage=0.682, label permutation p=0.0. Terminal state: QMAP_TRANSFER_SUPPORTED.",
+      "evidence": {
+        "code_commit": "7b0a7b7d1fae2a7815326a5f2640ff63c0497999",
+        "branch": "v1.2/tecto-qmap",
+        "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
+        "required_artifacts_present": true,
+        "missing_artifacts": [],
+        "spec_path": "specs/q5_locked_transfer_spec.json",
+        "build_script": "scripts/q5_build.py",
+        "finalize_script": "scripts/finalize_q5.py",
+        "spec_sha256": "8b6355a5ba67c32c540665815a6a4adbf21e7d60d673ce04d6ca34bad7dd6f59",
+        "n_variants": 98,
+        "k_folds": 4,
+        "baselines": {
+          "B1": {
+            "mean_rmse": 0.7056081491115335,
+            "mean_nlpd": 1.0921994031277649,
+            "mean_spearman": NaN,
+            "mean_cov68": 0.8307776560788609
+          },
+          "B2": {
+            "mean_rmse": 1.4632897041737856,
+            "mean_nlpd": 6.124103023027491,
+            "mean_spearman": 0.76754334410814,
+            "mean_cov68": 0.768893756845564
+          },
+          "B3": {
+            "mean_rmse": 0.7390826213681724,
+            "mean_nlpd": 1.165792604704249,
+            "mean_spearman": -0.17505293681759512,
+            "mean_cov68": 0.797645125958379
+          },
+          "B4": {
+            "mean_rmse": 0.19507323591843584,
+            "mean_nlpd": 0.5333715130298382,
+            "mean_spearman": 0.9474028066014155,
+            "mean_cov68": 0.6819550930996714
+          }
+        },
+        "b4_mean_rmse_kcal_mol": 0.19507323591843584,
+        "b1_mean_rmse_kcal_mol": 0.7056081491115335,
+        "preregistered_gain": {
+          "mean": 0.5105349131930977,
+          "ci_low": 0.4026500832431359,
+          "ci_high": 0.6184197431430596,
+          "p_value": 0.0006355379646573691,
+          "ci_includes_zero": "False"
+        },
+        "label_permutation": {
+          "p_value": 0.0,
+          "n_permutations": 100,
+          "pass": true
+        },
+        "mutation_class_bootstrap": {
+          "ci_low": 0.3586345907492374,
+          "ci_high": 0.6304399912236744,
+          "n_resamples": 1000
+        },
+        "condition_controls": {
+          "n_closing_pair_only": 18,
+          "mean_residual": -0.015571571994531495,
+          "std_residual": 0.17477750348597282
+        },
+        "negative_nucleotide_controls": {
+          "baseline": "B1",
+          "rmse": 0.7056081491115335
+        },
+        "adjudication_criteria": {
+          "(a) RMSE < 1.0": true,
+          "(b) gain > 0.3 AND 95%CI excludes 0": true,
+          "(c) 68% coverage in [0.55, 0.80]": true,
+          "(d) label permutation p < 0.05": true
+        },
+        "terminal_state": "QMAP_TRANSFER_SUPPORTED",
+        "locked_before_run": true,
+        "acceptance": {
+          "(a) RMSE < 1.0": true,
+          "(b) gain > 0.3 AND 95%CI excludes 0": true,
+          "(c) 68% coverage in [0.55, 0.80]": true,
+          "(d) label permutation p < 0.05": true
+        }
+      },
+      "finalized_at_utc": "2026-08-04T05:07:46.882214+00:00"
     }
   },
   "current_operational_state": "PROJECT_COMPLETE_QMAP_TRANSFER_SUPPORTED",
@@ -449,7 +688,7 @@
   "derived_manifest_freshness": {
     "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e"
   },
-  "last_updated_utc": "2026-08-04T05:09:31.307301+00:00",
+  "last_updated_utc": "2026-08-04T05:13:30.687709+00:00",
   "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED",
   "final_claim_adjudication": {
     "max_allowable_claim": "STRONG_CROSS_SYSTEM_RESTRICTED",
