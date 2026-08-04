@@ -59,11 +59,12 @@ def main():
 
     commit = git("rev-parse", "HEAD")
     branch = git("branch", "--show-current")
-    dirty = bool(git("status", "--porcelain"))
+    dirty_status = git("status", "--porcelain")
+    dirty = bool(dirty_status)
     results["code_commit"] = commit
     results["branch"] = branch
     results["dirty"] = dirty
-    results["worktree_dirty_ok"] = not rc.source_tree_dirty(dirty)
+    results["worktree_dirty_ok"] = not rc.source_tree_dirty(dirty_status)
 
     # ---- raw ENA artifacts ----
     fastq_dir = os.path.join(QDATA, "raw", "fastq")
