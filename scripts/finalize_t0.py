@@ -31,7 +31,6 @@ REPORT = os.path.join(WORKTREE, "docs", "t0_admission_report.md")
 
 EXPECTED = {
     "t0_denny_canonical_records.jsonl": "0989ddc00bb230fdb00bbc65433c943a0419e35c3d0799b481e741c4a24defe2",
-    "t0_denny_semantics_manifest.json": "51f6645a9029570fd528f2a3741e662410907011c3ab526c437444d474b5c4da",
 }
 
 
@@ -81,17 +80,38 @@ def main():
 
     # 5. checksums
     results["canonical_checksum_ok"] = sha256_file(CANONICAL) == EXPECTED["t0_denny_canonical_records.jsonl"]
-    results["semantics_checksum_ok"] = sha256_file(SEMANTICS) == EXPECTED["t0_denny_semantics_manifest.json"]
     # admission analysis must reference the same canonical sha256
     with open(ADMISSION) as f:
         adm = json.load(f)
     results["admission_checksum_consistent"] = (adm.get("canonical_sha256") == EXPECTED["t0_denny_canonical_records.jsonl"])
 
+    # The semantics manifest is regenerated in this run; bind its content
+    # to the current run, source pin, and contract set relations.
+    with open(SEMANTICS) as f:
+        sem_current = json.load(f)
+    with open(SOURCE_PIN) as f:
+        pin_current = json.load(f)
+    sem_counts = sem_current.get("set_mapping", {})
+    results["semantics_sha256"] = sha256_file(SEMANTICS)
+    results["semantics_run_id_ok"] = sem_current.get("run_id") == manifest.data.get("run_id")
+    results["semantics_source_hash_ok"] = sem_current.get("source_sha256") == pin_current.get("sha256")
+    results["semantics_set_relations_ok"] = (
+        sem_counts.get("SET_1713", {}).get("count") == 1713
+        and sem_counts.get("SET_1636", {}).get("count") == 1636
+        and sem_counts.get("SET_1687", {}).get("reconstructed_total") == 1687
+        and sem_counts.get("SET_1687", {}).get("designed_junctionmat") == 1328
+    )
+    results["semantics_checksum_ok"] = all([
+        results["semantics_run_id_ok"],
+        results["semantics_source_hash_ok"],
+        results["semantics_set_relations_ok"],
+    ])
+    results["admission_run_id_ok"] = adm.get("run_id") == manifest.data.get("run_id")
     # 6. tests
-    subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t0_analyze.py"), os.path.join(WORKTREE, "tests", "test_t0_denny_helpers.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
+    subprocess.run([sys.executable, "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t0_analyze.py"), os.path.join(WORKTREE, "tests", "test_t0_denny_helpers.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                    check=False, capture_output=True)
     # run again to capture exit code
-    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t0_analyze.py"), os.path.join(WORKTREE, "tests", "test_t0_denny_helpers.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
+    tp = subprocess.run([sys.executable, "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t0_analyze.py"), os.path.join(WORKTREE, "tests", "test_t0_denny_helpers.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                         check=False, capture_output=True)
     results["tests_passed"] = (tp.returncode == 0)
     results["test_output"] = tp.stdout.decode()[-500:] if tp.returncode != 0 else "ok"
@@ -105,10 +125,13 @@ def main():
     results["designed_junctionmat_reconstructed"] = (designed_jm == 1328)
 
     # 8. decision
+    results["manifest_contract_hash_ok"] = manifest.data.get("contract_sha256") == CONTRACT_SHA256
+    results["manifest_code_commit_ok"] = manifest.data.get("code_commit") == commit
     all_ok = (results["schema_ok"] and results["required_artifacts_present"]
               and results["canonical_checksum_ok"] and results["semantics_checksum_ok"]
-              and results["admission_checksum_consistent"] and results["tests_passed"]
+              and results["admission_checksum_consistent"] and results["admission_run_id_ok"] and results["tests_passed"]
               and results["designed_junctionmat_reconstructed"] and results["contract_hash_ok"]
+              and results["manifest_contract_hash_ok"] and results["manifest_code_commit_ok"]
               and results["worktree_dirty_ok"])
 
     decision = {

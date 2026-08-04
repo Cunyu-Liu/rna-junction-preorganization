@@ -88,7 +88,7 @@ def main():
     results["m0_outcome_ok"] = m0_ok
 
     # --- tests ---
-    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_m0.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
+    tp = subprocess.run([sys.executable, "-m", "pytest", os.path.join(WORKTREE, "tests", "test_m0.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                         check=False, capture_output=True)
     results["tests_passed"] = (tp.returncode == 0)
 

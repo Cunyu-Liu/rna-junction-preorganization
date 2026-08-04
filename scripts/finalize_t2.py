@@ -76,7 +76,7 @@ def main():
                      and results["homolog_leakage"] and results["calibration_drift"])
     results["t2_outcome_ok"] = t2_ok
 
-    tp = subprocess.run(["python", "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t2.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
+    tp = subprocess.run([sys.executable, "-m", "pytest", os.path.join(WORKTREE, "tests", "test_t2.py"), os.path.join(WORKTREE, "tests", "test_canonical_manifest.py"), "-q"],
                         check=False, capture_output=True)
     results["tests_passed"] = (tp.returncode == 0)
 
