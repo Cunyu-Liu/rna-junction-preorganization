@@ -2,12 +2,12 @@
   "schema_version": "1.0.0",
   "contract_version": "v1.2",
   "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
-  "code_commit": "3ffbe905d50162960c9aaf7e3f167f6add750c43",
+  "code_commit": "0874c88",
   "worktree_path": "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803",
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-04T04:34:46.534054+00:00",
+  "updated_at_utc": "2026-08-04T05:28:01.920775+00:00",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -22,18 +22,9 @@
     "manifests/t0_denny_semantics_manifest.json",
     "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/s0_spec_manifest.json",
     "/home/cunyuliu/rna_junction_preorganization_v1_2_20260803/specs/s0_spec_manifest.json",
-    {
-      "name": "claim_adjudication.md",
-      "path": "reports/final/claim_adjudication.md"
-    },
-    {
-      "name": "claim_matrix.json",
-      "path": "reports/final/claim_matrix.json"
-    },
-    {
-      "name": "final_delivery_report.md",
-      "path": "reports/final/final_delivery_report.md"
-    }
+    "reports/final/claim_adjudication.md",
+    "reports/final/claim_matrix.json",
+    "reports/final/final_delivery_report.md"
   ],
   "output_checksums": {
     "t0_denny_canonical_records.jsonl": "0989ddc00bb230fdb00bbc65433c943a0419e35c3d0799b481e741c4a24defe2",
@@ -678,17 +669,17 @@
       "finalized_at_utc": "2026-08-04T05:07:46.882214+00:00"
     }
   },
-  "current_operational_state": "PROJECT_COMPLETE_QMAP_TRANSFER_SUPPORTED",
-  "current_scientific_disposition": "INCONCLUSIVE_FOR_1_KCAL_PRECISION",
+  "current_operational_state": "IMPLEMENTATION_COMPLETE",
+  "current_scientific_disposition": "ADJUDICATED",
   "scientific_unlock": "NO_UNLOCK",
-  "qmap_terminal_disposition": "QMAP_READY_FOR_Q3",
-  "claim_class": "TECTO_REANALYSIS_AND_PARTIAL_ID_CASE_STUDY",
+  "qmap_terminal_disposition": "QMAP_TRANSFER_SUPPORTED",
+  "claim_class": "STRONG_CROSS_SYSTEM",
   "finalizer_status": "PASS",
   "sentinel_status": "PASS",
   "derived_manifest_freshness": {
     "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e"
   },
-  "last_updated_utc": "2026-08-04T05:21:11.178239+00:00",
+  "last_updated_utc": "2026-08-04T05:28:01.920775+00:00",
   "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED",
   "final_claim_adjudication": {
     "max_allowable_claim": "STRONG_CROSS_SYSTEM_RESTRICTED",
