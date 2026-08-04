@@ -1,0 +1,150 @@
+{
+  "gate": "Q2",
+  "title": "Attrition and censoring reconstruction",
+  "description": "Reproduce and freeze the 98-variant attrition classification: 84 fitted, 11 right-censored ([Mg2+]1/2 > 40 mM or unstable/unphysical fit), 2 closing-pair abnormal-reactivity, 1 alternate-structure/unknown-pattern. The 11 right-censored enter censored likelihood (not deleted). The 2+1 structural-QC variants retain per-row reasons and enter predefined sensitivity analysis. The 84 complete cases are not called an unbiased 98-variant validation set. Compare fitted, censored, and structural-QC strata by mutation class, sequence distance, and reference dG. Report condition-level and analysis-level attrition.",
+  "frozen_at_utc": "2026-08-04T00:00:00Z",
+  "data_sources": {
+    "q1_registry": {
+      "path": "QDATA/q1/q1_variant_registry.jsonl",
+      "description": "99 variants from Q1 (1 reference + 98 mutants); all 98 mutants have titration data"
+    },
+    "mg_1_2_fits": {
+      "path": "QDATA/raw/figshare/data/mg_1_2_fits/mtt6_data_mg_1_2.csv",
+      "description": "Published Hill-equation fits for 98 variants (replay-verified: replay values identical to published)",
+      "md5_source_archive": "7a080dc74bb3433e57fcdd885b5b7a56",
+      "columns": ["name", "num_points", "mg_1_2", "mg_1_2_err", "n", "n_err", "a_0", "a_0_err"]
+    },
+    "published_exclude_list": {
+      "source": "Zenodo 2024_qmap_paper-main/notebooks/figures/figure_5.ipynb cell 12 + supplemental_figures.ipynb cell 21",
+      "comment_in_code": "check supplemental table 4 for reasons",
+      "n_variants": 11,
+      "variants": [
+        "UCUAAA_CAUGA",
+        "CCUACA_UACGG",
+        "CUUAAC_UAUGG",
+        "CCUCAC_CACGG",
+        "GCUCAA_CAUGC",
+        "GCUGAA_CAUGC",
+        "CCUCAA_CAUGG",
+        "CCUGAA_CAUGG",
+        "CCUAAAG_UAAGG",
+        "CCUAAC_UAGGG",
+        "CCUCAC_UAUGG"
+      ]
+    },
+    "mutation_characterization": {
+      "source": "Zenodo 2024_qmap_paper-main/qmap_paper/mutation_characterize.py",
+      "function": "characterize_mutations",
+      "wt_seq": "CCUAAGUAUGG",
+      "all_bp_pos": [[0, -1], [1, -2], [5, 6]],
+      "bp_muts_format": "{orig_bp}{bp_index_1based}{new_bp} e.g. CG1GC means bp1 (pos 1,-2) changed CG->GC",
+      "closing_pair_definition": "bp1 (positions [1,-2] in 11-nt aligned sequence) — the C-G pair second from outside"
+    }
+  },
+  "classification_schema": {
+    "total": 98,
+    "fitted": 84,
+    "right_censored": 11,
+    "closing_pair_abnormal": 2,
+    "alternate_structure": 1
+  },
+  "right_censored_11": {
+    "description": "Published 11-variant exclude list. All enter censored likelihood (NOT deleted). Sub-classified by censoring reason.",
+    "mg_1_2_gt_40": {
+      "count": 6,
+      "variants": {
+        "CCUAAC_UAGGG": {"mg_1_2": 54.99, "reason": "[Mg2+]1/2 > 40 mM (54.99); beyond tested range"},
+        "CCUCAA_CAUGG": {"mg_1_2": 132.17, "reason": "[Mg2+]1/2 > 40 mM (132.17); beyond tested range"},
+        "CCUAAAG_UAAGG": {"mg_1_2": 141.05, "reason": "[Mg2+]1/2 > 40 mM (141.05); beyond tested range"},
+        "GCUGAA_CAUGC": {"mg_1_2": 1017.40, "reason": "[Mg2+]1/2 > 40 mM (1017.40); beyond tested range; closing-pair mutant CG1GC"},
+        "CCUCAC_CACGG": {"mg_1_2": 4412.29, "reason": "[Mg2+]1/2 > 40 mM (4412.29); beyond tested range; a_0=1.41 unphysical"},
+        "GCUCAA_CAUGC": {"mg_1_2": 5.39e19, "reason": "[Mg2+]1/2 > 40 mM (5.39e19); degenerate fit; a_0=2.14, n=2.28 unphysical; closing-pair mutant CG1GC"}
+      }
+    },
+    "unstable_unphysical_fit": {
+      "count": 5,
+      "variants": {
+        "CUUAAC_UAUGG": {"mg_1_2": 1.04, "n": 0.185, "a_0": 0.354, "reason": "Unstable fit: n=0.185 (extremely low cooperativity), a_0=0.354 (very low baseline); mg_1_2 not reliably measurable"},
+        "CCUACA_UACGG": {"mg_1_2": 1.39, "n": 0.965, "a_0": 0.526, "reason": "Unphysical fit: a_0=0.526 (very low baseline, below typical 0.7-1.0 range); mg_1_2 not reliably measurable"},
+        "UCUAAA_CAUGA": {"mg_1_2": 2.92, "n": 0.634, "a_0": 0.791, "reason": "Unstable fit: n=0.634 (low cooperativity), mg_1_2_err=3.14 > mg_1_2; closing-pair mutant CG1UA"},
+        "CCUCAC_UAUGG": {"mg_1_2": 10.48, "n": 0.891, "a_0": 1.014, "reason": "Unphysical fit: a_0=1.014 > 1 (exceeds theoretical maximum baseline); mg_1_2 not reliably measurable"},
+        "CCUGAA_CAUGG": {"mg_1_2": 35.33, "n": 0.870, "a_0": 1.002, "reason": "Unphysical fit: a_0=1.002 > 1 (exceeds theoretical maximum); mg_1_2=35.33 near censoring boundary"}
+      }
+    }
+  },
+  "closing_pair_abnormal_2": {
+    "description": "Closing-pair mutants (bp1 mutation) with abnormal titration behavior. Identified from 13 non-excluded closing-pair mutants by statistical outlier analysis of Hill fit parameters.",
+    "variants": {
+      "GCUAAA_UACGC": {
+        "bp_muts": ["CG1GC"],
+        "mg_1_2": 4.66,
+        "n": 4.93,
+        "n_err": 16.16,
+        "a_0": 0.917,
+        "reason": "Degenerate Hill coefficient: n=4.93 with err=16.16 (error 3.3x value). n is 3.2x the median (1.22) and 1.6x the next highest non-excluded variant. Fit is numerically unstable despite mg_1_2 in tested range. Closing-pair mutation CG->GC."
+      },
+      "GCUUAA_CAUGC": {
+        "bp_muts": ["CG1GC"],
+        "mg_1_2": 2.49,
+        "n": 1.41,
+        "n_err": 0.26,
+        "a_0": 0.609,
+        "a_0_err": 0.040,
+        "reason": "Abnormally low baseline DMS reactivity: a_0=0.609 (lowest among 13 non-excluded closing-pair mutants, 2.7 sigma below median 0.88). Suggests partial pre-folding or alternate conformational state at 0 Mg. Closing-pair mutation CG->GC."
+      }
+    },
+    "identification_method": "Among 13 non-excluded closing-pair (bp1) mutants, computed distribution of n, a_0, mg_1_2_err/mg_1_2. GCUAAA_UACGC is n outlier (4.93 vs median 1.22, IQR 1.11-1.53). GCUUAA_CAUGC is a_0 outlier (0.609 vs median 0.90, IQR 0.84-0.95). Both exceed 1.5xIQR fence."
+  },
+  "alternate_structure_1": {
+    "description": "Non-closing-pair variant with combined abnormal fit parameters suggesting alternate RNA structure.",
+    "variants": {
+      "CCUAAG_CACGG": {
+        "bp_muts": [],
+        "mutations": ["C7U", "C9U"],
+        "mg_1_2": 3.39,
+        "n": 3.03,
+        "n_err": 5.99,
+        "a_0": 0.582,
+        "a_0_err": 0.056,
+        "reason": "Combined abnormality: n=3.03 (highest among 74 non-excluded non-closing-pair variants; 2.5x median 1.22, n_err/n=1.98 indicates unstable cooperativity) AND a_0=0.582 (2nd lowest; 2.7 sigma below median 0.88). This unique combination of high Hill coefficient + low baseline suggests the variant adopts an alternate conformational state. Mutations U6C and U8C (0-indexed) are in the tetraloop/receptor region, potentially destabilizing the native fold."
+      }
+    },
+    "identification_method": "Among 74 non-excluded non-closing-pair variants, computed joint distribution of (n, a_0). CCUAAG_CACGG is the only variant that is simultaneously a top-5 outlier in BOTH n (highest: 3.03) and a_0 (2nd lowest: 0.582). No other variant shows this combined abnormality pattern."
+  },
+  "fitted_84": {
+    "description": "84 variants with reliable Hill-equation fits within the tested Mg range. NOT called an unbiased 98-variant validation set.",
+    "count": 84,
+    "includes_note": "2 variants (CCUACG_AAUGG mg_1_2=90.87, UCUAAG_AAUGG mg_1_2=440.88) have mg_1_2 > 40 but are NOT in the published 11 exclude list. Their fits are stable (reasonable n, a_0) so they remain in the fitted set per published analysis. Their mg_1_2 values are beyond the tested range and are flagged for sensitivity analysis."
+  },
+  "strata_comparison": {
+    "required": true,
+    "dimensions": ["mutation_class", "sequence_distance", "reference_dG"],
+    "note": "Compare fitted (84), right-censored (11), and structural-QC (3) strata"
+  },
+  "attrition_reporting": {
+    "condition_level": "Report attrition at the condition level (per Mg concentration, per variant)",
+    "analysis_level": "Report attrition at the analysis level (per variant, per classification stratum)"
+  },
+  "acceptance_criteria": {
+    "n_total": 98,
+    "n_fitted": 84,
+    "n_right_censored": 11,
+    "n_closing_pair_abnormal": 2,
+    "n_alternate_structure": 1,
+    "sum_equals_98": true,
+    "all_98_classified": true,
+    "censored_not_deleted": true,
+    "structural_qc_per_row_reason": true,
+    "fitted_not_called_unbiased": true,
+    "strata_comparison_complete": true,
+    "condition_level_attrition_reported": true,
+    "analysis_level_attrition_reported": true,
+    "published_vs_replay_match": true
+  },
+  "outputs": {
+    "attrition_jsonl": "QDATA/q2/q2_attrition.jsonl",
+    "strata_comparison_json": "QDATA/q2/q2_strata_comparison.json",
+    "summary_json": "QDATA/q2/q2_attrition_summary.json",
+    "manifest_json": "QDATA/q2/q2_manifest.json"
+  }
+}

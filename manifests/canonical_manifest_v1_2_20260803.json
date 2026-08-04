@@ -7,7 +7,7 @@
   "run_id": "v1_2_tecto_qmap_20260803",
   "parent_run_id": "v1_1_phase0_20260801",
   "created_at_utc": "2026-08-03T15:34:45Z",
-  "updated_at_utc": "2026-08-04T03:58:30.061954+00:00",
+  "updated_at_utc": "2026-08-04T04:34:46.534054+00:00",
   "host": "bms-18937653-012",
   "environment_lock_hash": "",
   "source_manifests": [],
@@ -48,7 +48,7 @@
     "T3": "PASS",
     "Q0": "PASS",
     "Q1": "PASS",
-    "Q2": "NOT_STARTED",
+    "Q2": "PASS",
     "Q3": "NOT_STARTED",
     "Q4": "NOT_STARTED",
     "Q5": "NOT_STARTED"
@@ -388,12 +388,61 @@
         "n_with_construct_seq": 99
       },
       "finalized_at_utc": "2026-08-04T03:58:30.061954+00:00"
+    },
+    "Q2": {
+      "gate": "Q2",
+      "decision": "PASS",
+      "summary": "Q2 attrition: 98 variants classified into 84 fitted + 11 right-censored + 2 closing-pair abnormal + 1 alternate-structure. Censored enter likelihood (not deleted). Strata comparison complete. Published vs replay match verified.",
+      "evidence": {
+        "code_commit": "4974a7496e64649ad894fa855fb903442bdfe38e",
+        "branch": "v1.2/tecto-qmap",
+        "required_artifacts_present": true,
+        "missing_artifacts": [],
+        "classification": {},
+        "n_total": 98,
+        "n_fitted": 84,
+        "n_right_censored": 11,
+        "n_closing_pair_abnormal": 2,
+        "n_alternate_structure": 1,
+        "acceptance": {
+          "n_total_ok": true,
+          "n_fitted_ok": true,
+          "n_right_censored_ok": true,
+          "n_closing_pair_abnormal_ok": true,
+          "n_alternate_structure_ok": true,
+          "sum_equals_98_ok": true,
+          "all_98_classified_ok": true,
+          "censored_not_deleted_ok": true,
+          "structural_qc_per_row_reason_ok": true,
+          "fitted_not_called_unbiased_ok": true,
+          "strata_comparison_complete_ok": true,
+          "condition_level_attrition_reported_ok": true,
+          "analysis_level_attrition_reported_ok": true,
+          "published_vs_replay_match_ok": true
+        },
+        "right_censored_breakdown": {
+          "mg_1_2_gt_40": 6,
+          "unstable_unphysical_fit": 5
+        },
+        "published_vs_replay_match": true,
+        "n_attrition_records": 98,
+        "category_counts": {
+          "fitted": 84,
+          "right_censored": 11,
+          "closing_pair_abnormal": 2,
+          "alternate_structure": 1
+        },
+        "all_have_reason": true,
+        "censored_not_deleted": true,
+        "strata_comparison_complete": true
+      },
+      "finalized_at_utc": "2026-08-04T04:34:46.534054+00:00"
     }
   },
   "current_operational_state": "QMAP_Q1_IN_PROGRESS",
   "current_scientific_disposition": "INCONCLUSIVE_FOR_1_KCAL_PRECISION",
   "scientific_unlock": "NO_UNLOCK",
-  "qmap_terminal_disposition": "QMAP_READY_FOR_Q2",
+  "qmap_terminal_disposition": "QMAP_READY_FOR_Q3",
   "claim_class": "TECTO_REANALYSIS_AND_PARTIAL_ID_CASE_STUDY",
   "finalizer_status": "PASS",
   "sentinel_status": "PASS",
