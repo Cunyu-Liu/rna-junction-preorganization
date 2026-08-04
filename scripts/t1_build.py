@@ -236,7 +236,7 @@ def main():
     # manifest
     manifest = {
         "schema_version": "t1-manifest-v1",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "canonical_source": CANONICAL,
         "canonical_sha256": sha256_file(CANONICAL),
         "outputs": {

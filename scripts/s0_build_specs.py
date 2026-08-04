@@ -63,7 +63,7 @@ def main():
     specs["estimand_spec.json"] = {
         "schema_version": "estimand-spec-v1",
         "spec_version": "1.0.0",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "frozen_at_utc": now,
         "code_commit": commit,
         "primary_estimand": "target-specific thermodynamic functional",
@@ -125,7 +125,7 @@ def main():
     specs["operator_uncertainty_spec.json"] = {
         "schema_version": "operator-uncertainty-spec-v1",
         "spec_version": "1.0.0",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "frozen_at_utc": now,
         "code_commit": commit,
         "operators": [
@@ -180,7 +180,7 @@ def main():
     specs["symmetry_frame_spec.json"] = {
         "schema_version": "symmetry-frame-spec-v1",
         "spec_version": "1.0.0",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "frozen_at_utc": now,
         "code_commit": commit,
         "strand_definition": "RNA sequences are written 5'->3' for each strand of the two-way junction; "
@@ -215,7 +215,7 @@ def main():
     specs["assay_transport_current_dms.json"] = {
         "schema_version": "assay-transport-spec-v1",
         "spec_version": "1.0.0",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "frozen_at_utc": now,
         "status": "N/A_CLOSED_NO_CROSSWALK",
         "role": "not a tecto precondition; closed and must not be reopened in v1.2",
@@ -229,7 +229,7 @@ def main():
     specs["assay_transport_qmapseq.json"] = {
         "schema_version": "assay-transport-spec-v1",
         "spec_version": "1.0.0",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "frozen_at_utc": now,
         "system": "qMaPseq TL/TLR-Mg2+ (NAR 2024, doi:10.1093/nar/gkae633)",
         "operational_contact_stability": "stability of the tetraloop/tetraloop-receptor contact in the "
@@ -261,7 +261,7 @@ def main():
     specs["primary_analysis_spec.json"] = {
         "schema_version": "primary-analysis-spec-v1",
         "spec_version": "1.0.0",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "frozen_at_utc": now,
         "code_commit": commit,
         "primary_estimand": "target-specific thermodynamic functional",
@@ -302,7 +302,7 @@ def main():
     specs["negative_control_spec.json"] = {
         "schema_version": "negative-control-spec-v1",
         "spec_version": "1.0.0",
-        "run_id": "v1_2_tecto_qmap_20260803",
+        "run_id": rc.RUN_ID,
         "frozen_at_utc": now,
         "code_commit": commit,
         "negative_controls": [
