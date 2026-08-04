@@ -19,6 +19,7 @@ from collections import defaultdict
 
 WORKTREE = rc.WORKTREE
 DATA = rc.RUN_ROOT
+RUN_ID = rc.RUN_ID
 CANONICAL = os.path.join(DATA, "t0", "t0_denny_canonical_records.jsonl")
 OUT = os.path.join(DATA, "t1")
 os.makedirs(OUT, exist_ok=True)
@@ -236,7 +237,7 @@ def main():
     # manifest
     manifest = {
         "schema_version": "t1-manifest-v1",
-        "run_id": rc.RUN_ID,
+        "run_id": RUN_ID,
         "canonical_source": CANONICAL,
         "canonical_sha256": sha256_file(CANONICAL),
         "outputs": {
