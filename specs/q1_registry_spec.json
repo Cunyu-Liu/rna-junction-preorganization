@@ -1,0 +1,64 @@
+{
+  "gate": "Q1",
+  "title": "qMaPseq 98-variant registry",
+  "description": "Build the canonical qMaPseq variant registry from verified Zenodo + Figshare sources. Register each variant with its thermodynamic label (rna_map_dg), construct sequence, receptor name, and provenance. Reconcile the 98-mutant vs 99-row count (1 wild-type reference).",
+  "frozen_at_utc": "2026-08-04T00:00:00Z",
+  "data_sources": {
+    "zenodo_rna_map_dg": {
+      "archive": "WORKTREE/2024_qmap_paper-main.zip",
+      "inner_path": "2024_qmap_paper-main/qmap_paper/resources/csvs/rna_map_dg.csv",
+      "md5_of_archive": "48da131a78f5027d4b1f31a58c08007b",
+      "doi": "10.5281/zenodo.11672684",
+      "license": "CC-BY-4.0",
+      "columns": ["name", "old_dg", "rna_map_dg", "rna_map_dg_err"],
+      "expected_rows": 99
+    },
+    "zenodo_ttr_subset": {
+      "archive": "WORKTREE/2024_qmap_paper-main.zip",
+      "inner_path": "2024_qmap_paper-main/qmap_paper/resources/csvs/ttr_mutation_dgs_subset.csv",
+      "columns": ["name", "r_name", "act_seq", "act_ss", "seq", "dg"],
+      "expected_rows": 99
+    },
+    "zenodo_ttr_all": {
+      "archive": "WORKTREE/2024_qmap_paper-main.zip",
+      "inner_path": "2024_qmap_paper-main/qmap_paper/resources/csvs/ttr_mutation_dgs_all.csv",
+      "columns": ["r_name", "r_seq", "seq", "variant_number", "dg_gaaa", "dg_guaa", "dg_gaaa_std", "dg_guaa_std", "n"],
+      "expected_rows": 1476
+    },
+    "figshare_data_zip": {
+      "path": "QDATA/raw/figshare/data.zip",
+      "md5": "7a080dc74bb3433e57fcdd885b5b7a56",
+      "doi": "10.6084/m9.figshare.25331758",
+      "license": "CC-BY-4.0",
+      "key_processed_json": "data/sequencing_runs/processed/mttr6_muts_titra.json"
+    }
+  },
+  "registry_schema": {
+    "variant_id": "integer, 0-based",
+    "name": "string, junction identifier e.g. CAUGG_CCUAAA",
+    "r_name": "string, receptor/construct name e.g. 11ntR_6A_7C",
+    "act_seq": "string, active junction sequence with & separator",
+    "act_ss": "string, active secondary structure dot-bracket",
+    "seq": "string, full construct sequence",
+    "old_dg": "float, previously reported delta-G (kcal/mol)",
+    "rna_map_dg": "float, rna_map reanalyzed delta-G (kcal/mol)",
+    "rna_map_dg_err": "float, rna_map delta-G standard error",
+    "is_reference": "boolean, true if wild-type (r_name == 11ntR with no mutation suffix)",
+    "source_zip": "string, zenodo or figshare"
+  },
+  "acceptance_criteria": {
+    "n_variants_registered": ">=99",
+    "n_mutants": ">=98",
+    "n_reference": 1,
+    "all_have_rna_map_dg": true,
+    "all_have_construct_seq": true,
+    "cross_reference_complete": "all 99 names in rna_map_dg.csv matched to ttr_mutation_dgs_subset.csv",
+    "provenance_recorded": true
+  },
+  "outputs": {
+    "registry_jsonl": "QDATA/q1/q1_variant_registry.jsonl",
+    "summary_json": "QDATA/q1/q1_registry_summary.json",
+    "manifest_json": "QDATA/q1/q1_manifest.json"
+  },
+  "contract_clause": "qMaPseq second system DAG: Q0 -> Q1 98-variant registry -> Q2 attrition/censoring -> Q3 endpoint replay -> Q4 selection/split -> Q5 locked transfer test"
+}
