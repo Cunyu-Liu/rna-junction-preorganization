@@ -60,7 +60,15 @@ def source_tree_dirty(status: str) -> bool:
     edit, contract edit, or unrelated worktree change still fails closed.
     """
     for line in status.splitlines():
-        path = line[3:].strip() if len(line) >= 4 else line.strip()
+        # Normal porcelain-v1 lines have two XY status bytes plus a space.
+        # The legacy git() helper applies str.strip(), which can remove the
+        # first leading status-space on the first line ("M path").
+        if len(line) >= 3 and line[1] == " ":
+            path = line[2:].strip()
+        elif len(line) >= 4:
+            path = line[3:].strip()
+        else:
+            path = line.strip()
         if path.startswith(GENERATED_PREFIXES):
             continue
         if " -> " in path:
