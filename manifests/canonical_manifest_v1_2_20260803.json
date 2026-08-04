@@ -443,7 +443,7 @@
       "decision": "PASS",
       "summary": "Q3 endpoint replay: 98 variants x 8 endpoints, tolerances frozen BEFORE run. 1600 PASS + 66 NOT_APPLICABLE (11 right-censored variants exempt from E2/E3 numerical mg_1_2; authoritative endpoint = E7 censoring reason) + 0 FAIL. No trend-only pass; categorical exact string match; numerical abs<=tol OR rel<=tol.",
       "evidence": {
-        "code_commit": "7b0a7b7d1fae2a7815326a5f2640ff63c0497999",
+        "code_commit": "0874c88",
         "branch": "v1.2/tecto-qmap",
         "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
         "required_artifacts_present": true,
@@ -537,7 +537,7 @@
       "decision": "PASS",
       "summary": "Q4 selection/split/analysis freeze: 98 mttr6 TTR mutants (no extrapolation to arbitrary TLR). Mutation graph 193 edges, 4 connected components (sizes [83, 11, 2, 2]); K=4 folds, 0 leakage. All 12 freeze items locked before viewing transfer outcome.",
       "evidence": {
-        "code_commit": "7b0a7b7d1fae2a7815326a5f2640ff63c0497999",
+        "code_commit": "0874c88",
         "branch": "v1.2/tecto-qmap",
         "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
         "required_artifacts_present": true,
@@ -595,7 +595,7 @@
       "decision": "PASS",
       "summary": "Q5 locked transfer test: 4 baselines compared. B4 (tecto old_dg + isotonic calibration) RMSE=0.1951 kcal/mol, gain over B1=0.511 (95%CI [0.403,0.618]), 68% coverage=0.682, label permutation p=0.0. Terminal state: QMAP_TRANSFER_SUPPORTED.",
       "evidence": {
-        "code_commit": "7b0a7b7d1fae2a7815326a5f2640ff63c0497999",
+        "code_commit": "0874c88",
         "branch": "v1.2/tecto-qmap",
         "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
         "required_artifacts_present": true,
@@ -688,7 +688,7 @@
   "derived_manifest_freshness": {
     "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e"
   },
-  "last_updated_utc": "2026-08-04T05:13:30.687709+00:00",
+  "last_updated_utc": "2026-08-04T05:21:11.178239+00:00",
   "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED",
   "final_claim_adjudication": {
     "max_allowable_claim": "STRONG_CROSS_SYSTEM_RESTRICTED",

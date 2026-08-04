@@ -2,22 +2,29 @@
   "schema_version": "claim-matrix-v1",
   "run_id": "v1_2_tecto_qmap_20260803",
   "contract_sha256": "32d09729638b7681b6efcfdf8b2addc3c7f83060e37ce5ef3dd5c5a051702252",
-  "adjudicated_at_utc": "2026-08-04T00:00:00Z",
-  "result_combination": "TECTO_PASS_QMAP_NOT_ADMITTED",
-  "allowed_max_claim": "tecto-specific reanalysis, benchmark, or partial-ID case study",
-  "claim_class": "TECTO_REANALYSIS_AND_PARTIAL_ID_CASE_STUDY",
+  "adjudicated_at_utc": "2026-08-04T05:21:11.178239+00:00",
+  "result_combination": "TECTO_PASS_QMAP_TRANSFER_SUPPORTED",
+  "allowed_max_claim": "STRONG_CROSS_SYSTEM_RESTRICTED",
+  "claim_class": "STRONG_CROSS_SYSTEM_RESTRICTED",
+  "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED",
   "rows": [
+    {
+      "claim": "restricted cross measurement-system transfer (tecto old_dg + isotonic cal -> RNA-MaP rna_map_dg, 98 mttr6 TTR mutants, 4-fold mutation-graph CV)",
+      "status": "ALLOWED_SUPPORTED",
+      "evidence": "B4 RMSE=0.1951, gain=0.511 CI [0.403,0.618], cov68=0.682, perm p=0.0",
+      "bound": "restricted to 98 mttr6 TTR mutants; no extrapolation to arbitrary TLR"
+    },
     {
       "claim": "identified-set/interval functional for tectoRNA junction DeltaG (10 mM Mg2+)",
       "status": "ALLOWED_SUPPORTED",
       "evidence": "T2/T3 interval width median 1.35 kcal/mol, coverage 0.957, M0 calibration validated",
-      "bound": "partial-identification only; no pseudo-exact point"
+      "bound": "partial-identification only; tecto-only context"
     },
     {
       "claim": "tecto-specific reanalysis / benchmark / case study",
       "status": "ALLOWED",
       "evidence": "T0-T3 gates PASS; auditable data census and pipeline",
-      "bound": "no cross-system or mechanism leverage"
+      "bound": "tecto platform only"
     },
     {
       "claim": "operator-robustness / sensitivity (5mM, 11mM, 9mM)",
@@ -26,27 +33,27 @@
       "bound": "sensitivity only; primary operator is 10 mM Mg2+"
     },
     {
-      "claim": "1 kcal/mol precision thermodynamic functional",
+      "claim": "1 kcal/mol precision thermodynamic functional (tecto-only)",
       "status": "NOT_SUPPORTED",
       "evidence": "interval width median 1.35 > 1.0; frac<=1kcal = 0.112",
-      "bound": "cannot claim 1 kcal precision"
+      "bound": "cannot claim 1 kcal precision on tecto-only"
     },
     {
-      "claim": "hierarchical model beats simple baseline",
+      "claim": "hierarchical model beats simple baseline (tecto-only T3)",
       "status": "NOT_SUPPORTED",
-      "evidence": "T3 proper score 41.8 vs motif_mean 27.0; relative_gain -0.55; bootstrap pos frac 0.0",
+      "evidence": "T3 proper score 41.8 vs motif_mean 27.0; relative_gain -0.55",
       "bound": "report as honest negative / limitation"
     },
     {
-      "claim": "cross-measurement-system (qMaPseq) transfer",
-      "status": "NOT_ADMITTED",
-      "evidence": "Q0 QMAP_NOT_ADMITTED; Figshare 403 / Zenodo refused",
-      "bound": "strong cross-system claim closed"
+      "claim": "cross-system transfer to arbitrary TLR families",
+      "status": "NOT_SUPPORTED",
+      "evidence": "Q5 restricted to 98 mttr6 TTR mutants",
+      "bound": "cannot extrapolate beyond mttr6 TTR set"
     },
     {
       "claim": "biological mechanism / junction-preorganization mechanism",
       "status": "NOT_SUPPORTED",
-      "evidence": "model does not beat baseline; INCONCLUSIVE; mechanism route declined",
+      "evidence": "transfer != mechanism; tecto T3 does not beat baseline",
       "bound": "decline mechanism positioning"
     }
   ],
@@ -64,7 +71,8 @@
   ],
   "completion_status": {
     "IMPLEMENTATION_COMPLETE": true,
-    "SCIENTIFIC_SUCCESS": "inconclusive",
-    "PUBLICATION_ROUTE": "TECTO_REANALYSIS_AND_PARTIAL_ID_CASE_STUDY"
+    "ALL_12_GATES_PASS": true,
+    "QMAP_TERMINAL_STATE": "QMAP_TRANSFER_SUPPORTED",
+    "PUBLICATION_ROUTE": "STRONG_CROSS_SYSTEM_RESTRICTED"
   }
 }
