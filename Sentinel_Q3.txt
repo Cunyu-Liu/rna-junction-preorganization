@@ -1,0 +1,14 @@
+{
+  "gate": "Q3",
+  "gate_result": "PASS",
+  "timestamp_utc": "2026-08-04T05:00:26.120799+00:00",
+  "n_variants": 98,
+  "n_pass": 1600,
+  "n_fail": 0,
+  "n_not_applicable": 66,
+  "all_records_pass_or_not_applicable": true,
+  "all_variants_all_endpoints_pass_or_na": true,
+  "tolerances_frozen_before_run": true,
+  "censored_variants_rule_applied": true,
+  "no_trend_only_pass": true
+}

@@ -1,0 +1,9 @@
+{
+  "gate": "Q4",
+  "gate_result": "PASS",
+  "timestamp_utc": "2026-08-04T05:05:07.217130+00:00",
+  "n_variants": 98,
+  "k_folds": 4,
+  "leakage_violations": 0,
+  "all_freeze_items_locked": true
+}

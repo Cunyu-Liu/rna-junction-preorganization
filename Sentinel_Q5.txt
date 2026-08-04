@@ -1,0 +1,12 @@
+{
+  "gate": "Q5",
+  "gate_result": "PASS",
+  "terminal_state": "QMAP_TRANSFER_SUPPORTED",
+  "timestamp_utc": "2026-08-04T05:07:46.882214+00:00",
+  "adjudication_criteria": {
+    "(a) RMSE < 1.0": true,
+    "(b) gain > 0.3 AND 95%CI excludes 0": true,
+    "(c) 68% coverage in [0.55, 0.80]": true,
+    "(d) label permutation p < 0.05": true
+  }
+}

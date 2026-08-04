@@ -1,0 +1,46 @@
+{
+  "gate": "Q5",
+  "title": "Locked transfer test",
+  "contract_ref": "\u63d0\u793a\u8bcd/rna \u4e09\u7ea7.md \u00a718 Q5 (lines 1093-1141)",
+  "locked_before_run": true,
+  "baselines_compared": [
+    "B1_intercept_mean",
+    "B2_published_univariate_mg_1_2",
+    "B3_sequence_mutation",
+    "B4_locked_partial_id_calibration"
+  ],
+  "primary_eval": "held_out_negative_log_predictive_density",
+  "main_eval_includes": [
+    "held_out_proper_score",
+    "reference_dg_ranking_spearman",
+    "interval_coverage_68pct",
+    "interval_coverage_95pct",
+    "interval_width_mean",
+    "calibration_slope",
+    "calibration_intercept",
+    "preregistered_gain_over_strongest_simple_baseline",
+    "mutation_class_bootstrap",
+    "label_permutation",
+    "condition_controls",
+    "negative_nucleotide_controls"
+  ],
+  "terminal_states": [
+    "QMAP_TRANSFER_SUPPORTED",
+    "QMAP_TRANSFER_NOT_SUPPORTED",
+    "QMAP_INCONCLUSIVE",
+    "QMAP_NOT_ADMITTED"
+  ],
+  "adjudication_logic": {
+    "QMAP_TRANSFER_SUPPORTED": "B4: (a) RMSE<1.0 AND (b) gain>B1>0.3 with 95%CI excl 0 AND (c) 68% cov in [0.55,0.80] AND (d) perm p<0.05",
+    "QMAP_TRANSFER_NOT_SUPPORTED": "B4 fails (a)-(d); negative/borderline",
+    "QMAP_INCONCLUSIVE": "insufficient power; CI includes 0 and point est <0.3",
+    "QMAP_NOT_ADMITTED": "Q0-Q3 not all PASS"
+  },
+  "outputs": {
+    "spec_path": "specs/q5_locked_transfer_spec.json",
+    "build_script": "scripts/q5_build.py",
+    "finalize_script": "scripts/finalize_q5.py",
+    "artifacts_dir": "QDATA/q5",
+    "sentinel": "Sentinel_Q5.txt"
+  }
+}

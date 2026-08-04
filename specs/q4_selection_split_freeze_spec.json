@@ -1,0 +1,118 @@
+{
+  "gate": "Q4",
+  "title": "Selection, split and analysis freeze",
+  "contract_ref": "\u63d0\u793a\u8bcd/rna \u4e09\u7ea7.md \u00a718 Q4 (lines 1068-1091)",
+  "frozen_before_viewing_transfer_outcome": true,
+  "freeze_timestamp_rule": "spec + build + manifest committed BEFORE any Q5 transfer-test code runs",
+  "selection_boundary": {
+    "n_variants": 98,
+    "source": "Q1 registry (99 entries = 1 reference + 98 mutants from Zenodo rna_map_dg.csv / mttr6_data_full.json)",
+    "inclusion_criteria": [
+      "variant is in mttr6 TTR mutant set",
+      "has published RNA-MaP rna_map_dg in Zenodo",
+      "has published mg_1_2 fit (incl. censored)",
+      "maintains wild-type-like binding mode (receptor + GAAA tetraloop architecture preserved)"
+    ],
+    "exclusion_criteria": [
+      "reference construct excluded from mutant set",
+      "no extrapolation to arbitrary TLR families",
+      "variants without rna_map_dg excluded"
+    ],
+    "q2_attrition_interaction": "All 98 variants retained in selection. Q2 attrition (84 fitted + 11 right-censored + 2 closing-pair-abnormal + 1 alternate-structure) affects analysis weighting NOT selection. Censored enter likelihood not deleted.",
+    "cannot_extrapolate_to_arbitrary_TLR_family": true
+  },
+  "mutation_edit_graph": {
+    "definition": "Vertices = 98 variants. Edge if aligned_seq Hamming distance == 1 (single-nucleotide difference).",
+    "adjacency_rule": "aligned_seq Hamming distance == 1",
+    "equivalence_rule": "same bp_muts tuple (e.g. all variants with bp_muts=[CG1GC] are base-pair-equivalent)",
+    "leakage_prohibition": "Adjacent (Hamming-1) or equivalent (same bp_muts) variants must NOT be split across train/test. Connected components assigned to folds atomically."
+  },
+  "outer_groups": {
+    "split_method": "mutation-graph-aware connected-component grouping; K=5 folds; components assigned greedily by size to balance folds; variant-level splitting (all 16 titration rows of a variant in same fold)",
+    "k_folds": 4,
+    "same_variant_all_rows_same_fold": true,
+    "no_leakage_rule": "Adjacent or equivalent variants in same fold"
+  },
+  "baseline": {
+    "B1_intercept_mean_baseline": "predict training-set mean rna_map_dg for all held-out (constant)",
+    "B2_published_univariate_relationship": "linear regression rna_map_dg ~ mg_1_2 on training; predict held-out",
+    "B3_sequence_mutation_baseline": "linear regression rna_map_dg ~ (bp_muts one-hot + mutation_count) on training; predict held-out",
+    "B4_locked_partial_id_calibration": "rna_map_dg ~ old_dg (tecto \u0394G) linear calibration on training; predict held-out"
+  },
+  "primary_metric": {
+    "name": "held_out_negative_log_predictive_density",
+    "description": "Average -log N(mu_i, sigma_i^2) over held-out variants and 5 folds. Lower is better.",
+    "unit": "nlogp",
+    "direction": "lower_is_better"
+  },
+  "secondary_metrics": {
+    "S1_reference_dg_ranking_spearman": "Spearman corr predicted vs true rna_map_dg on held-out",
+    "S2_interval_coverage_68pct": "fraction in 68% PI (target 0.68)",
+    "S3_interval_coverage_95pct": "fraction in 95% PI (target 0.95)",
+    "S4_interval_width_mean": "mean 68% PI width (kcal/mol)",
+    "S5_calibration_slope": "slope true~predicted (target 1.0)",
+    "S6_calibration_intercept": "intercept true~predicted (target 0.0)",
+    "S7_rmse": "RMSE of point predictions (kcal/mol)"
+  },
+  "minimum_meaningful_effect": {
+    "value": 1.0,
+    "unit": "kcal/mol",
+    "description": "held-out RMSE < 1.0 kcal/mol to beat paper precision target; improvements < 0.5 not meaningful"
+  },
+  "power_rule": {
+    "n_variants": 98,
+    "k_folds": 4,
+    "mean_test_size_per_fold": 20,
+    "sd_noise_kcal_mol": 0.5,
+    "minimum_detectable_effect_rmse": 0.3,
+    "rule": "declare outperformance if mean fold-level RMSE improvement > 0.3 kcal/mol AND 95% CI of paired difference excludes 0"
+  },
+  "negative_controls": {
+    "NC1_closing_pair_only": "closing-pair-only mutants should predict near-wild-type \u0394G",
+    "NC2_label_permutation": "permute rna_map_dg labels; expect chance-level held-out score",
+    "NC3_negative_nucleotide": "random draw from training marginal = B1 baseline"
+  },
+  "calibration_rule": {
+    "method": "isotonic regression on training (predicted,true); frozen; applies to B4 only; B1/B2/B3 use native predictions"
+  },
+  "interval_rule": {
+    "method": "Gaussian PI: pred +/- z*sigma; z=1.0 (68%) or 1.96 (95%); sigma from training residuals; min_width_68=0.5, max_width_68=5.0 kcal/mol"
+  },
+  "outcome_adjudication_rule": {
+    "terminal_states": [
+      "QMAP_TRANSFER_SUPPORTED",
+      "QMAP_TRANSFER_NOT_SUPPORTED",
+      "QMAP_INCONCLUSIVE",
+      "QMAP_NOT_ADMITTED"
+    ],
+    "adjudication_logic": {
+      "QMAP_TRANSFER_SUPPORTED": "B4 achieves: (a) held-out RMSE < 1.0 AND (b) preregistered gain over B1 > 0.3 with 95% CI excluding 0 AND (c) 68% coverage in [0.55,0.80] AND (d) label-permutation p<0.05",
+      "QMAP_TRANSFER_NOT_SUPPORTED": "B4 fails one or more of (a)-(d); negative/borderline evidence",
+      "QMAP_INCONCLUSIVE": "insufficient power to distinguish B4 from B1; uncertainty/power boundary",
+      "QMAP_NOT_ADMITTED": "Q0-Q3 gates not all PASS; provenance insufficient"
+    },
+    "fail_closed_mapping": {
+      "Tecto_PASS_qMaP_Q4_Q5_unfinished": "TECTO_SPECIFIC (STRONG_CROSS_SYSTEM prohibited)",
+      "Tecto_FAIL_qMaP_Q4_Q5_unfinished": "STOP_MECHANISM_ROUTE"
+    },
+    "qmap_outcome_cannot_modify": [
+      "tecto_model",
+      "operator",
+      "transport",
+      "thresholds",
+      "split",
+      "primary_metric"
+    ]
+  },
+  "outputs": {
+    "spec_path": "specs/q4_selection_split_freeze_spec.json",
+    "build_script": "scripts/q4_build.py",
+    "finalize_script": "scripts/finalize_q4.py",
+    "artifacts_dir": "QDATA/q4",
+    "fold_assignment_file": "QDATA/q4/q4_fold_assignment.json",
+    "mutation_graph_file": "QDATA/q4/q4_mutation_graph.json",
+    "summary_file": "QDATA/q4/q4_freeze_summary.json",
+    "manifest_file": "QDATA/q4/q4_manifest.json",
+    "sentinel": "Sentinel_Q4.txt"
+  }
+}

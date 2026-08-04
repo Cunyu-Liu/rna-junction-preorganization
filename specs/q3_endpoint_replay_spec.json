@@ -1,0 +1,63 @@
+{
+  "gate": "Q3",
+  "title": "Endpoint replay",
+  "contract_ref": "提示词/rna 三级.md §18 Q3 (lines 1033-1066)",
+  "frozen_before_run": true,
+  "tolerance_freeze_rationale": {
+    "public_table_precision": "Published mtt6_data_mg_1_2.csv stores mg_1_2, n, a_0 and their errs at full float64 precision (15-17 significant digits); rna_map_dg stored with 12+ decimals in Zenodo rna_map_dg.csv.",
+    "rounding": "No rounding applied in published CSV artifacts; raw float64 throughout. TTRMutsDataProcessor.clean_data rounds the per-position DMS data array to 5 decimal places before gaaa_avg aggregation (deterministic, no replay noise).",
+    "software_version": "qmap_paper pip-installed from Zenodo 2024_qmap_paper-main.zip (md5=48da131a78f5027d4b1f31a58c08007b); scipy.optimize.leastsq + numpy.random.normal bootstrap. Fixed commit, fixed conda env rna_junction_preorganization_v1_1.",
+    "numerical_solver_error": "scipy.optimize.leastsq is deterministic for identical inputs BUT bootstrap residuals are perturbed by np.random.normal. Even with seed=42, cross-numpy/scipy-version floating-point ordering differences introduce drift: ~1e-9 for stable fits (well-conditioned likelihood), up to ~6e-5 relative for borderline-stable fits (e.g. UCUAAG_AAUGG mg_1_2=440.88 has rel_err=5.7e-5). For censored/unstable fits (mg_1_2>40 or degenerate n), the likelihood surface is flat and bootstrap diverges arbitrarily (observed up to 7e15 absolute).",
+    "resampling_randomness": "np.random.seed(42) set immediately BEFORE compute_all_mg_1_2; bootstrap n_runs=100; mg_conc==5.0 dropped inside compute_all_mg_1_2. Seed makes replay reproducible WITHIN identical numpy/scipy versions; cross-version drift bounded by numerical_solver_error analysis above. Censored variants are by definition the set where mg_1_2 is unreliable — their numerical value is NOT a valid replay endpoint; the censoring reason (E7) is the authoritative endpoint."
+  },
+  "tolerances": {
+    "mg_1_2":             {"abs": 1.0e-6, "rel": 1.0e-4, "unit": "mM Mg2+", "applies_to": "non_censored_variants_only", "justification": "bootstrap seed=42 reproducible to ~1e-9 stable; ~6e-5 borderline; rel=1e-4 captures borderline while <<trend-only"},
+    "mg_1_2_err":         {"abs": 1.0e-6, "rel": 1.0e-4, "unit": "mM Mg2+", "applies_to": "non_censored_variants_only", "justification": "same bootstrap; err is std of bootstrap distribution, slightly noisier than mean"},
+    "n":                  {"abs": 1.0e-6, "rel": 1.0e-4, "unit": "dimensionless Hill coefficient", "applies_to": "non_censored_variants_only", "justification": "same bootstrap; Hill coefficient can be ill-conditioned for flat curves"},
+    "n_err":              {"abs": 1.0e-6, "rel": 1.0e-4, "unit": "dimensionless", "applies_to": "non_censored_variants_only", "justification": "same bootstrap"},
+    "a_0":                {"abs": 1.0e-6, "rel": 1.0e-4, "unit": "dimensionless baseline", "applies_to": "non_censored_variants_only", "justification": "same bootstrap; baseline well-conditioned"},
+    "a_0_err":            {"abs": 1.0e-6, "rel": 1.0e-4, "unit": "dimensionless", "applies_to": "non_censored_variants_only", "justification": "same bootstrap"},
+    "gaaa_avg_per_point": {"abs": 1.0e-9, "rel": 1.0e-6, "unit": "DMS reactivity", "justification": "derived from raw counts in mttr6_data_full.json; no randomness, no bootstrap; deterministic load"},
+    "dms_summary_fields": {"abs": 1.0e-9, "rel": 1.0e-6, "unit": "DMS reactivity", "justification": "deterministic aggregates of gaaa_avg"},
+    "rna_map_dg":         {"abs": 1.0e-9, "rel": 1.0e-6, "unit": "kcal/mol", "justification": "externally computed by RNA-MaP pipeline; published in Zenodo rna_map_dg.csv; no replay randomness"},
+    "rna_map_dg_err":     {"abs": 1.0e-9, "rel": 1.0e-6, "unit": "kcal/mol", "justification": "externally computed; published"},
+    "failure_reason":     {"categorical": "exact_string_match", "tolerance": 0, "justification": "categorical label from Q2 attrition; no numerical noise"},
+    "censoring_reason":   {"categorical": "exact_string_match", "tolerance": 0, "justification": "categorical label from Q2 attrition; no numerical noise"},
+    "structural_qc_reason": {"categorical": "exact_string_match", "tolerance": 0, "justification": "categorical label from Q2 attrition; no numerical noise"}
+  },
+  "censored_variants_rule": {
+    "description": "For the 11 right-censored variants (Q2 category=right_censored), E2_mg_1_2 and E3_uncertainty numerical comparison is NOT_APPLICABLE because the mg_1_2 value is by definition unreliable (mg_1_2>40 or unstable/unphysical fit). The authoritative endpoint for these variants is E7_censoring_reason (categorical, exact match). NOT_APPLICABLE is not a failure.",
+    "censored_categories": ["right_censored"],
+    "n_censored_variants": 11,
+    "numerical_endpoints_exempt": ["E2_mg_1_2", "E3_uncertainty"],
+    "authoritative_endpoint": "E7_censoring_reason"
+  },
+  "endpoints": [
+    {"id": "E1_dms_titration_curve", "description": "Per-variant gaaa_avg at each of 15 Mg concentrations (mg_conc==5.0 excluded)", "published_source": "mttr6_data_full.json (figshare data.zip)", "replay_method": "load mttr6_data_full.json; for each variant, extract (mg_conc, gaaa_avg) pairs excluding mg_conc==5.0; no transformation"},
+    {"id": "E2_mg_1_2", "description": "Mg2+ half-saturation concentration from Hill-equation fit", "published_source": "mtt6_data_mg_1_2.csv column mg_1_2", "replay_method": "np.random.seed(42); qmap_paper.data_processing.compute_all_mg_1_2(df) where df=mttr6_data_full.json; NOT_APPLICABLE for right_censored variants"},
+    {"id": "E3_uncertainty", "description": "Bootstrap 1-sigma errors: mg_1_2_err, n_err, a_0_err", "published_source": "mtt6_data_mg_1_2.csv columns *_err", "replay_method": "same as E2; errs are co-products of compute_all_mg_1_2; NOT_APPLICABLE for right_censored variants"},
+    {"id": "E4_dms_summary", "description": "Per-variant DMS summary: baseline (gaaa_avg at mg=0), min (most-folded), saturated (gaaa_avg at mg=40)", "published_source": "computed from mttr6_data_full.json", "replay_method": "deterministic aggregation of E1 curve points"},
+    {"id": "E5_rna_map_dg_mapping", "description": "RNA-MaP reference free-energy mapping (rna_map_dg, rna_map_dg_err) per variant", "published_source": "Zenodo rna_map_dg.csv (via Q1 registry)", "replay_method": "load Q1 registry; no recomputation (external pipeline artifact)"},
+    {"id": "E6_failure_reason", "description": "Q2 attrition category: fitted / right_censored / closing_pair_abnormal / alternate_structure", "published_source": "QDATA/q2/q2_attrition.jsonl field category", "replay_method": "re-derive from Q2 spec rules; compare categorical label"},
+    {"id": "E7_censoring_reason", "description": "Q2 censoring sub_reason (e.g. fitted__complete_case, right_censored__mg_1_2_gt_40, right_censored__unstable_fit)", "published_source": "QDATA/q2/q2_attrition.jsonl field sub_reason", "replay_method": "re-derive from Q2 spec rules; compare categorical label"},
+    {"id": "E8_structural_qc_reason", "description": "Q2 structural QC reason: closing-pair mutation, tetraloop-region mutation, structural abnormality flag", "published_source": "QDATA/q2/q2_attrition.jsonl fields is_closing_pair_mutant + bp_muts + mutations", "replay_method": "re-derive structural flags from Q1 registry act_seq/act_ss + characterize_mutations; compare categorical label"}
+  ],
+  "required_comparison_fields": ["published_value", "replayed_value", "absolute_error", "relative_error", "tolerance", "pass_or_fail", "evidence_path"],
+  "pass_criteria": {
+    "all_endpoints_all_variants_must_pass_or_not_applicable": true,
+    "categorical_pass_rule": "exact string equality",
+    "numerical_pass_rule": "abs_error <= abs_tol OR rel_error <= rel_tol (OR semantics)",
+    "not_applicable_rule": "right_censored variants are NOT_APPLICABLE for E2/E3 numerical endpoints; they must PASS E7 (censoring reason) instead",
+    "no_trend_only_pass": "Reproducing only correlation/scatter/trend is NOT Q3 PASS; per-variant per-endpoint comparison required"
+  },
+  "outputs": {
+    "spec_path": "specs/q3_endpoint_replay_spec.json",
+    "build_script": "scripts/q3_build.py",
+    "finalize_script": "scripts/finalize_q3.py",
+    "artifacts_dir": "QDATA/q3",
+    "comparison_file": "QDATA/q3/q3_replay_comparison.jsonl",
+    "summary_file": "QDATA/q3/q3_replay_summary.json",
+    "manifest_file": "QDATA/q3/q3_manifest.json",
+    "sentinel": "Sentinel_Q3.txt"
+  }
+}

@@ -49,9 +49,9 @@
     "Q0": "PASS",
     "Q1": "PASS",
     "Q2": "PASS",
-    "Q3": "NOT_STARTED",
-    "Q4": "NOT_STARTED",
-    "Q5": "NOT_STARTED"
+    "Q3": "PASS",
+    "Q4": "PASS",
+    "Q5": "PASS"
   },
   "gate_decisions": {
     "T0": {
@@ -439,7 +439,7 @@
       "finalized_at_utc": "2026-08-04T04:34:46.534054+00:00"
     }
   },
-  "current_operational_state": "QMAP_Q1_IN_PROGRESS",
+  "current_operational_state": "QMAP_Q5_COMPLETE_QMAP_TRANSFER_SUPPORTED",
   "current_scientific_disposition": "INCONCLUSIVE_FOR_1_KCAL_PRECISION",
   "scientific_unlock": "NO_UNLOCK",
   "qmap_terminal_disposition": "QMAP_READY_FOR_Q3",
@@ -448,5 +448,7 @@
   "sentinel_status": "PASS",
   "derived_manifest_freshness": {
     "s0_spec_manifest": "c545260d6144ce9120d14f49ba488d294d76a292428dbbe5a41fbed29442376e"
-  }
+  },
+  "last_updated_utc": "2026-08-04T05:07:46.882214+00:00",
+  "qmap_terminal_state": "QMAP_TRANSFER_SUPPORTED"
 }
