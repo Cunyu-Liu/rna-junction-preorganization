@@ -26,7 +26,7 @@ CONTRACT_PATH = os.path.abspath(os.environ.get(
 ))
 CONTRACT_SHA256 = os.environ.get(
     "RNA_V12_CONTRACT_SHA256",
-    "3ad0c9997cdea8e510f80424c4b011062f0f95a8bf8879a4659a847adcab22a",
+    "3ad0c9997cdea8e510f80424c4b011062f0f95a8bf8879a4659a847adcab22a0",
 )
 
 
