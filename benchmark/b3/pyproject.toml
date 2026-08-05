@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rna-audit-b3"
+version = "0.1.0"
+description = "RNA thermodynamic evidence admissibility audit — B3 generative multi-regime benchmark"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Cunyu Liu" }]
+dependencies = ["numpy>=1.21"]
+
+[project.scripts]
+rna-audit-b3 = "rna_audit_b3.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
