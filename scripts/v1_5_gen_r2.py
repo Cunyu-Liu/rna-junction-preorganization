@@ -70,7 +70,6 @@ def _walk_covered(run_root, exclude_set):
 
 def main():
     os.makedirs(R2_DIR, exist_ok=True)
-    now = _utcnow()
 
     # ---- 1. M3 must be closed ----
     assert os.path.exists(f"{RUN_ROOT}/sentinels/M3_CORRECTIONS_CLOSED_CARRIED_X1_R2.sentinel"), \
@@ -84,6 +83,9 @@ def main():
         return 2
     head = _git("rev-parse", "HEAD")
     branch = _git("rev-parse", "--abbrev-ref", "HEAD")
+    # deterministic seal time: use the commit timestamp so a seal is reproducible
+    commit_isots = _git("log", "-1", "--format=%cd", "--date=iso-strict")
+    now = commit_isots.split("+")[0] + "Z"
 
     # ---- 3. detached verification of current HEAD seal coverage ----
     def build_records():

@@ -89,6 +89,9 @@ def main():
     # ---- key hashes ----
     contract = _sha256(f"{RUN_ROOT}/contracts/1.5.docx") if os.path.exists(f"{RUN_ROOT}/contracts/1.5.docx") else "N/A"
     r2_manifest = _sha256(f"{RUN_ROOT}/release/r2/canonical_manifest.json")
+    r2_covered = _load_json("release/r2/R2_decision.json").get("covered_file_count", "?")
+    if not isinstance(r2_covered, int):
+        r2_covered = "?"
 
     # ---- sentinel registry ----
     sentinel_files = sorted(glob.glob(f"{RUN_ROOT}/sentinels/*.sentinel"))
@@ -276,7 +279,7 @@ def main():
         f"## 8. R2 seal",
         "",
         f"R2 bound to final clean commit `{final_commit}`; detached verification PASS "
-        f"(168 covered files). local HEAD = origin HEAD = `{origin_commit}`.",
+        f"({r2_covered} covered files). local HEAD = origin HEAD = `{origin_commit}`.",
         "",
         "## 9. Test collection scope",
         "",
