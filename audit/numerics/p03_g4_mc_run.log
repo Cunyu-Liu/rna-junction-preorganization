@@ -1,0 +1,42 @@
+{
+  "G4_PASS": false,
+  "gates": {
+    "direction_recovered_realistic_regime_0_20": true,
+    "direction_mc95_lower_bound_gt_0_3_realistic": true,
+    "censor_probability_recovered_all_fracs": true,
+    "operator_ordering_recovered_all_fracs": false,
+    "G4_PASS": false
+  },
+  "direction_realistic": {
+    "0.0": {
+      "median": 0.8608,
+      "mean": 0.8608,
+      "min": 0.8579,
+      "max": 0.8627,
+      "mc95": [
+        0.8579,
+        0.8627
+      ]
+    },
+    "0.2": {
+      "median": 0.8528,
+      "mean": 0.8523,
+      "min": 0.8473,
+      "max": 0.8545,
+      "mc95": [
+        0.8473,
+        0.8545
+      ]
+    }
+  },
+  "censor_prob_err": {
+    "0.0": 0.0,
+    "0.2": 0.0065,
+    "0.5": 0.0213
+  },
+  "operator_order": {
+    "0.0": 0.7917,
+    "0.2": 0.4833,
+    "0.5": 0.5
+  }
+}
