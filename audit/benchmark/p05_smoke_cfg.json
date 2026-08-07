@@ -1,0 +1,5 @@
+{"out_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/replay",
+ "worktree": "/home/cunyuliu/rna_junction_audit_20260807T090244Z",
+ "records": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/CleaningLedger.jsonl",
+ "protocol_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol",
+ "axes": ["symmetry_5fold"]}
