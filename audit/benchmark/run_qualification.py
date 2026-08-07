@@ -146,10 +146,17 @@ def main(cfg):
          "sealed": "test folds frozen from P0.4; no test selection"},
         indent=2, ensure_ascii=False) + "\n")
     # STATUS
-    status = {"phase": "P0.5", "state": "RUNNING",
+    # Terminal state: the replay is complete once main() returns here (all
+    # axes/models scored, leaderboard + predictions written).  The P0.6 gate
+    # matrix reads replay/STATUS.json["gates"]["qualification_replay"].
+    n_axes = len([a for a in axes if (Path(cfg["protocol_dir"]) / f"SplitManifest_{a}.jsonl").exists()])
+    replay_ok = (len(leaderboard) > 0 and len(all_preds) > 0
+                 and n_axes == len({r["axis"] for r in leaderboard}))
+    status = {"phase": "P0.5", "state": "PASS" if replay_ok else "FAIL",
               "axes": axes, "models": sorted(models.keys()),
               "leaderboard_rows": len(leaderboard),
-              "prediction_rows": len(all_preds)}
+              "prediction_rows": len(all_preds),
+              "gates": {"qualification_replay": bool(replay_ok)}}
     (out_dir / "STATUS.json").write_text(json.dumps(status, indent=2) + "\n")
     return status
 
