@@ -44,7 +44,7 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
 
 
-def build_gate_matrix(run_root: Path):
+def build_gate_matrix(run_root: Path, run_id=None):
     gates = []
     for phase, rel, key in GATE_REFS:
         sp = run_root / rel
@@ -71,6 +71,7 @@ def build_gate_matrix(run_root: Path):
     else:
         overall = "P0_PASS_COMPARISON_ELIGIBLE"
     return {"phase": "P0.6", "overall_state": overall,
+            "run_id": run_id,
             "n_gates": len(gates), "n_pass": sum(1 for g in gates if g["decision"] == "PASS"),
             "n_fail": len(hard_fail), "n_not_run": len(not_run),
             "hard_fail_gates": [g["gate"] for g in hard_fail],
@@ -80,7 +81,7 @@ def build_gate_matrix(run_root: Path):
 
 def main(cfg):
     run_root = Path(cfg["run_root"])
-    matrix = build_gate_matrix(run_root)
+    matrix = build_gate_matrix(run_root, run_id=cfg.get("run_id"))
     out = Path(cfg["out_dir"])
     out.mkdir(parents=True, exist_ok=True)
     (out / "P0GateMatrix.json").write_text(json.dumps(matrix, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
