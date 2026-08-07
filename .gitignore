@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+legacy/outputs/
+legacy/contracts_v1.2.docx
+source/
