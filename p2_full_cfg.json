@@ -1,0 +1,15 @@
+{
+  "out_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p2_full",
+  "records": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/CleaningLedger.jsonl",
+  "protocol_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol",
+  "p1_out": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p1_full",
+  "axes": ["symmetry_5fold", "edit_5fold", "context_lomo", "scaffold_lomo"],
+  "n_boot": 2000,
+  "n_workers": 80,
+  "permutations": {
+    "symmetry_5fold": {"label": 1000, "sequence": 1000},
+    "edit_5fold": {"label": 1000, "sequence": 1000},
+    "context_lomo": {"label": 100, "sequence": 100},
+    "scaffold_lomo": {"label": 100, "sequence": 100}
+  }
+}
