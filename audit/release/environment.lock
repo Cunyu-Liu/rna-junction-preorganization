@@ -1,0 +1,7 @@
+{
+  "conda_env": "rna_junction_preorganization_v1_1",
+  "numpy": "2.2.6",
+  "scipy": "1.15.2",
+  "pandas": "2.3.3",
+  "scikit_learn": "1.7.2"
+}

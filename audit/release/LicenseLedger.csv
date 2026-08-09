@@ -1,0 +1,4 @@
+asset,source,license_status,note
+dataset,Denny 2018 tectoRNA,UNKNOWN_NEEDS_LEGAL_REVIEW,source persisted as byte copy; distribution license not yet confirmed
+code,rna-junction-preorganization (audit/),OPEN_SOURCE_PENDING,author owns audit code; license to be declared before any public release
+env,numpy/scipy/pandas/scikit-learn,BSD/OSI,permissive open-source dependencies

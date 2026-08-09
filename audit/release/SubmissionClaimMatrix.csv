@@ -1,0 +1,5 @@
+claim,status,evidence
+benchmark protocol is reproducible,PASS,checksums.sha256 + REPRODUCE.md
+candidate beats strongest baseline,NOT_AUTHORIZED,P4 NOT_PROMOTED
+sequence mechanism/operator-transfer,NOT_AUTHORIZED,P5 identifiability boundary
+submission readiness,NOT_AUTHORIZED,SOTA_NOT_ADJUDICATED / NO_SUBMISSION_AUTHORIZATION

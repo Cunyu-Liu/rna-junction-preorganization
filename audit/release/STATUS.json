@@ -1,0 +1,26 @@
+{
+  "phase": "P6",
+  "state": "PASS",
+  "git_commit": "8df99c154c07c0eade92c9bfe9287d2f541944bf",
+  "environment": {
+    "conda_env": "rna_junction_preorganization_v1_1",
+    "numpy": "2.2.6",
+    "scipy": "1.15.2",
+    "pandas": "2.3.3",
+    "scikit_learn": "1.7.2"
+  },
+  "n_artifacts_hashed": 16,
+  "missing_artifacts": [],
+  "sota_status": "SOTA_NOT_ADJUDICATED",
+  "scientific_claim_authorized": false,
+  "deliverables": [
+    "REPRODUCE.md",
+    "environment.lock",
+    "ReleaseManifest.json",
+    "checksums.sha256",
+    "DataCard.md",
+    "ModelCard.md",
+    "LicenseLedger.csv",
+    "SubmissionClaimMatrix.csv"
+  ]
+}

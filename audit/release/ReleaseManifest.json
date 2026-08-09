@@ -1,0 +1,95 @@
+{
+  "run_id": "V1_28_V1_31_AUDIT_20260807T090244Z",
+  "git_commit": "8df99c154c07c0eade92c9bfe9287d2f541944bf",
+  "git_remote": "git@github.com:Cunyu-Liu/rna-junction-preorganization.git",
+  "run_root": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z",
+  "environment": {
+    "conda_env": "rna_junction_preorganization_v1_1",
+    "numpy": "2.2.6",
+    "scipy": "1.15.2",
+    "pandas": "2.3.3",
+    "scikit_learn": "1.7.2"
+  },
+  "phases": {
+    "P0": "P0_PASS_COMPARISON_ELIGIBLE",
+    "P1": "BASELINES_COMPLETE",
+    "P2": "CONDITIONAL_KNOWN_OPERATOR_SIGNAL",
+    "P3": "CANDIDATE_C_RETAINED_AS_TARGETED_EXTRAPOLATION_FIX",
+    "P4": "NOT_PROMOTED",
+    "P5": "IDENTIFIABILITY_BOUNDARY_NARRATIVE",
+    "P6": "RELEASE_PREPARED"
+  },
+  "overall_scientific_state": {
+    "sota_status": "SOTA_NOT_ADJUDICATED",
+    "submission_authorization": "NO_SUBMISSION_AUTHORIZATION",
+    "scientific_claim_authorized": false,
+    "narrative": "benchmark_identifiability_boundary"
+  },
+  "artifacts": {
+    "data/CleaningLedger.jsonl": {
+      "sha256": "0a0abf1c4acc5ba0988c444e0d93cc074362c6db4151b3ef145dbc86a52f6df5",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/CleaningLedger.jsonl"
+    },
+    "data/EffectiveNReport.json": {
+      "sha256": "dbb371068b054771abb008d4d61c9a64b687d89cbce9580d0595c6e093e59611",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/EffectiveNReport.json"
+    },
+    "data/ExposureRegistry.json": {
+      "sha256": "508b8cedd5fef5a48d4831fd98f41ffee71a7747ff5d53ca9e2a158f57ca5343",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/ExposureRegistry.json"
+    },
+    "protocol/SplitManifest_symmetry_5fold.jsonl": {
+      "sha256": "a2afb4cdc8f99128ac398582037f81420dd458c6d59d591c94e3b5f2b7296dbf",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_symmetry_5fold.jsonl"
+    },
+    "protocol/SplitManifest_edit_5fold.jsonl": {
+      "sha256": "ba599e216c6d1a9d7215e9b5fdc3aebe5916b835ef57316f4aaf0782ceecc761",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_edit_5fold.jsonl"
+    },
+    "protocol/SplitManifest_context_lomo.jsonl": {
+      "sha256": "b167555af6d23d5843cfca26d3f2eafd39fa9963efe32fc6b3d08f58239915a5",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_context_lomo.jsonl"
+    },
+    "protocol/SplitManifest_scaffold_lomo.jsonl": {
+      "sha256": "3d09ba993879b9edb1e6d6e99bb1f7ec1fb73ea84947b51b7a2f7c521dd5352b",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_scaffold_lomo.jsonl"
+    },
+    "p1_full/Predictions.jsonl": {
+      "sha256": "0774eacfccff78341e280c3b45eaa25bbbe702f591596e8728f5dead613bb521",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p1_full/Predictions.jsonl"
+    },
+    "p3_full_v2/SelectedGateEvaluation.csv": {
+      "sha256": "8aeff04314c9c69eb53cc5b026b8231300ab41e69a4f9183e698f88ca311a562",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p3_full_v2/SelectedGateEvaluation.csv"
+    },
+    "p4_final/FinalPredictions.parquet": {
+      "sha256": "4f52f0486d8f0c2dd649eab76cb77a154fde3cd1af5459fc55647498e0bbc2a3",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/FinalPredictions.parquet"
+    },
+    "p4_final/FinalLeaderboard.csv": {
+      "sha256": "f74117fe76a6a82e39befab851cacc343af710cf33f66a97bf3135f717aa6355",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/FinalLeaderboard.csv"
+    },
+    "p4_final/BootstrapIntervals.csv": {
+      "sha256": "feaa30390de52ab18bbe323fad2f0414bc1cc8fe10bb3d4368c3cd69b7ab9935",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/BootstrapIntervals.csv"
+    },
+    "p4_final/CandidatePromotionDecision.json": {
+      "sha256": "0a78d28bbd8f6cda76e3db8a43cece896862f71d09d3855cc5be8e1f50c19982",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/CandidatePromotionDecision.json"
+    },
+    "p5_diagnostics/FailureAtlas.parquet": {
+      "sha256": "7debbbfdd8c2c1dddf49411b8cc2935eef8cbd19dd9721641e6746253c7b5122",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p5_diagnostics/FailureAtlas.parquet"
+    },
+    "p5_diagnostics/ContextSensitivity.csv": {
+      "sha256": "580218935113d0437eb6ef00c4ab3229736003a4dc91cc3d30fe90e2e3a51d07",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p5_diagnostics/ContextSensitivity.csv"
+    },
+    "p5_diagnostics/ClaimEvidenceMatrix.csv": {
+      "sha256": "26e3423a6112326b64d670dc74674aab07f044b06b340abbd4668868a889c931",
+      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p5_diagnostics/ClaimEvidenceMatrix.csv"
+    }
+  },
+  "missing_artifacts": []
+}
