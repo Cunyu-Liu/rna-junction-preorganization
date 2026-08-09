@@ -21,3 +21,7 @@ source/
 
 # macOS resource forks
 ._*
+
+# R0 run logs/markers
+/r1_run.log
+/*.marker
