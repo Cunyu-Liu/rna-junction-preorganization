@@ -1,0 +1,9 @@
+{
+  "sealed_p4_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final",
+  "env1_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p6_replay_env1",
+  "env2_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p6_replay_env2",
+  "out_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p6_replay_verify",
+  "clean_checkout_commit": "de7192f797e8f4579769975dcde6604746ab7da9",
+  "env1_env": "rna_junction_preorganization_v1_1 (numpy 2.2.6, scipy 1.15.2)",
+  "env2_env": "pc_cng (numpy 2.2.6, scipy 1.15.3)"
+}
