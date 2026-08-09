@@ -1,0 +1,28 @@
+{
+  "phase": "P4",
+  "state": "PASS",
+  "candidate": "support_aware_mixture",
+  "axes": [
+    "symmetry_5fold",
+    "edit_5fold",
+    "context_lomo",
+    "scaffold_lomo"
+  ],
+  "comparison": "coverage-matched supported-NLL vs strongest eligible baseline",
+  "baselines_reused": "sealed P1 predictions (no refit, no test selection)",
+  "gates_frozen_from": "P3 nested-CV per-fold gates",
+  "n_boot": 2000,
+  "overall_promotion": "NOT_PROMOTED",
+  "sota_status": "SOTA_NOT_ADJUDICATED",
+  "deliverables": [
+    "FinalLeaderboard.csv",
+    "FinalPredictions.parquet",
+    "BootstrapIntervals.csv",
+    "NullAdjudication.csv",
+    "GeneralizationMatrix.csv",
+    "AblationTable.csv",
+    "FairnessLedger.jsonl",
+    "ProspectiveProtocol.json",
+    "CandidatePromotionDecision.json"
+  ]
+}
