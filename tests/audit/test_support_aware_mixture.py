@@ -1,9 +1,29 @@
 """Unit tests for Phase 3 Candidate C (support-aware gated mixture + abstention)."""
-import numpy as np
+import pytest
+
+from audit.models import support_aware_mixture as sam
 from audit.models.support_aware_mixture import (
     support_features, fit_local, predict_gated, supported_metrics,
     _lev, SUPPORT_DIST, GATE_GRID,
 )
+
+
+@pytest.fixture(autouse=True)
+def _reset_global_distance_cache():
+    """Reset the module-level Levenshtein distance cache between tests.
+
+    `support_aware_mixture` keeps a process-global distance matrix/seq index
+    (`_DIST_MAT`/`_SEQ_LIST`) that is built lazily on first use.  Because pytest
+    runs every test file in one process, a cache built by another test file for
+    a different junction universe would otherwise corrupt these fixtures.
+    """
+    sam._DIST_MAT = None
+    sam._SEQ_LIST = []
+    sam._DIST_CACHE = {}
+    yield
+    sam._DIST_MAT = None
+    sam._SEQ_LIST = []
+    sam._DIST_CACHE = {}
 
 
 def _rows():
