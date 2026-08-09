@@ -18,3 +18,6 @@ contract/1.1.docx
 legacy/outputs/
 legacy/contracts_v1.2.docx
 source/
+
+# macOS resource forks
+._*
