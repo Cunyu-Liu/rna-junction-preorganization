@@ -113,7 +113,7 @@ def _sequence_kmer_features(seq, k=3):
 # ---------------------------------------------------------------------------
 
 def fit_motif_topology(train, ridge=RIDGE):
-    from scipy.optimize import minimize
+    from audit.core.censored_objective import CensoredObjective, fit_lbfgs
     motifs = sorted({str(r["motif"]) for r in train})
     scafs = sorted({int(r["scaf"]) for r in train})
     mi = {m: i + 1 for i, m in enumerate(motifs)}
@@ -132,33 +132,10 @@ def fit_motif_topology(train, ridge=RIDGE):
         X[i, off + 1] = len(parts[0]) if parts else 0
         X[i, off + 2] = len(parts[1]) if len(parts) > 1 else 0
     y, cens = _rows_to_arrays(train)
-
-    def f(beta):
-        mu = X @ beta
-        g = np.zeros_like(beta)
-        loss = 0.0
-        m = ~cens
-        if m.any():
-            z = (y[m] - mu[m]) / TAU
-            loss += 0.5 * np.sum(z * z)
-            g += -(X[m].T @ z) / TAU
-        c = cens
-        if c.any():
-            from scipy.special import log_ndtr
-            a = (mu[c] - CAP) / TAU
-            phi = np.exp(-0.5 * a * a) / np.sqrt(2 * np.pi)
-            sa = np.clip(-log_ndtr(a), -50.0, 50.0)
-            loss += float(np.sum(sa))
-            d = -phi / np.exp(-sa)
-            g += -(X[c].T @ d) / TAU
-        reg = 0.5 * ridge * float(beta[1:] @ beta[1:])
-        g_reg = np.zeros(nf); g_reg[1:] = ridge * beta[1:]
-        return loss + reg, g + g_reg
-
-    res = minimize(f, np.zeros(nf), jac=True, method="L-BFGS-B",
-                   options={"maxiter": 2000, "gtol": 1e-8})
-    return {"kind": "motif_topology", "beta": res.x, "motifs": motifs, "scafs": scafs,
-            "mi": mi, "si": si}
+    obj = CensoredObjective(X, y, cens)
+    rec = fit_lbfgs(obj, np.zeros(nf), ridge=ridge, maxiter=2000, gtol=1e-8)
+    return {"kind": "motif_topology", "beta": rec["beta"], "motifs": motifs, "scafs": scafs,
+            "mi": mi, "si": si, "gate": rec}
 
 
 def predict_motif_topology(model, test):
@@ -206,7 +183,7 @@ def _add_intercept(X):
 
 
 def fit_kmer_ridge(train, k=3, ridge=RIDGE):
-    from scipy.optimize import minimize
+    from audit.core.censored_objective import CensoredObjective, fit_lbfgs
     by_jid = build_raw_by_jid(train)
     X, _ = _build_kmer_matrix(train, by_jid, k=k)
     mean = X.mean(axis=0); sd = X.std(axis=0)
@@ -214,34 +191,10 @@ def fit_kmer_ridge(train, k=3, ridge=RIDGE):
     X = (X - mean) / sd
     Xb = _add_intercept(X)
     y, cens = _rows_to_arrays(train)
-    nf = Xb.shape[1]
-
-    def f(beta):
-        mu = Xb @ beta
-        g = np.zeros_like(beta)
-        loss = 0.0
-        m = ~cens
-        if m.any():
-            z = (y[m] - mu[m]) / TAU
-            loss += 0.5 * np.sum(z * z)
-            g += -(Xb[m].T @ z) / TAU
-        c = cens
-        if c.any():
-            from scipy.special import log_ndtr
-            a = (mu[c] - CAP) / TAU
-            phi = np.exp(-0.5 * a * a) / np.sqrt(2 * np.pi)
-            sa = np.clip(-log_ndtr(a), -50.0, 50.0)
-            loss += float(np.sum(sa))
-            d = -phi / np.exp(-sa)
-            g += -(Xb[c].T @ d) / TAU
-        # penalize all coefficients except the intercept (beta[0])
-        reg = 0.5 * ridge * float(beta[1:] @ beta[1:])
-        gr = np.zeros(nf); gr[1:] = ridge * beta[1:]
-        return loss + reg, g + gr
-
-    res = minimize(f, np.zeros(nf), jac=True, method="L-BFGS-B",
-                   options={"maxiter": 2000, "gtol": 1e-8})
-    return {"kind": "kmer_ridge", "beta": res.x, "mean": mean, "sd": sd, "k": k}
+    obj = CensoredObjective(Xb, y, cens)
+    rec = fit_lbfgs(obj, np.zeros(Xb.shape[1]), ridge=ridge, maxiter=2000, gtol=1e-8)
+    return {"kind": "kmer_ridge", "beta": rec["beta"], "mean": mean, "sd": sd, "k": k,
+            "gate": rec}
 
 
 def predict_kmer_ridge(model, test):
@@ -259,7 +212,7 @@ def predict_kmer_ridge(model, test):
 # ---------------------------------------------------------------------------
 
 def fit_position_additive(train, ridge=RIDGE):
-    from scipy.optimize import minimize
+    from audit.core.censored_objective import CensoredObjective, fit_lbfgs
     tr_jids = sorted({str(r["jid"]) for r in train})
     by_jid = build_raw_by_jid(train)
     mean, sd = fit_scaler(tr_jids, by_jid)
@@ -270,33 +223,10 @@ def fit_position_additive(train, ridge=RIDGE):
         Xr[i] = X[ji[str(r["jid"])]]
     y, cens = _rows_to_arrays(train)
     Xb = _add_intercept(Xr)
-    nf = Xb.shape[1]
-
-    def f(beta):
-        mu = Xb @ beta
-        g = np.zeros_like(beta)
-        loss = 0.0
-        m = ~cens
-        if m.any():
-            z = (y[m] - mu[m]) / TAU
-            loss += 0.5 * np.sum(z * z)
-            g += -(Xb[m].T @ z) / TAU
-        c = cens
-        if c.any():
-            from scipy.special import log_ndtr
-            a = (mu[c] - CAP) / TAU
-            phi = np.exp(-0.5 * a * a) / np.sqrt(2 * np.pi)
-            sa = np.clip(-log_ndtr(a), -50.0, 50.0)
-            loss += float(np.sum(sa))
-            d = -phi / np.exp(-sa)
-            g += -(Xb[c].T @ d) / TAU
-        reg = 0.5 * ridge * float(beta[1:] @ beta[1:])
-        gr = np.zeros(nf); gr[1:] = ridge * beta[1:]
-        return loss + reg, g + gr
-
-    res = minimize(f, np.zeros(nf), jac=True, method="L-BFGS-B",
-                   options={"maxiter": 2000, "gtol": 1e-8})
-    return {"kind": "position_additive", "beta": res.x, "mean": mean, "sd": sd}
+    obj = CensoredObjective(Xb, y, cens)
+    rec = fit_lbfgs(obj, np.zeros(Xb.shape[1]), ridge=ridge, maxiter=2000, gtol=1e-8)
+    return {"kind": "position_additive", "beta": rec["beta"], "mean": mean, "sd": sd,
+            "gate": rec}
 
 
 def predict_position_additive(model, test):

@@ -1,0 +1,15 @@
+{
+  "run_id": "r0_comparison_eligibility_20260809T105504Z",
+  "run_root": "/mnt/cunyuliu/rna_junction_r0_20260809T105504Z",
+  "worktree": "/home/cunyuliu/rna_junction_r0_20260809T105504Z",
+  "canonical_source": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/source/tecto_v111_canonical_records.jsonl",
+  "dag_nodes": ["source", "clean", "splits", "baselines", "v131", "eligibility"],
+  "dag_edges": [
+    ["source", "clean"],
+    ["clean", "splits"],
+    ["splits", "baselines"],
+    ["splits", "v131"],
+    ["baselines", "eligibility"],
+    ["v131", "eligibility"]
+  ]
+}

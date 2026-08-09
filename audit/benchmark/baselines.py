@@ -18,53 +18,24 @@ survival), identical to audit.evaluation.metrics.
 from __future__ import annotations
 
 import numpy as np
-from scipy.optimize import minimize
 from scipy.special import log_ndtr
 
 CAP = -7.1
 TAU = 0.7
 RIDGE = 1.0   # partial-pooling shrinkage for hierarchy
 
-
-def _nll_and_grad(beta, X, y, cens):
-    mu = X @ beta
-    sigma = TAU
-    grad = np.zeros_like(beta)
-    nll = 0.0
-    # measured rows
-    m = ~cens
-    if m.any():
-        z = (y[m] - mu[m]) / sigma
-        nll += 0.5 * np.sum(z * z)
-        grad += -(X[m].T @ z) / sigma
-    # censored rows: -log Phi((mu-CAP)/sigma)
-    c = cens
-    if c.any():
-        a = (mu[c] - CAP) / sigma
-        # d/da[-log Phi(a)] = -phi(a)/Phi(a)
-        phi = np.exp(-0.5 * a * a) / np.sqrt(2 * np.pi)
-        sa = np.clip(-log_ndtr(a), -50.0, 50.0)
-        nll += float(np.sum(sa))
-        d = -phi / np.exp(-sa)
-        grad += -(X[c].T @ d) / sigma
-    # constant per-row terms (same for all rows, cancels in comparisons but kept)
-    n_const = float(len(y))
-    nll += n_const * (0.5 * np.log(2 * np.pi) + np.log(sigma))
-    return nll, grad
+# R0.2: single unified censored objective (correct gradient, optimizer gate).
+from audit.core.censored_objective import CensoredObjective, fit_lbfgs
 
 
 def _fit(Xtr, ytr, ctr, ridge=RIDGE):
-    """Censored MLE with L2 ridge (shrinkage toward 0)."""
+    """Censored MLE with L2 ridge (shrinkage toward 0) using the unified
+    R0.2 objective.  Returns (beta, gate_record); gate_record carries the
+    optimizer/convergence diagnostics required by the fold gate."""
     nf = Xtr.shape[1]
-    def f(beta):
-        nll, g = _nll_and_grad(beta, Xtr, ytr, ctr)
-        reg = 0.5 * ridge * float(beta[1:] @ beta[1:])  # don't shrink intercept
-        g_reg = np.zeros(nf); g_reg[1:] = ridge * beta[1:]
-        return nll + reg, g + g_reg
-    beta0 = np.zeros(nf)
-    res = minimize(f, beta0, jac=True, method="L-BFGS-B",
-                   options={"maxiter": 2000, "gtol": 1e-8})
-    return res.x
+    obj = CensoredObjective(Xtr, ytr, ctr)
+    rec = fit_lbfgs(obj, np.zeros(nf), ridge=ridge, maxiter=2000, gtol=1e-8)
+    return rec["beta"], rec
 
 
 def _predict(beta, Xte, abstain_cols=None):
@@ -94,8 +65,8 @@ def _rows_to_arrays(rows):
 def fit_global(train):
     y, cens = _rows_to_arrays(train)
     X = np.ones((len(y), 1))
-    beta = _fit(X, y, cens, ridge=0.0)
-    return {"kind": "global", "beta": beta, "intercept": True}
+    beta, gate = _fit(X, y, cens, ridge=0.0)
+    return {"kind": "global", "beta": beta, "intercept": True, "gate": gate}
 
 
 def predict_global(model, test):
@@ -112,8 +83,8 @@ def fit_scaffold(train):
     for i, r in enumerate(train):
         X[i, idx[r["scaf"]]] = 1.0
     y, cens = _rows_to_arrays(train)
-    beta = _fit(X, y, cens, ridge=0.0)
-    return {"kind": "scaffold", "beta": beta, "scafs": scafs, "idx": idx}
+    beta, gate = _fit(X, y, cens, ridge=0.0)
+    return {"kind": "scaffold", "beta": beta, "scafs": scafs, "idx": idx, "gate": gate}
 
 
 def predict_scaffold(model, test):
@@ -142,9 +113,9 @@ def fit_hierarchy(train, ridge=RIDGE):
         X[i, si[int(r["scaf"])]] = 1.0
         X[i, ci[str(r["helix_seq"])]] = 1.0
     y, cens = _rows_to_arrays(train)
-    beta = _fit(X, y, cens, ridge=ridge)
+    beta, gate = _fit(X, y, cens, ridge=ridge)
     return {"kind": "hierarchy", "beta": beta, "scafs": scafs, "ctxs": ctxs,
-            "si": si, "ci": ci}
+            "si": si, "ci": ci, "gate": gate}
 
 
 def predict_hierarchy(model, test):
