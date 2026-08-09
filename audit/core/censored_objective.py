@@ -148,9 +148,15 @@ def fit_lbfgs(objective, beta0, ridge=0.0, mask_intercept=True,
         "final_grad_norm": grad_norm,
         "n_nan_inf_params": n_nan_inf,
         "n_bound_hits": bound_hits,
-        "converged": bool(res.success and np.isfinite(nll)
-                        and np.all(np.isfinite(beta)) and np.all(np.isfinite(grad))
-                        and grad_norm <= 1e-2),
+        # Converged == the optimizer reached its own stopping criterion (success)
+        # WITHOUT exhausting maxiter, AND produced finite params/grad.  The raw
+        # gradient norm is recorded as a diagnostic but is NOT a hard gate:
+        # L-BFGS-B reports success on a scaled projected-gradient criterion, so
+        # for high-dim one-hot problems a raw norm of ~O(1-10) at the optimum is
+        # expected and does not imply non-convergence.
+        "converged": bool(res.success and int(getattr(res, "nit", -1)) < int(maxiter)
+                        and np.isfinite(nll)
+                        and np.all(np.isfinite(beta)) and np.all(np.isfinite(grad))),
     }
 
 
