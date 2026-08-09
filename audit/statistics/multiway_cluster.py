@@ -76,6 +76,7 @@ def load_axis_rows(run_root: Path, axis: str):
         rows.append({
             "source_row_id": rid, "jid": str(f["jid"]),
             "context": str(f["context"]), "scaf": int(f["scaf"]),
+            "y": float(f["y"]), "cens": bool(f["cens"]),
             "d": nll_ns - nll_full, "nll_ns": nll_ns,
         })
     return rows
