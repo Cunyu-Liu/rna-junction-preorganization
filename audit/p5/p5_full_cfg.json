@@ -1,0 +1,7 @@
+{
+  "out_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p5_diagnostics",
+  "records": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/CleaningLedger.jsonl",
+  "protocol_dir": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol",
+  "final_preds": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/FinalPredictions.parquet",
+  "p1_preds": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p1_full/Predictions.jsonl"
+}
