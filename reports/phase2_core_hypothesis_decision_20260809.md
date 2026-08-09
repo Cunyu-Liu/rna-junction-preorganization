@@ -67,3 +67,34 @@ Phase 2 合同验收标准（§12, line 512：gain CI 下界>0；5/5 外层 fold
 - 输出物（`/mnt/.../p2_full/`）：HypothesisRegistry.json、NullProtocol.json、NullResults_{axis}_{type}.parquet（8 个）、SupportLedger.parquet、EffectDecomposition.csv、BootstrapIntervals.csv/json、CoreHypothesisDecision.json、STATUS.json ✓
 - 单元测试：`tests/audit/test_p2.py` **7 passed** ✓
 - STATUS.json: state=FAIL, verdict=H0_OR_INCONCLUSIVE, operator_transfer_boundary=true ✓
+
+---
+
+## 8. 复裁附录：label-permutation null 结构诊断（2026-08-09，用户授权）
+
+### 8.1 诊断结论
+
+`corrected_v1_31` 为 **per-junction latent** 模型：`q_j ~ N(f_theta(seq), s_q^2)`，`f_theta = X_j @ theta`，每个 junction 一个标量 latent。诊断发现：
+
+- **1,336/1,336（100%）junction 的 `junction_seq` 全组唯一**（`max_distinct_seq_per_junction = 1`）。
+- 因此同一 junction 内所有行的 `X_j` 完全相同 → `q_j`（junction 级位置）在 **junction 内 label 置换下不变**（junction 均值位移 ~3.6e-15，数值为零）。
+
+**含义**：label-permutation null（在 junction 内置换 y/cens）**结构性无法破坏** 该模型所利用的 sequence→junction-location 关联，是一个 **不当/偏弱 null**。它对 genuine 的"反超"是预期现象，**不是** 信号为负的证据。真正恰当的 null 是 **sequence-pairing null**（全局置换 sequence↔junction，切断 `X_j→label`），而它在 symmetry/edit/context 三轴全部通过。
+
+### 8.2 复裁
+
+- 移除决定性判据中的 `A3_label_permutation`（结构不当）。
+- 剩余判据复核：A1 CI>0（symmetry/context ✓，edit ✗ −0.10，scaffold ✗）；A2 5/5（symmetry ✓，edit 3/5 ✗，context 104/234 ✗）；A4 blocked-context ✓；A5 edit 正但边际；A6 无 catastrophic ✗。
+- **修正裁定：`CONDITIONAL_KNOWN_OPERATOR_SIGNAL`** —— 在恰当 sequence-pairing null 下，已知 operator 宇宙（symmetry/edit/context）内存在真实的条件性 sequence 信号；但未达完整合同 gate（edit 轴边际、context_lomo 大量 catastrophic fold），且 **operator 迁移为零**（scaffold_lomo gain=0）。
+
+### 8.3 对后续阶段的影响
+
+- 存在非 null、可复制的条件性序列信号 → 按合同 §12 Phase 3 前置，**允许针对已知 operator 条件信号的有限架构迭代**。
+- **禁止** operator-transfer / SOTA 主张（`KNOWN_OPERATOR_CONDITIONAL_ONLY`）。
+- Phase 3 必须先处理 edit 轴稳健性与 context_lomo catastrophic fold，再谈提升。
+
+### 8.4 产物
+
+- `audit/p2/label_null_diagnostic.py` + `tests/audit/test_label_null_diagnostic.py`（**3 passed**；P2 全量 10 passed）
+- `p2_full/LabelNullDiagnostic.json`
+- `p2_full/CoreHypothesisDecision_v2_reedjudication.json`
