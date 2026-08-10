@@ -91,12 +91,12 @@ def test_coverage_skips_mutation_graph_not_run_when_smoother_present(tmp_path):
     ids = {c["model_id"] for c in cov}
     # mutation_graph family covered -> no NOT_RUN entry for it
     assert "mutation_graph_propagation" not in ids
-    # physical_prior / frozen_lm still genuinely NOT_RUN
+    # physical_prior / frozen_lm are external prior art -> UNAVAILABLE_NOT_COMPARED
     assert "physical_ensemble_prior" in ids
     assert "frozen_rna_lm" in ids
     for c in cov:
         if c["model_id"] in ("physical_ensemble_prior", "frozen_rna_lm"):
-            assert c["status"] == "NOT_RUN"
+            assert c["status"] == "UNAVAILABLE_NOT_COMPARED"
 
 
 def test_coverage_flags_mutation_graph_not_run_when_absent(tmp_path):
@@ -105,3 +105,5 @@ def test_coverage_flags_mutation_graph_not_run_when_absent(tmp_path):
     cov = model_coverage(tmp_path)
     by_id = {c["model_id"]: c for c in cov}
     assert by_id["mutation_graph_propagation"]["status"] == "NOT_RUN"
+    assert by_id["physical_ensemble_prior"]["status"] == "UNAVAILABLE_NOT_COMPARED"
+    assert by_id["frozen_rna_lm"]["status"] == "UNAVAILABLE_NOT_COMPARED"

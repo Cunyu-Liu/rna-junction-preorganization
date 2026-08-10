@@ -246,19 +246,27 @@ def model_coverage(run_root):
             "model_id": mid, "class": classes.get(mid, "other"),
             **fam[mid], "independent_method_class": True,
         })
-    # Strong baseline families that are NOT run: only flagged as NOT_RUN when
-    # no member of that family is already present in the R1 leaderboard.  This
-    # keeps coverage accurate when a family is subsequently run (e.g.
-    # mutation_graph_smoother was added to R1 after R4's first pass).
+    # Baseline families not present in the R1 leaderboard.  Only flagged when no
+    # member of that family is already present (keeps coverage accurate when a
+    # family is subsequently run, e.g. mutation_graph_smoother was added to R1
+    # after R4's first pass).  Contract §12.2 distinguishes:
+    #   - UNAVAILABLE_NOT_COMPARED : external prior art that cannot be run here
+    #     (tooling/license/weights/network) -> exclusion is a hard blocker, SOTA
+    #     stays NOT_ADJUDICATED (contract line 685)
+    #   - NOT_RUN                  : an internal baseline family that is simply
+    #     not executed in this universe
     not_run_families = [
         {
             "model_id": "physical_ensemble_prior", "class": "physical_prior",
             "run_signals": ("physical_ensemble_prior",),
-            "note": "RNAMake/Denny-style ensemble prior not executed (needs tooling/license)",
+            "status": "UNAVAILABLE_NOT_COMPARED",
+            "note": "RNAMake/Denny-style ensemble prior not executed (needs tooling/license); "
+                    "excluded from comparison, SOTA stays NOT_ADJUDICATED",
         },
         {
             "model_id": "mutation_graph_propagation", "class": "mutation_graph",
             "run_signals": ("mutation_graph_smoother",),
+            "status": "NOT_RUN",
             "note": "mutation-neighborhood graph propagation baseline not executed; "
                    "edit_knn covers sequence-similarity neighborhood but is not a "
                    "label-propagation graph over the mutation graph",
@@ -266,7 +274,9 @@ def model_coverage(run_root):
         {
             "model_id": "frozen_rna_lm", "class": "frozen_lm_embedding",
             "run_signals": ("frozen_rna_lm",),
-            "note": "frozen RNA foundation model embedding not executed; must use same head/search-budget",
+            "status": "UNAVAILABLE_NOT_COMPARED",
+            "note": "frozen RNA foundation model embedding not executed (no weights/network); "
+                    "excluded from comparison, SOTA stays NOT_ADJUDICATED",
         },
     ]
     for not_run in not_run_families:
@@ -274,7 +284,7 @@ def model_coverage(run_root):
             continue  # family already covered by a running member in R1
         coverage.append({
             "model_id": not_run["model_id"], "class": not_run["class"],
-            "status": "NOT_RUN", "independent_method_class": True,
+            "status": not_run["status"], "independent_method_class": True,
             "note": not_run["note"],
         })
     return coverage
