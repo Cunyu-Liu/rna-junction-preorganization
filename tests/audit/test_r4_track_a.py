@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from audit.r4_track_a import (effective_n, noise_ceiling, power_analysis,
-                              TARGET_REL_GAIN)
+                              model_coverage, TARGET_REL_GAIN)
 
 
 def _rows(n_junctions=8, n_contexts=4, cens=False):
@@ -56,3 +56,52 @@ def test_power_analysis_available_and_scaled():
     assert 0.0 <= pw["power_at_target_gain"] <= 1.0
     assert pw["negative_result_interpretation"] in (
         "POWER_BOUNDARY", "ADEQUATE_POWER_TO_EXCLUDE_TARGET")
+
+
+# ---------------------------------------------------------------------------
+# model coverage: mutation_graph family is run via mutation_graph_smoother
+# ---------------------------------------------------------------------------
+def _write_leaderboard(tmp_path, model_ids):
+    """Write a minimal R1 leaderboard with the given model_id rows."""
+    lb = tmp_path / "r1"
+    lb.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for mid in model_ids:
+        rows.append(f"symmetry_5fold,0,{mid},1,True")
+        rows.append(f"edit_5fold,0,{mid},1,True")
+    (lb / "Leaderboard_v2.csv").write_text(
+        "axis,fold,model_id,coverage,eligible_full_coverage\n" + "\n".join(rows)
+        + "\n")
+
+
+def test_coverage_maps_mutation_graph_smoother(tmp_path):
+    """mutation_graph_smoother maps to the mutation_graph class."""
+    _write_leaderboard(tmp_path, ["edit_knn", "mutation_graph_smoother"])
+    cov = model_coverage(tmp_path)
+    by_id = {c["model_id"]: c for c in cov}
+    assert by_id["mutation_graph_smoother"]["class"] == "mutation_graph"
+    assert by_id["mutation_graph_smoother"].get("status", "RUN") != "NOT_RUN"
+
+
+def test_coverage_skips_mutation_graph_not_run_when_smoother_present(tmp_path):
+    """When mutation_graph_smoother is in R1, mutation_graph_propagation is
+    NOT flagged as NOT_RUN (family already covered)."""
+    _write_leaderboard(tmp_path, ["edit_knn", "mutation_graph_smoother"])
+    cov = model_coverage(tmp_path)
+    ids = {c["model_id"] for c in cov}
+    # mutation_graph family covered -> no NOT_RUN entry for it
+    assert "mutation_graph_propagation" not in ids
+    # physical_prior / frozen_lm still genuinely NOT_RUN
+    assert "physical_ensemble_prior" in ids
+    assert "frozen_rna_lm" in ids
+    for c in cov:
+        if c["model_id"] in ("physical_ensemble_prior", "frozen_rna_lm"):
+            assert c["status"] == "NOT_RUN"
+
+
+def test_coverage_flags_mutation_graph_not_run_when_absent(tmp_path):
+    """If no mutation_graph member ran, mutation_graph_propagation is NOT_RUN."""
+    _write_leaderboard(tmp_path, ["edit_knn"])
+    cov = model_coverage(tmp_path)
+    by_id = {c["model_id"]: c for c in cov}
+    assert by_id["mutation_graph_propagation"]["status"] == "NOT_RUN"

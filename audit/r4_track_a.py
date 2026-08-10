@@ -238,6 +238,7 @@ def model_coverage(run_root):
         "edit_knn": "edit_distance_knn",
         "corrected_v1_31": "latent_operator_sequence",
         "no_sequence_latent_operator": "latent_operator_no_sequence",
+        "mutation_graph_smoother": "mutation_graph",
     }
     coverage = []
     for mid in sorted(fam):
@@ -245,23 +246,37 @@ def model_coverage(run_root):
             "model_id": mid, "class": classes.get(mid, "other"),
             **fam[mid], "independent_method_class": True,
         })
-    coverage.append({
-        "model_id": "physical_ensemble_prior", "class": "physical_prior",
-        "status": "NOT_RUN", "independent_method_class": True,
-        "note": "RNAMake/Denny-style ensemble prior not executed (needs tooling/license)"
-    })
-    coverage.append({
-        "model_id": "mutation_graph_propagation", "class": "mutation_graph",
-        "status": "NOT_RUN", "independent_method_class": True,
-        "note": "mutation-neighborhood graph propagation baseline not executed; "
-               "edit_knn covers sequence-similarity neighborhood but is not a "
-               "label-propagation graph over the mutation graph"
-    })
-    coverage.append({
-        "model_id": "frozen_rna_lm", "class": "frozen_lm_embedding",
-        "status": "NOT_RUN", "independent_method_class": True,
-        "note": "frozen RNA foundation model embedding not executed; must use same head/search-budget"
-    })
+    # Strong baseline families that are NOT run: only flagged as NOT_RUN when
+    # no member of that family is already present in the R1 leaderboard.  This
+    # keeps coverage accurate when a family is subsequently run (e.g.
+    # mutation_graph_smoother was added to R1 after R4's first pass).
+    not_run_families = [
+        {
+            "model_id": "physical_ensemble_prior", "class": "physical_prior",
+            "run_signals": ("physical_ensemble_prior",),
+            "note": "RNAMake/Denny-style ensemble prior not executed (needs tooling/license)",
+        },
+        {
+            "model_id": "mutation_graph_propagation", "class": "mutation_graph",
+            "run_signals": ("mutation_graph_smoother",),
+            "note": "mutation-neighborhood graph propagation baseline not executed; "
+                   "edit_knn covers sequence-similarity neighborhood but is not a "
+                   "label-propagation graph over the mutation graph",
+        },
+        {
+            "model_id": "frozen_rna_lm", "class": "frozen_lm_embedding",
+            "run_signals": ("frozen_rna_lm",),
+            "note": "frozen RNA foundation model embedding not executed; must use same head/search-budget",
+        },
+    ]
+    for not_run in not_run_families:
+        if any(sig in fam for sig in not_run["run_signals"]):
+            continue  # family already covered by a running member in R1
+        coverage.append({
+            "model_id": not_run["model_id"], "class": not_run["class"],
+            "status": "NOT_RUN", "independent_method_class": True,
+            "note": not_run["note"],
+        })
     return coverage
 
 
