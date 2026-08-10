@@ -239,6 +239,9 @@ def model_coverage(run_root):
         "corrected_v1_31": "latent_operator_sequence",
         "no_sequence_latent_operator": "latent_operator_no_sequence",
         "mutation_graph_smoother": "mutation_graph",
+        "denny_train_only": "denny_thermo_fingerprint",
+        "physical_ensemble_prior": "physical_prior",
+        "frozen_rnafm_lm": "frozen_lm_embedding",
     }
     coverage = []
     for mid in sorted(fam):
@@ -273,7 +276,7 @@ def model_coverage(run_root):
         },
         {
             "model_id": "frozen_rna_lm", "class": "frozen_lm_embedding",
-            "run_signals": ("frozen_rna_lm",),
+            "run_signals": ("frozen_rnafm_lm",),
             "status": "UNAVAILABLE_NOT_COMPARED",
             "note": "frozen RNA foundation model embedding not executed (no weights/network); "
                     "excluded from comparison, SOTA stays NOT_ADJUDICATED",
