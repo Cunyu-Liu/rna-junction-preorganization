@@ -25,3 +25,7 @@ source/
 # R0 run logs/markers
 /r1_run.log
 /*.marker
+
+# R0.5 frozen-LM run cache + log (large artifacts in /mnt run root)
+/r05_frozenlm/
+/r05_frozenlm_run.log
