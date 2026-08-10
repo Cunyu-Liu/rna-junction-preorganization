@@ -57,6 +57,20 @@ def _convergence(model):
     return {"converged": False, "reason": "no optimizer gate"}, False
 
 
+def _gate_fields(res):
+    """Persist full optimizer-gate diagnostics for a fold (contract R0.2)."""
+    if not res:
+        return {}
+    conv = res.get("convergence") or {}
+    return {
+        "success": conv.get("success"),
+        "n_iter": conv.get("n_iter"),
+        "n_bound_hits": conv.get("n_bound_hits"),
+        "n_nan_inf_params": conv.get("n_nan_inf_params"),
+        "final_grad_norm": conv.get("final_grad_norm"),
+    }
+
+
 def load_splits(manifest_path: Path):
     by_fold = defaultdict(set)
     axis = None
@@ -137,11 +151,11 @@ def main(cfg):
             train_rows = [r for sid, r in rows.items() if sid not in test_ids]
             for model_id, (fit_fn, pred_fn) in R05_MODELS.items():
                 res, preds = run_fold(model_id, fit_fn, pred_fn, train_rows, test_rows)
-                conv_rows.append({"axis": axis, "fold": str(fold), "model_id": model_id,
-                                  "converged": res.get("converged") if res else None,
-                                  "error": res.get("error") if res else "fit_error",
-                                  "final_grad_norm": (res.get("convergence", {}).get("final_grad_norm")
-                                                      if res else None)})
+                rec = {"axis": axis, "fold": str(fold), "model_id": model_id,
+                       "converged": res.get("converged") if res else None,
+                       "error": res.get("error") if res else "fit_error"}
+                rec.update(_gate_fields(res))
+                conv_rows.append(rec)
                 if res is None or "error" in res:
                     leaderboard.append({"axis": axis, "fold": str(fold), "model_id": model_id,
                                         "error": res["error"] if res else "fit_error"})
@@ -172,12 +186,12 @@ def main(cfg):
         train_rows = [r for sid, r in rows.items() if sid in f["train_ids"]]
         for model_id, (fit_fn, pred_fn) in R05_MODELS.items():
             res, preds = run_fold(model_id, fit_fn, pred_fn, train_rows, test_rows)
-            conv_rows.append({"axis": "edit_x_nested_context", "fold": f["fold"],
-                              "model_id": model_id,
-                              "converged": res.get("converged") if res else None,
-                              "error": res.get("error") if res else "fit_error",
-                              "final_grad_norm": (res.get("convergence", {}).get("final_grad_norm")
-                                                  if res else None)})
+            rec = {"axis": "edit_x_nested_context", "fold": f["fold"],
+                   "model_id": model_id,
+                   "converged": res.get("converged") if res else None,
+                   "error": res.get("error") if res else "fit_error"}
+            rec.update(_gate_fields(res))
+            conv_rows.append(rec)
             if res is None or "error" in res:
                 leaderboard.append({"axis": "edit_x_nested_context", "fold": f["fold"],
                                     "model_id": model_id,

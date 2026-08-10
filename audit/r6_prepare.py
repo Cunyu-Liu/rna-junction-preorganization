@@ -23,6 +23,7 @@ from pathlib import Path
 
 # final artifacts to seal (relative to run_root)
 FINAL_ARTIFACTS = [
+    "r05/ConvergenceLedger.parquet",
     "r1/Leaderboard_v2.csv",
     "r1/ConvergenceLedger.parquet",
     "r2/CoreHypothesisDecision_v3.json",
@@ -99,13 +100,13 @@ def reproduce_md(cfg, git):
         "## Steps (each phase must hit its acceptance gate before the next)\n"
         "```bash\n"
         "conda activate rna_junction_preorganization_v1_1\n"
-        f"cd {cfg['run_root']}\n"
+        f"cd {cfg.get('repo', cfg['run_root'])}\n"
         "export PYTHONPATH=.\n"
         "# R0.5 gradient-corrected baselines + edit_knn (needs protocol splits)\n"
-        "python audit/r05_run.py audit/provenance/r01_cfg.json\n"
-        "python audit/r05_v131_run.py audit/provenance/r01_cfg.json\n"
+        "python audit/r05_run.py audit/provenance/r05_cfg.json\n"
+        "python audit/r05_v131_run.py audit/provenance/r05_v131_cfg.json\n"
         "# R0.6 re-adjudicate comparison eligibility\n"
-        "python audit/r06_adjudicate.py audit/provenance/r01_cfg.json\n"
+        "python audit/r06_adjudicate.py audit/provenance/r06_cfg.json\n"
         "# R1 unified leaderboard (adds matched no-sequence latent operator + joint axis)\n"
         "python audit/r1_run.py audit/provenance/r1_cfg.json\n"
         "# R2 matched ablation + multiway cluster + decision\n"
@@ -116,7 +117,8 @@ def reproduce_md(cfg, git):
         "python audit/r4_track_a.py audit/provenance/r4_cfg.json\n"
         "# R5 mechanism / claim matrix / narrative\n"
         "python audit/r5_mechanism.py audit/provenance/r5_cfg.json\n"
-        "# verify sealed checksums (run from run_root; checksum paths are run_root-relative)\n"
+        "# verify sealed checksums (checksum paths are run_root-relative)\n"
+        f"cd {cfg['run_root']}\n"
         "sha256sum -c r6/checksums.sha256\n"
         "```\n\n"
         "## Expected outcome\n"
