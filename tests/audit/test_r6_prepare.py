@@ -24,3 +24,13 @@ def test_license_ledger_marks_legal_pending():
         assert r["owner"] == "PENDING_LEGAL"
     assert any(r["type"] == "data" for r in led)
     assert any(r["type"] == "code" for r in led)
+
+
+def test_reproduce_md_uses_run_root_relative_checksum():
+    """Checksum paths are run_root-relative, so the verify command must run from run_root."""
+    from audit.r6_prepare import reproduce_md
+    cfg = {"run_root": "/tmp/fake_root"}
+    git = {"branch": "b", "commit": "c", "remote": "r"}
+    md = reproduce_md(cfg, git)
+    assert "sha256sum -c r6/checksums.sha256" in md
+    assert "cd r6 && sha256sum -c checksums.sha256" not in md
