@@ -265,7 +265,7 @@ def limitations():
         "- 核心 sequence 假设：NOT_SUPPORTED_OR_INCONCLUSIVE，非普遍 impossibility\n"
         "- identifiability boundary：UNKNOWN_NOT_ASSERTED；当前仅 tested-candidate failure\n"
         "- SOTA：NOT_ADJUDICATED；无同协议公开榜单\n"
-        "- 模型类：physical_prior / frozen_lm 未运行，结论限定到已覆盖类\n"
+        "- 模型类：mutation_graph / physical_prior / frozen_lm 均未运行，结论限定到已覆盖类\n"
         "- 数据：单一 study、9 operators、37 edit components；无跨研究复制\n"
         "- 许可：dataset UNKNOWN_NEEDS_LEGAL_REVIEW，code OPEN_SOURCE_PENDING（需 R6 legal）\n"
         "- 复现：R6 双环境 clean replay 尚未完成\n"

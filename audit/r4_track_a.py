@@ -251,6 +251,13 @@ def model_coverage(run_root):
         "note": "RNAMake/Denny-style ensemble prior not executed (needs tooling/license)"
     })
     coverage.append({
+        "model_id": "mutation_graph_propagation", "class": "mutation_graph",
+        "status": "NOT_RUN", "independent_method_class": True,
+        "note": "mutation-neighborhood graph propagation baseline not executed; "
+               "edit_knn covers sequence-similarity neighborhood but is not a "
+               "label-propagation graph over the mutation graph"
+    })
+    coverage.append({
         "model_id": "frozen_rna_lm", "class": "frozen_lm_embedding",
         "status": "NOT_RUN", "independent_method_class": True,
         "note": "frozen RNA foundation model embedding not executed; must use same head/search-budget"
