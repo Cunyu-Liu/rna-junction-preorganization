@@ -91,7 +91,11 @@ def make_no_sequence_adapter():
                 "a": a, "b": b, "ref": ref, "scaffolds": scaffolds,
                 "n_junctions": len(panel["jids"]),
                 "success": bool(res.success), "nit": int(res.nit),
-                "final_grad_norm": float(np.linalg.norm(res.jac))}
+                "optimizer_message": str(res.message),
+                "final_grad_norm": float(np.linalg.norm(res.jac)),
+                "grad": np.asarray(res.jac, dtype=float),
+                "beta": np.asarray(res.x, dtype=float),
+                "bounds": bounds(nf, ns, ref)}
 
     def predict(model, test_rows):
         si = {s: i for i, s in enumerate(model["scaffolds"])}

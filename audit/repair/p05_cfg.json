@@ -1,0 +1,4 @@
+{"run_root": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z",
+ "canonical_source": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/source/tecto_v111_canonical_records.jsonl",
+ "models": ["corrected_v1_31", "no_sequence_latent_operator", "train_only_scaffold",
+            "scaffold_context_hierarchy", "motif_topology_hierarchy"]}

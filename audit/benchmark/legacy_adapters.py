@@ -81,11 +81,19 @@ def make_v131_adapter():
         theta, a, b = unpack(res.x, nf, ns, ref)
         # store scaler + jid map for train-only transform at predict time
         by_jid = build_raw_by_jid(train_rows)
+        # Store the full final gradient vector + bounds + optimizer message so the
+        # P0.5 projected-gradient gate can be computed explicitly (the audit
+        # rejects relying on res.success alone, which can report success on a
+        # scaled projected-gradient criterion even with a large raw norm).
         return {"kind": "v131", "theta": theta, "a": a, "b": b, "ref": ref,
                 "scaffolds": panel["scaffolds"],
                 "by_jid": by_jid, "tr_jids": tr_jids,
                 "success": bool(res.success), "nit": int(res.nit),
-                "final_grad_norm": float(np.linalg.norm(res.jac))}
+                "optimizer_message": str(res.message),
+                "final_grad_norm": float(np.linalg.norm(res.jac)),
+                "grad": np.asarray(res.jac, dtype=float),
+                "beta": np.asarray(res.x, dtype=float),
+                "bounds": bounds(nf, ns, ref)}
 
     def predict(model, test_rows):
         mean, sd = fit_scaler(model["tr_jids"], model["by_jid"])
