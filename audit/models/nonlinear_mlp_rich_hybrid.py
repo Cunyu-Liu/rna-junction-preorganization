@@ -470,6 +470,7 @@ def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1):
 
 def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
                  dropout=0.1, weight_decay=1e-2, df=_DEFAULT_DF,
+                 seed=_T_SEED,
                  lr=LR, max_epochs=MAX_EPOCHS, patience=PATIENCE,
                  loss_tol=LOSS_TOL, plateau_window=PLATEAU_WINDOW,
                  plateau_rel_tol=PLATEAU_REL_TOL):
@@ -485,7 +486,7 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
         _MLP, MAX_EPOCHS, PATIENCE, LOSS_TOL, PLATEAU_WINDOW, PLATEAU_REL_TOL,
         BATCH, GRAD_TOL,
     )
-    torch.manual_seed(_T_SEED)
+    torch.manual_seed(seed)
     net = _MLP(in_dim, hidden=hidden, dropout=dropout).to(device)
     opt = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
 
@@ -694,7 +695,8 @@ def make_nonlinear_mlp_extended_hybrid_localctx(hidden=(96, 64, 32), dropout=0.1
 def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
                                                   hidden=(96, 64, 32),
                                                   dropout=0.1,
-                                                  weight_decay=1e-2):
+                                                  weight_decay=1e-2,
+                                                  seed=_T_SEED):
     """reg_deep MLP trained with a robust right-censored Student-t objective.
 
     Same winning feature block (nuisance + 21-D extended-Vienna, reg_deep arch)
@@ -722,12 +724,13 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
         net, gate = _train_mlp_t(X, y, cens, device, X.shape[1], hidden=hidden,
                                  dropout=dropout, weight_decay=weight_decay,
-                                 df=df)
+                                 df=df, seed=seed)
         return {"kind": "nonlinear_mlp_extended_hybrid_reg_deep_t", "net": net,
                 "gate": gate, "motifs": motifs, "scafs": scafs, "mean": mean,
                 "sd": sd, "by_jid": by_jid, "n_nuisance": Xn.shape[1],
                 "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
-                "dropout": dropout, "weight_decay": weight_decay, "df": float(df)}
+                "dropout": dropout, "weight_decay": weight_decay, "df": float(df),
+                "seed": int(seed)}
 
     def predict(model, test_rows):
         import torch

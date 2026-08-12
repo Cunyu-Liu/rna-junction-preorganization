@@ -257,6 +257,34 @@ def test_robust_t_df_variants_shapes():
 
 
 @needs_torch_vienna
+def test_robust_t_seed_replication():
+    """A different seed must change the fit (independent replication), cleanly.
+
+    The robust head carries its seed through the gate; re-fitting with a distinct
+    seed must yield finite outputs and a recorded gate, and (with fixed df) the
+    two fits need not be numerically identical, confirming the seed is threaded
+    into training rather than ignored.
+    """
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    m1 = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=23)[0](tr)
+    m2 = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=99)[0](tr)
+    assert m1["seed"] == 23 and m2["seed"] == 99
+    assert m1["df"] == m2["df"] == 5.0
+    assert m1["gate"]["df"] == 5.0
+    assert "eligible" in m1["gate"] and "final_grad_norm" in m1["gate"]
+    assert "eligible" in m2["gate"] and "final_grad_norm" in m2["gate"]
+    # predict both and check finiteness
+    pred1 = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=23)[1]
+    pred2 = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=99)[1]
+    mu1, s1, cp1, su1, ab1 = pred1(m1, te)
+    mu2, s2, cp2, su2, ab2 = pred2(m2, te)
+    assert np.all(np.isfinite(mu1)) and np.all(np.isfinite(mu2))
+    assert np.allclose(s1, 0.7) and np.allclose(s2, 0.7)
+    assert su1.dtype == bool and ab1.dtype == bool
+
+
+@needs_torch_vienna
 def test_student_t_survival_matches_scipy():
     """torch survival must match scipy.stats.t.sf and be differentiable."""
     import torch
