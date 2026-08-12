@@ -67,7 +67,7 @@ def _nuisance_basis(rows, motifs, scafs):
 
 
 def make_nonlinear_mlp_extended_hybrid(hidden=(64, 32), dropout=0.0,
-                                       weight_decay=None):
+                                       weight_decay=None, seed=None):
     """Return (fit, predict) for MLP on nuisance + ViennaRNA-extended(21).
 
     dropout/weight_decay are passed through to the MLP core so a caller can
@@ -93,13 +93,16 @@ def make_nonlinear_mlp_extended_hybrid(hidden=(64, 32), dropout=0.0,
         net, gate = _train_mlp(X, y, cens, device, X.shape[1], hidden=hidden,
                                dropout=dropout,
                                weight_decay=(weight_decay if weight_decay is not None
-                                             else _DEFAULT_WD))
+                                             else _DEFAULT_WD),
+                               seed=seed)
         return {"kind": "nonlinear_mlp_extended_hybrid", "net": net, "gate": gate,
                 "motifs": motifs, "scafs": scafs, "mean": mean, "sd": sd,
                 "by_jid": by_jid, "n_nuisance": Xn.shape[1],
                 "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
-                "dropout": dropout, "weight_decay": (weight_decay if weight_decay is not None
-                                                     else _DEFAULT_WD)}
+                "dropout": dropout,
+                "weight_decay": (weight_decay if weight_decay is not None
+                                 else _DEFAULT_WD),
+                "seed": seed}
 
     def predict(model, test_rows):
         import torch
@@ -170,14 +173,14 @@ def make_nonlinear_mlp_extended_hybrid_reg_wider():
                                               weight_decay=1e-2)
 
 
-def make_nonlinear_mlp_extended_hybrid_reg_deep():
+def make_nonlinear_mlp_extended_hybrid_reg_deep(seed=None):
     """Extended-MLP with a third hidden layer (96,64,32) at the reference reg.
 
     Probe whether depth adds representational power on the richer folding
     representation, again under the reference regularization budget.
     """
     return make_nonlinear_mlp_extended_hybrid(hidden=(96, 64, 32), dropout=0.1,
-                                              weight_decay=1e-2)
+                                              weight_decay=1e-2, seed=seed)
 
 
 def make_nonlinear_mlp_extended_hybrid_reg_deep4():

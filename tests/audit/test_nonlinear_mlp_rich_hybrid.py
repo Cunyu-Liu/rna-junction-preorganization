@@ -285,8 +285,28 @@ def test_robust_t_seed_replication():
 
 
 @needs_torch_vienna
+def test_gaussian_reg_deep_seed_threading():
+    """Gaussian reg_deep must thread an independent seed through training."""
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    m1 = make_nonlinear_mlp_extended_hybrid_reg_deep(seed=23)[0](tr)
+    m2 = make_nonlinear_mlp_extended_hybrid_reg_deep(seed=99)[0](tr)
+    assert m1["seed"] == 23 and m2["seed"] == 99
+    assert m1["hidden"] == [96, 64, 32] and m2["hidden"] == [96, 64, 32]
+    assert "eligible" in m1["gate"] and "final_grad_norm" in m1["gate"]
+    assert "eligible" in m2["gate"] and "final_grad_norm" in m2["gate"]
+    pred1 = make_nonlinear_mlp_extended_hybrid_reg_deep(seed=23)[1]
+    pred2 = make_nonlinear_mlp_extended_hybrid_reg_deep(seed=99)[1]
+    mu1, s1, cp1, su1, ab1 = pred1(m1, te)
+    mu2, s2, cp2, su2, ab2 = pred2(m2, te)
+    assert np.all(np.isfinite(mu1)) and np.all(np.isfinite(mu2))
+    assert np.allclose(s1, 0.7) and np.allclose(s2, 0.7)
+    assert su1.dtype == bool and ab1.dtype == bool
+    assert not np.allclose(mu1, mu2)  # distinct seeds -> distinct fits
+
+
+@needs_torch_vienna
 def test_student_t_survival_matches_scipy():
-    """torch survival must match scipy.stats.t.sf and be differentiable."""
     import torch
     from scipy import stats as spstats
     ts = torch.tensor([-4.0, -2.0, -0.5, 0.0, 0.5, 2.0, 4.0], dtype=torch.float64,

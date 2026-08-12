@@ -118,8 +118,9 @@ def _censored_nll(mu, y, cens):
 def _train_mlp(Xtr, ytr, cens_tr, device, in_dim, hidden=(64, 32),
                dropout=0.0, weight_decay=WEIGHT_DECAY, lr=LR,
                max_epochs=MAX_EPOCHS, patience=PATIENCE, loss_tol=LOSS_TOL,
-               plateau_window=PLATEAU_WINDOW, plateau_rel_tol=PLATEAU_REL_TOL):
-    torch.manual_seed(SEED)
+               plateau_window=PLATEAU_WINDOW, plateau_rel_tol=PLATEAU_REL_TOL,
+               seed=SEED):
+    torch.manual_seed(SEED if seed is None else seed)
     net = _MLP(in_dim, hidden=hidden, dropout=dropout).to(device)
     opt = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
 

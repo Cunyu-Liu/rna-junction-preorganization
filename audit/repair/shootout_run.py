@@ -100,6 +100,11 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep_t3"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=3.0)   # heavier-tailed Student-t
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0)   # lighter-tailed Student-t
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0)  # near-Gaussian Student-t
+    # independent-seed replication (seed=99) of the df-diverse ensemble members
+    U["nonlinear_mlp_extended_hybrid_reg_deep_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep(seed=99)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=99)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, seed=99)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t10_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, seed=99)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)

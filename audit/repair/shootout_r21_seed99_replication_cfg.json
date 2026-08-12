@@ -1,0 +1,12 @@
+{
+  "run_root": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z",
+  "canonical_source": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/source/tecto_v111_canonical_records.jsonl",
+  "out_subdir": "r21_seed99_replication",
+  "models": [
+    "nonlinear_mlp_extended_hybrid_reg_deep_s99",
+    "nonlinear_mlp_extended_hybrid_reg_deep_t_s99",
+    "nonlinear_mlp_extended_hybrid_reg_deep_t7_s99",
+    "nonlinear_mlp_extended_hybrid_reg_deep_t10_s99",
+    "motif_topology_hierarchy"
+  ]
+}
