@@ -58,8 +58,12 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_reg_light,
     make_nonlinear_mlp_extended_hybrid_reg_wider,
     make_nonlinear_mlp_extended_hybrid_reg_deep,
+    make_nonlinear_mlp_extended_hybrid_reg_deep4,
+    make_nonlinear_mlp_extended_hybrid_reg_deep4w,
+    make_nonlinear_mlp_extended_hybrid_reg_deep5,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
+    make_nonlinear_mlp_rnafm_extended_reg_deep,
 )
 from audit.repair.fold_loader import build_joint_edit_context_folds
 from audit.repair.optimizer_gate import gate_from_fit, unbounded_fit_gate
@@ -84,12 +88,16 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_light"] = make_nonlinear_mlp_extended_hybrid_reg_light()  # do=0.05, wd=1e-2
     U["nonlinear_mlp_extended_hybrid_reg_wider"] = make_nonlinear_mlp_extended_hybrid_reg_wider()  # (128,64)
     U["nonlinear_mlp_extended_hybrid_reg_deep"] = make_nonlinear_mlp_extended_hybrid_reg_deep()  # (96,64,32)
+    U["nonlinear_mlp_extended_hybrid_reg_deep4"] = make_nonlinear_mlp_extended_hybrid_reg_deep4()  # (96,64,32,16)
+    U["nonlinear_mlp_extended_hybrid_reg_deep4w"] = make_nonlinear_mlp_extended_hybrid_reg_deep4w()  # (128,96,64,32)
+    U["nonlinear_mlp_extended_hybrid_reg_deep5"] = make_nonlinear_mlp_extended_hybrid_reg_deep5()  # (128,96,64,32,16)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)
         U["rnafm_pca_linear_hybrid"] = make_rnafm_pca_linear_hybrid(rnafm_cache)
         U["nonlinear_mlp_rnafm_pca_hybrid"] = make_nonlinear_mlp_rnafm_pca_hybrid(rnafm_cache)
         U["nonlinear_mlp_rnafm_only_pca_hybrid"] = make_nonlinear_mlp_rnafm_only_pca_hybrid(rnafm_cache)
+        U["nonlinear_mlp_rnafm_extended_reg_deep"] = make_nonlinear_mlp_rnafm_extended_reg_deep(rnafm_cache)
     return U
 
 

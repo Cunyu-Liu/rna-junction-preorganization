@@ -168,6 +168,124 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep():
                                               weight_decay=1e-2)
 
 
+def make_nonlinear_mlp_extended_hybrid_reg_deep4():
+    """Extended-MLP with a fourth hidden layer (96,64,32,16) at reference reg.
+
+    The r14 scan found the 3-layer (96,64,32) reg_deep decisive (+13.17% over
+    nuisance, CI excludes 0).  This probe adds one more layer at the same
+    (dropout=0.1, wd=1e-2) budget to test whether depth gains continue.
+    """
+    return make_nonlinear_mlp_extended_hybrid(hidden=(96, 64, 32, 16),
+                                              dropout=0.1, weight_decay=1e-2)
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_deep4w():
+    """Extended-MLP with a wider four-layer stack (128,96,64,32) at ref reg.
+
+    Probes whether a 4-layer stack with more capacity at every level (vs the
+    (96,64,32,16) taper) extracts more from the 21-D folding features without
+    re-introducing catastrophic overfitting.
+    """
+    return make_nonlinear_mlp_extended_hybrid(hidden=(128, 96, 64, 32),
+                                              dropout=0.1, weight_decay=1e-2)
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_deep5():
+    """Extended-MLP with a five-layer stack (128,96,64,32,16) at ref reg.
+
+    Aggressive-depth probe: checks whether a 5-layer nonlinear head on the 21-D
+    folding features keeps improving mean NLL or begins to overfit under the
+    reference regularization budget.
+    """
+    return make_nonlinear_mlp_extended_hybrid(hidden=(128, 96, 64, 32, 16),
+                                              dropout=0.1, weight_decay=1e-2)
+
+
+def make_nonlinear_mlp_rnafm_extended_reg_deep(cache: dict, k: int = DEFAULT_K,
+                                               hidden=(96, 64, 32), dropout=0.1,
+                                               weight_decay=1e-2):
+    """MLP on nuisance + extended-ViennaRNA(21) + RNA-FM-PCA(K), reg_deep arch.
+
+    Combines the winning r14 architecture (reg_deep: 3 hidden layers under the
+    reference regularization budget) with BOTH the folding proxy (21-D extended
+    ViennaRNA) and the learned RNA-FM representation.  Tests whether the learned
+    embedding is complementary to the folding proxy once the deeper nonlinear
+    head is in place -- i.e. whether reg_deep's +13% gain over nuisance can be
+    extended further.
+    """
+    assert cache, "RNA-FM embedding cache is empty; run rnafm_extract.py first"
+
+    def fit(train_rows):
+        motifs = sorted({str(r["motif"]) for r in train_rows})
+        scafs = sorted({int(r["scaf"]) for r in train_rows})
+        Xn = _nuisance_basis(train_rows, motifs, scafs)
+        tr_jids = sorted({str(r["jid"]) for r in train_rows})
+
+        v_by_jid = vienna_ext_build_raw(train_rows)
+        v_mean, v_sd = vienna_ext_fit_scaler(tr_jids, v_by_jid)
+
+        r_by_jid = rnafm_build_raw(train_rows, cache)
+        missing = [j for j in tr_jids if j not in r_by_jid]
+        if missing:
+            raise RuntimeError(f"{len(missing)} train junctions missing RNA-FM embedding")
+        Xr_raw = np.asarray([r_by_jid[j] for j in tr_jids], dtype=float)
+        k_eff = min(k, Xr_raw.shape[0], Xr_raw.shape[1])
+        pca_mean, comps, scale = _fit_pca(Xr_raw, k_eff)
+
+        Xv = np.zeros((len(train_rows), len(v_mean)))
+        Xr = np.zeros((len(train_rows), k_eff))
+        for i, r in enumerate(train_rows):
+            j = str(r["jid"])
+            Xv[i] = vienna_ext_transform([j], v_by_jid, v_mean, v_sd)[0]
+            Xr[i] = _apply_pca(r_by_jid[j][None, :], pca_mean, comps, scale)[0]
+
+        X = np.hstack([Xn, Xv, Xr])
+        y = np.asarray([r["y"] for r in train_rows], dtype=float)
+        cens = np.asarray([r["cens"] for r in train_rows], dtype=bool)
+        import torch
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        net, gate = _train_mlp(X, y, cens, device, X.shape[1], hidden=hidden,
+                               dropout=dropout, weight_decay=weight_decay)
+        return {"kind": "nonlinear_mlp_rnafm_extended_reg_deep", "net": net,
+                "gate": gate, "motifs": motifs, "scafs": scafs,
+                "v_mean": v_mean, "v_sd": v_sd, "v_by_jid": v_by_jid,
+                "pca_mean": pca_mean, "comps": comps, "scale": scale,
+                "k": k_eff, "n_nuisance": Xn.shape[1], "n_vienna": Xv.shape[1],
+                "n_rnafm_pca": k_eff, "device": device, "hidden": list(hidden),
+                "dropout": dropout, "weight_decay": weight_decay}
+
+    def predict(model, test_rows):
+        import torch
+        Xn = _nuisance_basis(test_rows, model["motifs"], model["scafs"])
+        Xv = np.zeros((len(test_rows), model["n_vienna"]))
+        Xr = np.zeros((len(test_rows), model["n_rnafm_pca"]))
+        r_by_jid = rnafm_build_raw(test_rows, cache)
+        for i, r in enumerate(test_rows):
+            j = str(r["jid"])
+            if j in model["v_by_jid"]:
+                Xv[i] = vienna_ext_transform([j], model["v_by_jid"], model["v_mean"],
+                                             model["v_sd"])[0]
+            if j in r_by_jid:
+                Xr[i] = _apply_pca(r_by_jid[j][None, :], model["pca_mean"],
+                                   model["comps"], model["scale"])[0]
+        X = np.hstack([Xn, Xv, Xr])
+        model["net"].eval()
+        with torch.no_grad():
+            Xt = torch.tensor(X, dtype=torch.float32, device=model["device"])
+            mu = model["net"](Xt).squeeze(-1).cpu().numpy()
+        sigma = np.full(len(mu), 0.7)
+        from scipy.special import log_ndtr
+        a = (mu + 7.1) / 0.7
+        cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
+        seen_scaf = np.zeros(len(mu), dtype=bool)
+        for i, r in enumerate(test_rows):
+            if int(r["scaf"]) in model["scafs"]:
+                seen_scaf[i] = True
+        return mu, sigma, cp, seen_scaf, ~seen_scaf
+
+    return fit, predict
+
+
 def make_nonlinear_mlp_rnafm_pca_hybrid(cache: dict, k: int = DEFAULT_K,
                                         hidden=(64, 32)):
     """Return (fit, predict) for MLP on nuisance + ViennaRNA(11) + RNA-FM-PCA(K)."""

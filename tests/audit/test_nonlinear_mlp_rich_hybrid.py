@@ -17,8 +17,12 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_reg_light,
     make_nonlinear_mlp_extended_hybrid_reg_wider,
     make_nonlinear_mlp_extended_hybrid_reg_deep,
+    make_nonlinear_mlp_extended_hybrid_reg_deep4,
+    make_nonlinear_mlp_extended_hybrid_reg_deep4w,
+    make_nonlinear_mlp_extended_hybrid_reg_deep5,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
+    make_nonlinear_mlp_rnafm_extended_reg_deep,
 )
 
 try:
@@ -139,6 +143,9 @@ def test_reg_architecture_variants_shapes():
         make_nonlinear_mlp_extended_hybrid_reg_light,
         make_nonlinear_mlp_extended_hybrid_reg_wider,
         make_nonlinear_mlp_extended_hybrid_reg_deep,
+        make_nonlinear_mlp_extended_hybrid_reg_deep4,
+        make_nonlinear_mlp_extended_hybrid_reg_deep4w,
+        make_nonlinear_mlp_extended_hybrid_reg_deep5,
     ]
     rows = _rows()
     tr, te = rows[:18], rows[18:]
@@ -148,6 +155,7 @@ def test_reg_architecture_variants_shapes():
         assert model["n_vienna"] == 21
         assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
         assert model["hidden"] == list(model["hidden"])
+        assert len(model["hidden"]) >= 2
         mu, sigma, cp, support, abstain = predict(model, te)
         assert mu.shape == (len(te),) and sigma.shape == (len(te),)
         assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
@@ -167,6 +175,32 @@ def test_rnafm_pca_shapes_and_finiteness():
     assert model["n_vienna"] == 11
     # PCA rank is capped by n_unique_train_junctions (6 here) -> effective k < 8.
     assert 0 < model["n_rnafm_pca"] <= 8
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+
+
+@needs_torch_vienna
+def test_rnafm_extended_reg_deep_shapes_and_finiteness():
+    """Combined reg_deep arch + extended-Vienna(21) + RNA-FM-PCA must fit/predict.
+
+    The r14 scan found reg_deep (96,64,32) is the best-robust 21-D extended-Vienna
+    model (13.17% over nuisance, CI excludes 0).  This probe verifies that adding
+    the learned RNA-FM-PCA block on top still fits cleanly, keeps 21-D Vienna,
+    carries a convergence gate, and returns finite, well-typed outputs.
+    """
+    rows = _rows()
+    cache = _rnafm_cache(rows)
+    fit, predict = make_nonlinear_mlp_rnafm_extended_reg_deep(cache, k=8)
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_rnafm_extended_reg_deep"
+    assert model["n_vienna"] == 21
+    assert 0 < model["n_rnafm_pca"] <= 8
+    assert model["hidden"] == [96, 64, 32]
+    assert model["dropout"] == 0.1 and model["weight_decay"] == 1e-2
     assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
     mu, sigma, cp, support, abstain = predict(model, te)
     n = len(te)
@@ -220,6 +254,7 @@ if __name__ == "__main__":
              test_reg_variant_shapes_and_dropout,
              test_reg_architecture_variants_shapes,
              test_rnafm_pca_shapes_and_finiteness,
+             test_rnafm_extended_reg_deep_shapes_and_finiteness,
              test_rnafm_pca_train_only_pca_no_leakage,
              test_rnafm_only_pca_shapes]
     failed = 0
