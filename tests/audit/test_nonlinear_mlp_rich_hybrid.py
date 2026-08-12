@@ -230,6 +230,33 @@ def test_robust_t_variant_shapes_and_finiteness():
 
 
 @needs_torch_vienna
+def test_robust_t_df_variants_shapes():
+    """Student-t tail-heaviness sweep (df=3/5/7/10) must fit/predict cleanly.
+
+    Each variant carries its own df through the fit gate and returns finite,
+    correctly-typed outputs with the fixed evaluation sigma=0.7.
+    """
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    for df in (3.0, 5.0, 7.0, 10.0):
+        fit, predict = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=df)
+        model = fit(tr)
+        assert model["n_vienna"] == 21
+        assert model["hidden"] == [96, 64, 32]
+        assert model["df"] == df
+        assert model["gate"]["df"] == df
+        assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+        mu, sigma, cp, support, abstain = predict(model, te)
+        n = len(te)
+        assert mu.shape == (n,) and sigma.shape == (n,)
+        assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+        assert np.allclose(sigma, 0.7)
+        assert cp.min() >= 0.0 and cp.max() <= 1.0
+        assert np.all(np.isfinite(cp))
+        assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
 def test_student_t_survival_matches_scipy():
     """torch survival must match scipy.stats.t.sf and be differentiable."""
     import torch
