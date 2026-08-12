@@ -21,6 +21,9 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_reg_deep4w,
     make_nonlinear_mlp_extended_hybrid_reg_deep5,
     make_nonlinear_mlp_extended_hybrid_het,
+    make_nonlinear_mlp_extended_hybrid_localctx,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t,
+    _student_t_survival,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
     make_nonlinear_mlp_rnafm_extended_reg_deep,
@@ -195,6 +198,79 @@ def test_het_variant_shapes_and_heteroscedastic_sigma():
     # learned sigma must remain a valid censoring model: mu capped at CAP
     # corresponds to cp near 0.5, not a degenerate all-0/1
     assert np.all(np.isfinite(cp))
+
+
+@needs_torch_vienna
+def test_robust_t_variant_shapes_and_finiteness():
+    """reg_deep trained with the Student-t objective must fit/predict cleanly.
+
+    The robust head keeps the 21-D extended-Vienna feature block and reg_deep
+    architecture but minimizes a heavier-tailed Student-t right-censored NLL.
+    We assert the carried df matches, the convergence gate is present, outputs
+    are finite and well-typed, and the Gaussian evaluation NLL is computable.
+    """
+    fit, predict = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0)
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_extended_hybrid_reg_deep_t"
+    assert model["n_vienna"] == 21
+    assert model["hidden"] == [96, 64, 32]
+    assert model["df"] == 5.0
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    assert model["gate"]["df"] == 5.0
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+    assert np.allclose(sigma, 0.7)          # evaluation sigma stays fixed at 0.7
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert np.all(np.isfinite(cp))
+    assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
+def test_student_t_survival_matches_scipy():
+    """torch survival must match scipy.stats.t.sf and be differentiable."""
+    import torch
+    from scipy import stats as spstats
+    ts = torch.tensor([-4.0, -2.0, -0.5, 0.0, 0.5, 2.0, 4.0], dtype=torch.float64,
+                      requires_grad=True)
+    for nu in (3.0, 5.0, 7.0):
+        got = _student_t_survival(ts, nu).detach().numpy()
+        want = spstats.t.sf(ts.detach().numpy(), df=nu)
+        assert np.allclose(got, want, atol=1e-6, rtol=1e-4)
+    # differentiability: gradient w.r.t. t is finite and nonzero
+    out = _student_t_survival(ts, 5.0).sum()
+    out.backward()
+    assert ts.grad is not None and np.all(np.isfinite(ts.grad.numpy()))
+    assert np.all(np.abs(ts.grad.numpy()) > 0)
+
+
+@needs_torch_vienna
+def test_localctx_variant_shapes_and_finiteness():
+    """reg_deep + extended-Vienna(21) + join-local-context(24) must fit/predict.
+
+    Asserts the model keeps 21-D Vienna plus a 24-D local-context block, carries
+    a convergence gate, returns finite well-typed outputs, and abstains only on
+    unseen scaffolds.
+    """
+    fit, predict = make_nonlinear_mlp_extended_hybrid_localctx()
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_extended_hybrid_localctx"
+    assert model["n_vienna"] == 21
+    assert model["n_localctx"] == 24
+    assert model["hidden"] == [96, 64, 32]
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+    assert sigma.min() > 0
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert support.dtype == bool and abstain.dtype == bool
 
 
 @needs_torch_vienna

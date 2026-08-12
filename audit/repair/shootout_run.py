@@ -62,6 +62,8 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_reg_deep4w,
     make_nonlinear_mlp_extended_hybrid_reg_deep5,
     make_nonlinear_mlp_extended_hybrid_het,
+    make_nonlinear_mlp_extended_hybrid_localctx,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
     make_nonlinear_mlp_rnafm_extended_reg_deep,
@@ -93,6 +95,8 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep4w"] = make_nonlinear_mlp_extended_hybrid_reg_deep4w()  # (128,96,64,32)
     U["nonlinear_mlp_extended_hybrid_reg_deep5"] = make_nonlinear_mlp_extended_hybrid_reg_deep5()  # (128,96,64,32,16)
     U["nonlinear_mlp_extended_hybrid_het"] = make_nonlinear_mlp_extended_hybrid_het()  # reg_deep + learned sigma
+    U["nonlinear_mlp_extended_hybrid_localctx"] = make_nonlinear_mlp_extended_hybrid_localctx()  # reg_deep + Vienna21 + localctx24
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0)  # reg_deep + Student-t obj
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)
@@ -510,6 +514,33 @@ def main(cfg):
     rnafm_only_mlp_cluster = _edit_cluster_ci(
         all_preds, admitted, "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy")
 
+    # LOCAL-CONTEXT step: does the position-anchored join-local-context one-hot
+    # block add signal beyond the folding aggregates under the reg_deep arch?
+    localctx_vs_nuisance = _pooled_contrast(
+        all_preds, "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy",
+        "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_extended_hybrid_localctx)")
+    localctx_vs_reg_deep = _pooled_contrast(
+        all_preds, "nonlinear_mlp_extended_hybrid_localctx", "nonlinear_mlp_extended_hybrid_reg_deep",
+        "nonlinear_mlp_extended_hybrid_localctx", "nonlinear_mlp_extended_hybrid_reg_deep",
+        "pooled-OOF junction-macro NLL delta (nonlinear_mlp_extended_hybrid_reg_deep - nonlinear_mlp_extended_hybrid_localctx)")
+    localctx_cluster = _edit_cluster_ci(
+        all_preds, admitted, "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy")
+
+    # ROBUST-LIKELIHOOD step: does training reg_deep with a heavy-tailed
+    # Student-t objective (down-weighting outlier/catastrophic folds) lower the
+    # Gaussian evaluation NLL vs the Gaussian-trained reg_deep?
+    robust_t_vs_nuisance = _pooled_contrast(
+        all_preds, "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy",
+        "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_extended_hybrid_reg_deep_t)")
+    robust_t_vs_reg_deep = _pooled_contrast(
+        all_preds, "nonlinear_mlp_extended_hybrid_reg_deep_t", "nonlinear_mlp_extended_hybrid_reg_deep",
+        "nonlinear_mlp_extended_hybrid_reg_deep_t", "nonlinear_mlp_extended_hybrid_reg_deep",
+        "pooled-OOF junction-macro NLL delta (nonlinear_mlp_extended_hybrid_reg_deep - nonlinear_mlp_extended_hybrid_reg_deep_t)")
+    robust_t_cluster = _edit_cluster_ci(
+        all_preds, admitted, "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy")
+
     report = {
         "axis": "edit_x_nested_context",
         "purpose": "REPRESENTATION_SHOOTOUT",
@@ -679,6 +710,42 @@ def main(cfg):
                      "BETTER than nonlinear_mlp_hybrid (base 11-D). Isolates the "
                      "learned representation under the nonlinear head."),
             "pooled": rnafm_only_mlp_vs_mlp,
+        },
+        "localctx_vs_nuisance": {
+            "note": ("positive delta = nonlinear_mlp_extended_hybrid_localctx "
+                     "(reg_deep + 21-D ViennaRNA + 24-D join-local-context) is "
+                     "BETTER than motif_topology_hierarchy. Tests whether the "
+                     "position-anchored edit-site local-context block adds "
+                     "sequence signal beyond folding aggregates."),
+            "pooled": localctx_vs_nuisance,
+            "edit_cluster": localctx_cluster,
+            "gate_10pct": 0.10,
+        },
+        "localctx_vs_reg_deep": {
+            "note": ("positive delta = nonlinear_mlp_extended_hybrid_localctx is "
+                     "BETTER than nonlinear_mlp_extended_hybrid_reg_deep (same "
+                     "arch, without local-context block). Tests whether the "
+                     "local-context features add increment over the folding-only "
+                     "reg_deep reference."),
+            "pooled": localctx_vs_reg_deep,
+        },
+        "robust_t_vs_nuisance": {
+            "note": ("positive delta = nonlinear_mlp_extended_hybrid_reg_deep_t "
+                     "(reg_deep trained with a heavy-tailed Student-t objective, "
+                     "df=5) is BETTER than motif_topology_hierarchy. Tests whether "
+                     "robust training against outlier/catastrophic folds improves "
+                     "the Gaussian evaluation NLL."),
+            "pooled": robust_t_vs_nuisance,
+            "edit_cluster": robust_t_cluster,
+            "gate_10pct": 0.10,
+        },
+        "robust_t_vs_reg_deep": {
+            "note": ("positive delta = nonlinear_mlp_extended_hybrid_reg_deep_t "
+                     "is BETTER than nonlinear_mlp_extended_hybrid_reg_deep (same "
+                     "arch + features, Gaussian-trained). Tests whether the "
+                     "Student-t training objective improves on the Gaussian "
+                     "objective at equal capacity."),
+            "pooled": robust_t_vs_reg_deep,
         },
     }
     (out / "ShootoutReport.json").write_text(
