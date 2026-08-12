@@ -16,6 +16,7 @@ from audit.benchmark.rnafm_features import (
 )
 from audit.models.rnafm_linear_hybrid import make_rnafm_linear_hybrid
 from audit.models.rnafm_vienna_linear_hybrid import make_rnafm_vienna_linear_hybrid
+from audit.models.rnafm_pca_linear_hybrid import make_rnafm_pca_linear_hybrid
 from audit.benchmark.vienna_features import _RNA as _VIENNA_AVAILABLE
 
 HAVE_VIENNA = _VIENNA_AVAILABLE is not None
@@ -147,6 +148,40 @@ def test_rnafm_vienna_hybrid_fit_predict_shapes():
     assert sigma.min() > 0
 
 
+@pytest.mark.skipif(not HAVE_VIENNA, reason="ViennaRNA unavailable")
+def test_rnafm_pca_hybrid_fit_predict_shapes():
+    fit, predict = make_rnafm_pca_linear_hybrid(_cache(_rows()), k=3)
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "rnafm_pca_linear_hybrid"
+    assert model["n_vienna"] == 11
+    assert model["n_rnafm_pca"] == 3
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert cp.shape == (n,) and abstain.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(cp))
+    assert sigma.min() > 0
+
+
+@pytest.mark.skipif(not HAVE_VIENNA, reason="ViennaRNA unavailable")
+def test_rnafm_pca_train_only_no_leakage():
+    """PCA mean/components must be fit on TRAIN embeddings only."""
+    fit, _ = make_rnafm_pca_linear_hybrid(_cache(_rows()), k=4)
+    rows = _rows()
+    tr = rows[:18]
+    model = fit(tr)
+    tr_jids = sorted({str(r["jid"]) for r in tr})
+    by_jid = build_raw_by_jid(tr, _cache(rows))
+    Xtr = np.asarray([by_jid[j] for j in tr_jids], dtype=float)
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=4).fit(Xtr)
+    assert np.allclose(model["pca_mean"], pca.mean_)
+    # train-only invariance: recomputing PCA on a superset would differ
+    assert model["comps"].shape == (4, RENDER_DIM)
+
+
 if __name__ == "__main__":
     import sys
     from pathlib import Path
@@ -157,6 +192,8 @@ if __name__ == "__main__":
              test_rnafm_hybrid_missing_embedding_fails_closed]
     if HAVE_VIENNA:
         tests.append(test_rnafm_vienna_hybrid_fit_predict_shapes)
+        tests.append(test_rnafm_pca_hybrid_fit_predict_shapes)
+        tests.append(test_rnafm_pca_train_only_no_leakage)
     failed = 0
     for t in tests:
         try:
