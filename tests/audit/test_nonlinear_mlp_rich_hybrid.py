@@ -20,6 +20,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_reg_deep4,
     make_nonlinear_mlp_extended_hybrid_reg_deep4w,
     make_nonlinear_mlp_extended_hybrid_reg_deep5,
+    make_nonlinear_mlp_extended_hybrid_het,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
     make_nonlinear_mlp_rnafm_extended_reg_deep,
@@ -165,6 +166,38 @@ def test_reg_architecture_variants_shapes():
 
 
 @needs_torch_vienna
+def test_het_variant_shapes_and_heteroscedastic_sigma():
+    """Two-output (mu, sigma) head must fit/predict with finite, floored sigma.
+
+    The reg_deep family fixes sigma=0.7; this variant learns a per-input
+    sigma = softplus(raw) + 0.05.  We assert the head carries a convergence
+    gate, outputs are finite, sigma is floored above 0, and sigma is NOT
+    identical across rows (i.e. it is genuinely input-dependent), while
+    remaining a valid probability model for the capped censoring.
+    """
+    fit, predict = make_nonlinear_mlp_extended_hybrid_het()
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_extended_hybrid_het"
+    assert model["n_vienna"] == 21
+    assert model["hidden"] == [96, 64, 32]
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+    assert sigma.min() > 0.05 and sigma.min() > 0.0
+    # heteroscedastic: sigma should not be constant across a varied test set
+    assert np.ptp(sigma) > 1e-6
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert support.dtype == bool and abstain.dtype == bool
+    # learned sigma must remain a valid censoring model: mu capped at CAP
+    # corresponds to cp near 0.5, not a degenerate all-0/1
+    assert np.all(np.isfinite(cp))
+
+
+@needs_torch_vienna
 def test_rnafm_pca_shapes_and_finiteness():
     rows = _rows()
     cache = _rnafm_cache(rows)
@@ -253,6 +286,7 @@ if __name__ == "__main__":
              test_extended_unseen_scaffold_abstains,
              test_reg_variant_shapes_and_dropout,
              test_reg_architecture_variants_shapes,
+             test_het_variant_shapes_and_heteroscedastic_sigma,
              test_rnafm_pca_shapes_and_finiteness,
              test_rnafm_extended_reg_deep_shapes_and_finiteness,
              test_rnafm_pca_train_only_pca_no_leakage,

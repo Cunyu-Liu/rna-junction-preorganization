@@ -201,6 +201,200 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep5():
                                               dropout=0.1, weight_decay=1e-2)
 
 
+_SIGMA_FLOOR = 0.05          # matches the row_nll sigma clamp
+_CAP = -7.1
+_HET_SEED = 17
+
+
+def _train_mlp_het(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
+                   dropout=0.1, weight_decay=1e-2):
+    """Train a two-output MLP that learns BOTH mu and a heteroscedastic sigma.
+
+    The base reg_deep models fix sigma=0.7 in the right-censored Gaussian NLL,
+    so the head only ever optimizes mu.  This variant gives the model a second
+    output that predicts per-input sigma = softplus(raw) + floor, trained with
+    the EXACT right-censored Gaussian NLL used by row_nll:
+
+      measured : 0.5*log(2pi) + log(sigma) + 0.5*((y-mu)/sigma)^2
+      censored : -log Phi((mu-CAP)/sigma)
+
+    Because sigma enters both the measured and censored terms, the model cannot
+    cheat by inflating sigma (that blows up the censored loss).  Early stopping
+    and the eligibility gate mirror _train_mlp so the fold remains auditable.
+    """
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    from audit.models.nonlinear_mlp_hybrid import (
+        MAX_EPOCHS, PATIENCE, LOSS_TOL, PLATEAU_WINDOW, PLATEAU_REL_TOL,
+        BATCH, GRAD_TOL,
+    )
+
+    class _MLP2(nn.Module):
+        def __init__(self, in_dim, hidden):
+            super().__init__()
+            layers = []
+            d = in_dim
+            for h in hidden:
+                layers.append(nn.Linear(d, h))
+                layers.append(nn.ReLU())
+                if dropout > 0.0:
+                    layers.append(nn.Dropout(dropout))
+                d = h
+            self.shared = nn.Sequential(*layers)
+            self.mu_head = nn.Linear(d, 1)
+            self.sigma_head = nn.Linear(d, 1)
+
+        def forward(self, x):
+            h = self.shared(x)
+            mu = self.mu_head(h).squeeze(-1)
+            raw = self.sigma_head(h).squeeze(-1)
+            sigma = F.softplus(raw) + _SIGMA_FLOOR
+            return mu, sigma
+
+    def het_nll(mu, sigma, y, cens):
+        z = (y - mu) / sigma
+        nll_m = 0.5 * torch.log(torch.tensor(2.0 * 3.141592653589793,
+                                             device=mu.device)) + torch.log(sigma) + 0.5 * z * z
+        a = (mu - _CAP) / sigma
+        log_phi = torch.special.log_ndtr(a.clamp(min=-30.0, max=30.0))
+        nll_c = -log_phi
+        return torch.where(cens, nll_c, nll_m).mean()
+
+    torch.manual_seed(_HET_SEED)
+    net = _MLP2(in_dim, hidden).to(device)
+    opt = torch.optim.Adam(net.parameters(), lr=1e-3, weight_decay=weight_decay)
+
+    Xt = torch.tensor(Xtr, dtype=torch.float32, device=device)
+    yt = torch.tensor(ytr, dtype=torch.float32, device=device)
+    ct = torch.tensor(cens_tr, dtype=torch.bool, device=device)
+    n = Xt.shape[0]
+
+    best_loss = float("inf")
+    best_state = None
+    epochs_since_best = 0
+    n_epochs = 0
+    final_loss = float("inf")
+    loss_history = []
+    plateau_reached = False
+    for epoch in range(MAX_EPOCHS):
+        net.train()
+        perm = torch.randperm(n, device=device)
+        epoch_losses = []
+        for start in range(0, n, BATCH):
+            idx = perm[start:start + BATCH]
+            opt.zero_grad()
+            mu, sigma = net(Xt[idx])
+            loss = het_nll(mu, sigma, yt[idx], ct[idx])
+            loss.backward()
+            opt.step()
+            epoch_losses.append(float(loss.detach().cpu()))
+        final_loss = float(np.mean(epoch_losses))
+        loss_history.append(final_loss)
+        n_epochs = epoch + 1
+        if final_loss < best_loss - LOSS_TOL:
+            best_loss = final_loss
+            best_state = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
+            epochs_since_best = 0
+        else:
+            epochs_since_best += 1
+            if epochs_since_best >= PATIENCE:
+                plateau_reached = True
+                break
+        if len(loss_history) >= PLATEAU_WINDOW:
+            base = abs(loss_history[-PLATEAU_WINDOW]) or 1e-8
+            rel = abs(final_loss - loss_history[-PLATEAU_WINDOW]) / base
+            if rel < PLATEAU_REL_TOL:
+                plateau_reached = True
+                break
+
+    net.load_state_dict(best_state)
+    net.eval()
+
+    net.zero_grad()
+    mu_all, sigma_all = net(Xt)
+    lossg = het_nll(mu_all, sigma_all, yt, ct)
+    lossg.backward()
+    gn = 0.0
+    for p in net.parameters():
+        if p.grad is not None:
+            gn += float(torch.norm(p.grad).item() ** 2)
+    total_grad_norm = float(np.sqrt(gn))
+    net.eval()
+
+    params_finite = all(bool(torch.isfinite(p).all().item()) for p in net.parameters())
+    converged = bool(plateau_reached and params_finite and np.isfinite(final_loss))
+    eligible = bool(converged and np.isfinite(total_grad_norm))
+    gate = {
+        "eligible": eligible, "converged": converged,
+        "final_grad_norm": total_grad_norm, "grad_tol": GRAD_TOL,
+        "n_epochs": n_epochs, "max_epochs": MAX_EPOCHS,
+        "final_train_nll": final_loss, "best_train_nll": best_loss,
+        "plateau_reached": plateau_reached, "success": converged,
+        "n_nan_inf_params": int(not params_finite),
+    }
+    return net, gate
+
+
+def make_nonlinear_mlp_extended_hybrid_het(hidden=(96, 64, 32), dropout=0.1,
+                                           weight_decay=1e-2):
+    """Extended-Vienna(21) MLP with a learned heteroscedastic sigma head.
+
+    Same reg_deep feature block as the winning ensemble member, but the head
+    outputs both mu and sigma (softplus-parameterized, floored at 0.05),
+    trained with the exact right-censored Gaussian NLL.  Tests whether letting
+    the model learn per-input uncertainty (instead of the fixed 0.7) lowers the
+    evaluation NLL further.
+    """
+    def fit(train_rows):
+        motifs = sorted({str(r["motif"]) for r in train_rows})
+        scafs = sorted({int(r["scaf"]) for r in train_rows})
+        Xn = _nuisance_basis(train_rows, motifs, scafs)
+        tr_jids = sorted({str(r["jid"]) for r in train_rows})
+        by_jid = vienna_ext_build_raw(train_rows)
+        mean, sd = vienna_ext_fit_scaler(tr_jids, by_jid)
+        Xv = np.zeros((len(train_rows), len(mean)))
+        for i, r in enumerate(train_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, mean, sd)[0]
+        X = np.hstack([Xn, Xv])
+        y = np.asarray([r["y"] for r in train_rows], dtype=float)
+        cens = np.asarray([r["cens"] for r in train_rows], dtype=bool)
+        import torch
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        net, gate = _train_mlp_het(X, y, cens, device, X.shape[1], hidden=hidden,
+                                   dropout=dropout, weight_decay=weight_decay)
+        return {"kind": "nonlinear_mlp_extended_hybrid_het", "net": net,
+                "gate": gate, "motifs": motifs, "scafs": scafs, "mean": mean,
+                "sd": sd, "by_jid": by_jid, "n_nuisance": Xn.shape[1],
+                "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
+                "dropout": dropout, "weight_decay": weight_decay}
+
+    def predict(model, test_rows):
+        import torch
+        Xn = _nuisance_basis(test_rows, model["motifs"], model["scafs"])
+        by_jid = vienna_ext_build_raw(test_rows)
+        Xv = np.zeros((len(test_rows), model["n_vienna"]))
+        for i, r in enumerate(test_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, model["mean"], model["sd"])[0]
+        X = np.hstack([Xn, Xv])
+        model["net"].eval()
+        with torch.no_grad():
+            Xt = torch.tensor(X, dtype=torch.float32, device=model["device"])
+            mu, sigma = model["net"](Xt)
+            mu = mu.cpu().numpy()
+            sigma = sigma.cpu().numpy()
+        from scipy.special import log_ndtr
+        a = (mu + 7.1) / sigma
+        cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
+        seen_scaf = np.zeros(len(mu), dtype=bool)
+        for i, r in enumerate(test_rows):
+            if int(r["scaf"]) in model["scafs"]:
+                seen_scaf[i] = True
+        return mu, sigma, cp, seen_scaf, ~seen_scaf
+
+    return fit, predict
+
+
 def make_nonlinear_mlp_rnafm_extended_reg_deep(cache: dict, k: int = DEFAULT_K,
                                                hidden=(96, 64, 32), dropout=0.1,
                                                weight_decay=1e-2):
