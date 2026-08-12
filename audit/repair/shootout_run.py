@@ -54,6 +54,10 @@ from audit.models.nonlinear_mlp_hybrid import NONLINEAR_MLP_HYBRID
 from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid,
     make_nonlinear_mlp_extended_hybrid_reg,
+    make_nonlinear_mlp_extended_hybrid_reg_strong,
+    make_nonlinear_mlp_extended_hybrid_reg_light,
+    make_nonlinear_mlp_extended_hybrid_reg_wider,
+    make_nonlinear_mlp_extended_hybrid_reg_deep,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
 )
@@ -76,6 +80,10 @@ def _universe(rnafm_cache=None):
     U.update(NONLINEAR_MLP_HYBRID)                 # nonlinear MLP on the winning feature set
     U["nonlinear_mlp_extended_hybrid"] = make_nonlinear_mlp_extended_hybrid()  # MLP + 21-D ViennaRNA
     U["nonlinear_mlp_extended_hybrid_reg"] = make_nonlinear_mlp_extended_hybrid_reg()  # dropout=0.1, wd=1e-2
+    U["nonlinear_mlp_extended_hybrid_reg_strong"] = make_nonlinear_mlp_extended_hybrid_reg_strong()  # do=0.2, wd=3e-2
+    U["nonlinear_mlp_extended_hybrid_reg_light"] = make_nonlinear_mlp_extended_hybrid_reg_light()  # do=0.05, wd=1e-2
+    U["nonlinear_mlp_extended_hybrid_reg_wider"] = make_nonlinear_mlp_extended_hybrid_reg_wider()  # (128,64)
+    U["nonlinear_mlp_extended_hybrid_reg_deep"] = make_nonlinear_mlp_extended_hybrid_reg_deep()  # (96,64,32)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)

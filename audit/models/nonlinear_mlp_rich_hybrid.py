@@ -128,6 +128,46 @@ def make_nonlinear_mlp_extended_hybrid_reg(hidden=(64, 32), dropout=0.1,
                                               weight_decay=weight_decay)
 
 
+def make_nonlinear_mlp_extended_hybrid_reg_strong():
+    """Extended-MLP with stronger regularization (dropout=0.2, wd=3e-2).
+
+    Probe whether more aggressive regularization on the 21-D folding features
+    pushes the robust mean NLL even lower without erasing signal.
+    """
+    return make_nonlinear_mlp_extended_hybrid(hidden=(64, 32), dropout=0.2,
+                                              weight_decay=3e-2)
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_light():
+    """Extended-MLP with lighter dropout (0.05) at the same wd=1e-2.
+
+    Probe whether a milder regularizer retains more signal while still taming
+    the catastrophic folds seen in the un-regularized 21-D model.
+    """
+    return make_nonlinear_mlp_extended_hybrid(hidden=(64, 32), dropout=0.05,
+                                              weight_decay=1e-2)
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_wider():
+    """Extended-MLP with a wider hidden layer (128,64) at the reference reg.
+
+    Probe whether more capacity helps the nonlinear head fit the 21-D folding
+    features once regularization already prevents catastrophic overfitting.
+    """
+    return make_nonlinear_mlp_extended_hybrid(hidden=(128, 64), dropout=0.1,
+                                              weight_decay=1e-2)
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_deep():
+    """Extended-MLP with a third hidden layer (96,64,32) at the reference reg.
+
+    Probe whether depth adds representational power on the richer folding
+    representation, again under the reference regularization budget.
+    """
+    return make_nonlinear_mlp_extended_hybrid(hidden=(96, 64, 32), dropout=0.1,
+                                              weight_decay=1e-2)
+
+
 def make_nonlinear_mlp_rnafm_pca_hybrid(cache: dict, k: int = DEFAULT_K,
                                         hidden=(64, 32)):
     """Return (fit, predict) for MLP on nuisance + ViennaRNA(11) + RNA-FM-PCA(K)."""

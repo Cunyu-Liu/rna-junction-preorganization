@@ -13,6 +13,10 @@ from audit.models.nonlinear_mlp_hybrid import HAVE_TORCH
 from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid,
     make_nonlinear_mlp_extended_hybrid_reg,
+    make_nonlinear_mlp_extended_hybrid_reg_strong,
+    make_nonlinear_mlp_extended_hybrid_reg_light,
+    make_nonlinear_mlp_extended_hybrid_reg_wider,
+    make_nonlinear_mlp_extended_hybrid_reg_deep,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
 )
@@ -123,6 +127,36 @@ def test_reg_variant_shapes_and_dropout():
 
 
 @needs_torch_vienna
+def test_reg_architecture_variants_shapes():
+    """All regularization/architecture probes must fit and predict cleanly.
+
+    Each probe is the same 21-D extended-Vienna MLP under a different
+    (dropout, weight_decay, hidden) budget; all must yield finite, correctly
+    shaped, support/abstain-typed outputs with a recorded convergence gate.
+    """
+    factories = [
+        make_nonlinear_mlp_extended_hybrid_reg_strong,
+        make_nonlinear_mlp_extended_hybrid_reg_light,
+        make_nonlinear_mlp_extended_hybrid_reg_wider,
+        make_nonlinear_mlp_extended_hybrid_reg_deep,
+    ]
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    for make in factories:
+        fit, predict = make()
+        model = fit(tr)
+        assert model["n_vienna"] == 21
+        assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+        assert model["hidden"] == list(model["hidden"])
+        mu, sigma, cp, support, abstain = predict(model, te)
+        assert mu.shape == (len(te),) and sigma.shape == (len(te),)
+        assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+        assert sigma.min() > 0
+        assert cp.min() >= 0 and cp.max() <= 1.0
+        assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
 def test_rnafm_pca_shapes_and_finiteness():
     rows = _rows()
     cache = _rnafm_cache(rows)
@@ -184,6 +218,7 @@ if __name__ == "__main__":
              test_extended_train_only_scaling_no_leakage,
              test_extended_unseen_scaffold_abstains,
              test_reg_variant_shapes_and_dropout,
+             test_reg_architecture_variants_shapes,
              test_rnafm_pca_shapes_and_finiteness,
              test_rnafm_pca_train_only_pca_no_leakage,
              test_rnafm_only_pca_shapes]
