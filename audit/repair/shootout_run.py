@@ -48,6 +48,15 @@ from audit.models.vienna_linear_hybrid import VIENNA_LINEAR_HYBRID
 from audit.models.vienna_extended_linear_hybrid import VIENNA_EXTENDED_LINEAR_HYBRID
 from audit.models.rnafm_linear_hybrid import make_rnafm_linear_hybrid
 from audit.models.rnafm_vienna_linear_hybrid import make_rnafm_vienna_linear_hybrid
+from audit.models.rnafm_pca_linear_hybrid import make_rnafm_pca_linear_hybrid
+from audit.models.vienna_interaction_linear_hybrid import VIENNA_INTERACTION_LINEAR_HYBRID
+from audit.models.nonlinear_mlp_hybrid import NONLINEAR_MLP_HYBRID
+from audit.models.nonlinear_mlp_rich_hybrid import (
+    make_nonlinear_mlp_extended_hybrid,
+    make_nonlinear_mlp_extended_hybrid_reg,
+    make_nonlinear_mlp_rnafm_pca_hybrid,
+    make_nonlinear_mlp_rnafm_only_pca_hybrid,
+)
 from audit.repair.fold_loader import build_joint_edit_context_folds
 from audit.repair.optimizer_gate import gate_from_fit, unbounded_fit_gate
 
@@ -63,9 +72,16 @@ def _universe(rnafm_cache=None):
     U.update({k: PHASE1_MODELS[k] for k in ("onehot_kmer_ridge",)})  # k-mer plain linear
     U.update(VIENNA_LINEAR_HYBRID)                 # winning linear head + ViennaRNA
     U.update(VIENNA_EXTENDED_LINEAR_HYBRID)        # winning linear head + extended ViennaRNA
+    U.update(VIENNA_INTERACTION_LINEAR_HYBRID)     # winning linear head + Vienna x scaffold/motif interactions
+    U.update(NONLINEAR_MLP_HYBRID)                 # nonlinear MLP on the winning feature set
+    U["nonlinear_mlp_extended_hybrid"] = make_nonlinear_mlp_extended_hybrid()  # MLP + 21-D ViennaRNA
+    U["nonlinear_mlp_extended_hybrid_reg"] = make_nonlinear_mlp_extended_hybrid_reg()  # dropout=0.1, wd=1e-2
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)
+        U["rnafm_pca_linear_hybrid"] = make_rnafm_pca_linear_hybrid(rnafm_cache)
+        U["nonlinear_mlp_rnafm_pca_hybrid"] = make_nonlinear_mlp_rnafm_pca_hybrid(rnafm_cache)
+        U["nonlinear_mlp_rnafm_only_pca_hybrid"] = make_nonlinear_mlp_rnafm_only_pca_hybrid(rnafm_cache)
     return U
 
 
@@ -96,11 +112,18 @@ def _param_count(model: dict) -> int:
 
 
 def _convergence_row(axis, fold, model_id, model, gate, runtime, elig):
+    # Diagnostics live on the gate record for hybrid/MLP models (which store
+    # optimizer state under "gate"); fall back to top-level fields for the
+    # legacy latent-operator models that keep them at the top level.
+    success = bool(model.get("success", gate.get("success", True)))
+    opt_msg = str(model.get("optimizer_message", gate.get("optimizer_message", "")))
+    fgn = model.get("final_grad_norm", gate.get("final_grad_norm", float("nan")))
+    n_iter = int(model.get("nit", gate.get("n_iter", gate.get("n_epochs", -1))))
     base = {"axis": axis, "fold": str(fold), "model_id": model_id,
-            "success": bool(model.get("success", True)),
-            "optimizer_message": str(model.get("optimizer_message", "")),
-            "final_grad_norm": float(model.get("final_grad_norm", float("nan"))),
-            "n_iter": int(model.get("nit", -1)),
+            "success": success,
+            "optimizer_message": opt_msg,
+            "final_grad_norm": float(fgn) if fgn is not None else float("nan"),
+            "n_iter": n_iter,
             "n_param": _param_count(model),
             "runtime_s": round(runtime, 3),
             "eligible": bool(gate.get("eligible", False)),
@@ -108,7 +131,9 @@ def _convergence_row(axis, fold, model_id, model, gate, runtime, elig):
             "elig_reason": elig.get("reason"),
             **({k: gate[k] for k in
                 ("projected_grad_norm", "proj_grad_tol", "n_bound_hits",
-                 "n_nan_inf_params", "grad_tol")
+                 "n_nan_inf_params", "grad_tol", "converged", "n_epochs",
+                 "max_epochs", "final_train_nll", "best_train_nll",
+                 "plateau_reached")
                 if k in gate})}
     return base
 
@@ -392,6 +417,80 @@ def main(cfg):
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - rnafm_vienna_linear_hybrid)")
     rnafmvienna_cluster = _edit_cluster_ci(
         all_preds, admitted, "rnafm_vienna_linear_hybrid", "motif_topology_hierarchy")
+    rnafm_pca_vs_vienna = _pooled_contrast(
+        all_preds, "rnafm_pca_linear_hybrid", "vienna_linear_hybrid",
+        "rnafm_pca_linear_hybrid", "vienna_linear_hybrid",
+        "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - rnafm_pca_linear_hybrid)")
+    rnafm_pca_vs_nuisance = _pooled_contrast(
+        all_preds, "rnafm_pca_linear_hybrid", "motif_topology_hierarchy",
+        "rnafm_pca_linear_hybrid", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - rnafm_pca_linear_hybrid)")
+    rnafm_pca_cluster = _edit_cluster_ci(
+        all_preds, admitted, "rnafm_pca_linear_hybrid", "motif_topology_hierarchy")
+
+    # NONLINEAR/INTERACTION: does adding Vienna x scaffold/motif interactions or
+    # replacing the linear head with an MLP capture the residual sequence signal?
+    interact_vs_nuisance = _pooled_contrast(
+        all_preds, "vienna_interaction_linear_hybrid", "motif_topology_hierarchy",
+        "vienna_interaction_linear_hybrid", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - vienna_interaction_linear_hybrid)")
+    interact_vs_vienna = _pooled_contrast(
+        all_preds, "vienna_interaction_linear_hybrid", "vienna_linear_hybrid",
+        "vienna_interaction_linear_hybrid", "vienna_linear_hybrid",
+        "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - vienna_interaction_linear_hybrid)")
+    interact_cluster = _edit_cluster_ci(
+        all_preds, admitted, "vienna_interaction_linear_hybrid", "motif_topology_hierarchy")
+
+    mlp_vs_nuisance = _pooled_contrast(
+        all_preds, "nonlinear_mlp_hybrid", "motif_topology_hierarchy",
+        "nonlinear_mlp_hybrid", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_hybrid)")
+    mlp_vs_vienna = _pooled_contrast(
+        all_preds, "nonlinear_mlp_hybrid", "vienna_linear_hybrid",
+        "nonlinear_mlp_hybrid", "vienna_linear_hybrid",
+        "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - nonlinear_mlp_hybrid)")
+    mlp_cluster = _edit_cluster_ci(
+        all_preds, admitted, "nonlinear_mlp_hybrid", "motif_topology_hierarchy")
+
+    # RICHER-FEATURE NONLINEAR step: does the nonlinear head finally unlock the
+    # richer representations (21-D ViennaRNA, RNA-FM-PCA) that saturated the
+    # linear head?  Contrast each against the base nonlinear MLP and nuisance.
+    ext_mlp_vs_nuisance = _pooled_contrast(
+        all_preds, "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy",
+        "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_extended_hybrid)")
+    ext_mlp_vs_mlp = _pooled_contrast(
+        all_preds, "nonlinear_mlp_extended_hybrid", "nonlinear_mlp_hybrid",
+        "nonlinear_mlp_extended_hybrid", "nonlinear_mlp_hybrid",
+        "pooled-OOF junction-macro NLL delta (nonlinear_mlp_hybrid - nonlinear_mlp_extended_hybrid)")
+    ext_mlp_cluster = _edit_cluster_ci(
+        all_preds, admitted, "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy")
+
+    rnafm_mlp_vs_nuisance = _pooled_contrast(
+        all_preds, "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy",
+        "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_rnafm_pca_hybrid)")
+    rnafm_mlp_vs_mlp = _pooled_contrast(
+        all_preds, "nonlinear_mlp_rnafm_pca_hybrid", "nonlinear_mlp_hybrid",
+        "nonlinear_mlp_rnafm_pca_hybrid", "nonlinear_mlp_hybrid",
+        "pooled-OOF junction-macro NLL delta (nonlinear_mlp_hybrid - nonlinear_mlp_rnafm_pca_hybrid)")
+    rnafm_mlp_vs_rnafm_lin = _pooled_contrast(
+        all_preds, "nonlinear_mlp_rnafm_pca_hybrid", "rnafm_pca_linear_hybrid",
+        "nonlinear_mlp_rnafm_pca_hybrid", "rnafm_pca_linear_hybrid",
+        "pooled-OOF junction-macro NLL delta (rnafm_pca_linear_hybrid - nonlinear_mlp_rnafm_pca_hybrid)")
+    rnafm_mlp_cluster = _edit_cluster_ci(
+        all_preds, admitted, "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy")
+
+    rnafm_only_mlp_vs_nuisance = _pooled_contrast(
+        all_preds, "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy",
+        "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy",
+        "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_rnafm_only_pca_hybrid)")
+    rnafm_only_mlp_vs_mlp = _pooled_contrast(
+        all_preds, "nonlinear_mlp_rnafm_only_pca_hybrid", "nonlinear_mlp_hybrid",
+        "nonlinear_mlp_rnafm_only_pca_hybrid", "nonlinear_mlp_hybrid",
+        "pooled-OOF junction-macro NLL delta (nonlinear_mlp_hybrid - nonlinear_mlp_rnafm_only_pca_hybrid)")
+    rnafm_only_mlp_cluster = _edit_cluster_ci(
+        all_preds, admitted, "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy")
 
     report = {
         "axis": "edit_x_nested_context",
@@ -470,6 +569,98 @@ def main(cfg):
             "pooled": rnafmvienna_vs_nuisance,
             "edit_cluster": rnafmvienna_cluster,
             "gate_10pct": 0.10,
+        },
+        "rnafm_pca_vs_vienna": {
+            "note": ("positive delta = rnafm_pca_linear_hybrid (RNA-FM PCA-reduced "
+                     "to 64-D, train-only) is BETTER than vienna_linear_hybrid. Tests "
+                     "whether the learned representation adds increment once "
+                     "dimensional overfitting is removed."),
+            "pooled": rnafm_pca_vs_vienna,
+        },
+        "rnafm_pca_vs_nuisance": {
+            "note": ("positive delta = rnafm_pca_linear_hybrid is BETTER than "
+                     "motif_topology_hierarchy."),
+            "pooled": rnafm_pca_vs_nuisance,
+            "edit_cluster": rnafm_pca_cluster,
+            "gate_10pct": 0.10,
+        },
+        "interaction_vs_nuisance": {
+            "note": ("positive delta = vienna_interaction_linear_hybrid (winning "
+                     "head + ViennaRNA x scaffold/motif interactions) is BETTER than "
+                     "motif_topology_hierarchy. Tests whether the residual sequence "
+                     "signal is interactive (scaffold/motif-dependent)."),
+            "pooled": interact_vs_nuisance,
+            "edit_cluster": interact_cluster,
+            "gate_10pct": 0.10,
+        },
+        "interaction_vs_vienna": {
+            "note": ("positive delta = vienna_interaction_linear_hybrid is BETTER "
+                     "than vienna_linear_hybrid (base 11-D). Tests whether the "
+                     "interaction blocks push the sequence increment further."),
+            "pooled": interact_vs_vienna,
+        },
+        "mlp_vs_nuisance": {
+            "note": ("positive delta = nonlinear_mlp_hybrid (shallow MLP on the "
+                     "winning feature set, right-censored NLL) is BETTER than "
+                     "motif_topology_hierarchy. Tests whether nonlinearity captures "
+                     "signal a linear head cannot."),
+            "pooled": mlp_vs_nuisance,
+            "edit_cluster": mlp_cluster,
+            "gate_10pct": 0.10,
+        },
+        "mlp_vs_vienna": {
+            "note": ("positive delta = nonlinear_mlp_hybrid is BETTER than "
+                     "vienna_linear_hybrid (linear head, same features). Tests "
+                     "whether nonlinearity adds increment over the linear head."),
+            "pooled": mlp_vs_vienna,
+        },
+        "extended_mlp_vs_nuisance": {
+            "note": ("positive delta = nonlinear_mlp_extended_hybrid (nonlinear "
+                     "head + 21-D ViennaRNA) is BETTER than motif_topology_hierarchy."),
+            "pooled": ext_mlp_vs_nuisance,
+            "edit_cluster": ext_mlp_cluster,
+            "gate_10pct": 0.10,
+        },
+        "extended_mlp_vs_mlp": {
+            "note": ("positive delta = nonlinear_mlp_extended_hybrid (21-D) is "
+                     "BETTER than nonlinear_mlp_hybrid (11-D). Tests whether the "
+                     "nonlinear head unlocks the richer folding representation."),
+            "pooled": ext_mlp_vs_mlp,
+        },
+        "rnafm_mlp_vs_nuisance": {
+            "note": ("positive delta = nonlinear_mlp_rnafm_pca_hybrid (nonlinear "
+                     "head + 11-D ViennaRNA + RNA-FM-PCA) is BETTER than "
+                     "motif_topology_hierarchy."),
+            "pooled": rnafm_mlp_vs_nuisance,
+            "edit_cluster": rnafm_mlp_cluster,
+            "gate_10pct": 0.10,
+        },
+        "rnafm_mlp_vs_mlp": {
+            "note": ("positive delta = nonlinear_mlp_rnafm_pca_hybrid is BETTER "
+                     "than nonlinear_mlp_hybrid (base 11-D). Tests whether the "
+                     "nonlinear head unlocks the learned RNA-FM representation."),
+            "pooled": rnafm_mlp_vs_mlp,
+        },
+        "rnafm_mlp_vs_rnafm_linear": {
+            "note": ("positive delta = nonlinear_mlp_rnafm_pca_hybrid is BETTER "
+                     "than rnafm_pca_linear_hybrid (same features, linear head). "
+                     "Tests whether nonlinearity unlocks RNA-FM that the linear "
+                     "head could not."),
+            "pooled": rnafm_mlp_vs_rnafm_lin,
+        },
+        "rnafm_only_mlp_vs_nuisance": {
+            "note": ("positive delta = nonlinear_mlp_rnafm_only_pca_hybrid "
+                     "(nonlinear head + RNA-FM-PCA only) is BETTER than "
+                     "motif_topology_hierarchy."),
+            "pooled": rnafm_only_mlp_vs_nuisance,
+            "edit_cluster": rnafm_only_mlp_cluster,
+            "gate_10pct": 0.10,
+        },
+        "rnafm_only_mlp_vs_mlp": {
+            "note": ("positive delta = nonlinear_mlp_rnafm_only_pca_hybrid is "
+                     "BETTER than nonlinear_mlp_hybrid (base 11-D). Isolates the "
+                     "learned representation under the nonlinear head."),
+            "pooled": rnafm_only_mlp_vs_mlp,
         },
     }
     (out / "ShootoutReport.json").write_text(

@@ -1,0 +1,17 @@
+{
+  "run_root": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z",
+  "canonical_source": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/source/tecto_v111_canonical_records.jsonl",
+  "out_subdir": "r11_nonlinear_rich_smoke",
+  "rnafm_cache": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/rnafm_junction_embeddings.npz",
+  "models": [
+    "nonlinear_mlp_extended_hybrid",
+    "nonlinear_mlp_extended_hybrid_reg",
+    "nonlinear_mlp_rnafm_pca_hybrid",
+    "nonlinear_mlp_rnafm_only_pca_hybrid",
+    "nonlinear_mlp_hybrid",
+    "rnafm_pca_linear_hybrid",
+    "vienna_linear_hybrid",
+    "motif_topology_hierarchy"
+  ],
+  "max_folds": 2
+}
