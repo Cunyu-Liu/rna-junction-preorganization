@@ -1,0 +1,61 @@
+# r19-r21 鲁棒似然头部与 df 多样集成方法改进审计
+
+日期：2026-08-13
+
+## 背景
+
+按合同思路继续优化 D2T-RNA_v7 模型效果。此前所有"加特征/加容量"方向（RNA-FM、deep4/5、
+异方差 sigma、局部上下文 one-hot）均被否决，只有方差缩减（mu-ensemble）有效。本阶段转向
+**鲁棒似然头部**（重尾 Student-t 训练目标）并在其上叠加 df 多样 mu-集成，最后做**独立种子复现**。
+
+## 方法
+
+- **Student-t 右删失 NLL**：`audit/models/nonlinear_mlp_rich_hybrid.py` 中 `_train_mlp_t`。
+  使用 df 自由度的 Student-t 分布替换 Gaussian NLL，通过自定义可微正则化不完全 Beta 函数
+  （Lentz 连分数）计算生存函数，梯度用 Student-t pdf 精确给出。评估目标保持不变
+  （固定 sigma=0.7 的右删失 Gaussian NLL），仅训练目标不同。
+- **df 扫描（r20）**：37 个 blocked fold，df ∈ {3,5,7,10}，对照 reg_deep(Gaussian) 与 nuisance。
+- **df 多样集成**：对同一 fold 上各变体的 mu 取平均（共享固定 sigma=0.7）。
+- **独立种子复现（r21）**：seed=99 重训 4 个集成成员（reg_deep/t5/t7/t10），37 fold 完整复现，
+  验证方法增益非单一初始化侥幸。
+
+## 结果：pooled junction-macro NLL（越低越好）
+
+### r20 df 扫描（原始 seed）
+
+| 模型 | NLL | vs nuisance |
+|------|-----|-----------|
+| nuisance | 1.0916 | — |
+| reg_deep (Gaussian) | 0.9479 | +13.2% |
+| Student-t df=3 | 1.0228 | 更差 |
+| Student-t df=5 | 0.9140 | +16.3% |
+| Student-t df=7 | 0.9129 | +16.4% |
+| Student-t df=10 | 0.9138 | +16.3% |
+
+### df 多样集成（4 成员：reg_deep + t5 + t7 + t10）
+
+| 集成 | NLL | vs nuisance | edit-cluster CI |
+|------|-----|-----------|----------------|
+| 原始 seed 4x | 0.9012 | +17.44% | [0.145, 0.250] |
+| **seed=99 复现 4x** | **0.8866** | **+18.78%** | **[0.159, 0.286]** |
+| 跨 seed 8x | 0.8896 | +18.51% | [0.156, 0.277] |
+
+两个独立种子均以 CI 排除 0 通过 10% gate，增益稳定在 **+17.4%~+18.8%**。
+
+## 结论
+
+- **鲁棒似然头部有效**：df≥5 的 Student-t 训练目标在等容量下稳定优于 Gaussian（约 +3.6%，
+  robust_t_vs_reg_deep）；df=3 过重尾有害。
+- **df 多样集成是当前最佳方法**：跨两个独立种子复现均以排除 0 的 CI 通过 10% gate。
+- 复现产物、manifest 与预测存于 `/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/`
+  `r20_robust_t_df_sweep/` 与 `r21_seed99_replication/`。
+
+## 代码与提交
+
+- 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 参数）、
+  `audit/models/nonlinear_mlp_rich_hybrid.py`（Student-t 训练目标、seed 线程化、
+  seed-diverse 变体）、`audit/repair/shootout_run.py`（注册 t3/t5/t7/t10 与 _s99 变体）、
+  `tests/audit/test_nonlinear_mlp_rich_hybrid.py`。
+- 新增配置：`shootout_r20_robust_t_df_sweep_cfg.json`、`shootout_r21_seed99_replication_cfg.json`。
+- 提交：`9fff7f2`（branch `r0_audit_repair_20260811`）。
+- 单元测试：22 passed。
