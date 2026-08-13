@@ -105,6 +105,11 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep_t_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=99)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, seed=99)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, seed=99)
+    # SWA (stochastic weight averaging) over the last swa_n converged epochs:
+    # variance reduction at the weight level, matching the mu-ensemble theme.
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, swa_n=10)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, swa_n=10)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t10_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, swa_n=10)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)

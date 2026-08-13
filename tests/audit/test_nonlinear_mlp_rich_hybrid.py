@@ -306,6 +306,32 @@ def test_gaussian_reg_deep_seed_threading():
 
 
 @needs_torch_vienna
+def test_robust_t_swa_shapes_and_finiteness():
+    """reg_deep_t with SWA (swa_n>0) must fit/predict cleanly and record swa_n."""
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    fit, predict = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, swa_n=10)
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_extended_hybrid_reg_deep_t"
+    assert model["df"] == 7.0
+    assert model["swa_n"] == 10
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+    assert np.allclose(sigma, 0.7)
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert np.all(np.isfinite(cp))
+    assert support.dtype == bool and abstain.dtype == bool
+    # SWA must actually change the fit vs. no-SWA (same seed)
+    fit0, pred0 = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, swa_n=0)
+    m0 = fit0(tr)
+    mu0, s0, cp0, su0, ab0 = pred0(m0, te)
+    assert not np.allclose(mu, mu0)  # SWA vs best-epoch differ on the same seed
+
+
+@needs_torch_vienna
 def test_student_t_survival_matches_scipy():
     import torch
     from scipy import stats as spstats

@@ -473,7 +473,7 @@ def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1):
 
 def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
                  dropout=0.1, weight_decay=1e-2, df=_DEFAULT_DF,
-                 seed=_T_SEED,
+                 seed=_T_SEED, swa_n=0,
                  lr=LR, max_epochs=MAX_EPOCHS, patience=PATIENCE,
                  loss_tol=LOSS_TOL, plateau_window=PLATEAU_WINDOW,
                  plateau_rel_tol=PLATEAU_REL_TOL):
@@ -505,6 +505,9 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
     final_loss = float("inf")
     loss_history = []
     plateau_reached = False
+    # SWA: rolling average of the last `swa_n` epochs' weights.
+    swa_sum = None        # running sum (float32) of recent weights
+    swa_epochs = []       # recent state dicts (kept only if swa_n>0)
     for epoch in range(max_epochs):
         net.train()
         perm = torch.randperm(n, device=device)
@@ -520,6 +523,18 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
         final_loss = float(np.mean(epoch_losses))
         loss_history.append(final_loss)
         n_epochs = epoch + 1
+        if swa_n > 0:
+            sd = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
+            swa_epochs.append(sd)
+            if swa_sum is None:
+                swa_sum = {k: v.detach().clone() for k, v in sd.items()}
+            else:
+                for k in sd:
+                    swa_sum[k].add_(sd[k])
+            if len(swa_epochs) > swa_n:
+                dropped = swa_epochs.pop(0)
+                for k in sd:
+                    swa_sum[k].sub_(dropped[k])
         if final_loss < best_loss - loss_tol:
             best_loss = final_loss
             best_state = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
@@ -536,7 +551,15 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
                 plateau_reached = True
                 break
 
-    net.load_state_dict(best_state)
+    if swa_n > 0 and swa_sum is not None and len(swa_epochs) > 0:
+        nk = len(swa_epochs)
+        swa_state = {k: (swa_sum[k] / float(nk)).clone() for k in swa_sum}
+        if all(bool(torch.isfinite(swa_state[k]).all().item()) for k in swa_state):
+            net.load_state_dict(swa_state)
+        else:
+            net.load_state_dict(best_state)
+    else:
+        net.load_state_dict(best_state)
     net.eval()
 
     net.zero_grad()
@@ -699,7 +722,8 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
                                                   hidden=(96, 64, 32),
                                                   dropout=0.1,
                                                   weight_decay=1e-2,
-                                                  seed=_T_SEED):
+                                                  seed=_T_SEED,
+                                                  swa_n=0):
     """reg_deep MLP trained with a robust right-censored Student-t objective.
 
     Same winning feature block (nuisance + 21-D extended-Vienna, reg_deep arch)
@@ -727,13 +751,13 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
         net, gate = _train_mlp_t(X, y, cens, device, X.shape[1], hidden=hidden,
                                  dropout=dropout, weight_decay=weight_decay,
-                                 df=df, seed=seed)
+                                 df=df, seed=seed, swa_n=swa_n)
         return {"kind": "nonlinear_mlp_extended_hybrid_reg_deep_t", "net": net,
                 "gate": gate, "motifs": motifs, "scafs": scafs, "mean": mean,
                 "sd": sd, "by_jid": by_jid, "n_nuisance": Xn.shape[1],
                 "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
                 "dropout": dropout, "weight_decay": weight_decay, "df": float(df),
-                "seed": int(seed)}
+                "seed": int(seed), "swa_n": int(swa_n)}
 
     def predict(model, test_rows):
         import torch

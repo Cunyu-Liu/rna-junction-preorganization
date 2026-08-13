@@ -119,7 +119,7 @@ def _train_mlp(Xtr, ytr, cens_tr, device, in_dim, hidden=(64, 32),
                dropout=0.0, weight_decay=WEIGHT_DECAY, lr=LR,
                max_epochs=MAX_EPOCHS, patience=PATIENCE, loss_tol=LOSS_TOL,
                plateau_window=PLATEAU_WINDOW, plateau_rel_tol=PLATEAU_REL_TOL,
-               seed=SEED):
+               seed=SEED, swa_n=0):
     torch.manual_seed(SEED if seed is None else seed)
     net = _MLP(in_dim, hidden=hidden, dropout=dropout).to(device)
     opt = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
@@ -136,6 +136,10 @@ def _train_mlp(Xtr, ytr, cens_tr, device, in_dim, hidden=(64, 32),
     final_loss = float("inf")
     loss_history = []
     plateau_reached = False
+    # SWA: rolling average of the last `swa_n` epochs' weights.
+    swa_sum = None        # running sum (float32) of recent weights
+    swa_count = 0         # number of states folded into swa_sum
+    swa_epochs = []       # recent state dicts (kept only if swa_n>0)
     for epoch in range(max_epochs):
         net.train()
         perm = torch.randperm(n, device=device)
@@ -151,6 +155,18 @@ def _train_mlp(Xtr, ytr, cens_tr, device, in_dim, hidden=(64, 32),
         final_loss = float(np.mean(epoch_losses))
         loss_history.append(final_loss)
         n_epochs = epoch + 1
+        if swa_n > 0:
+            sd = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
+            swa_epochs.append(sd)
+            if swa_sum is None:
+                swa_sum = {k: v.detach().clone() for k, v in sd.items()}
+            else:
+                for k in sd:
+                    swa_sum[k].add_(sd[k])
+            if len(swa_epochs) > swa_n:
+                dropped = swa_epochs.pop(0)
+                for k in sd:
+                    swa_sum[k].sub_(dropped[k])
         if final_loss < best_loss - loss_tol:
             best_loss = final_loss
             best_state = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
@@ -168,7 +184,17 @@ def _train_mlp(Xtr, ytr, cens_tr, device, in_dim, hidden=(64, 32),
                 plateau_reached = True
                 break
 
-    net.load_state_dict(best_state)
+    if swa_n > 0 and swa_sum is not None and len(swa_epochs) > 0:
+        nk = len(swa_epochs)
+        swa_state = {k: (swa_sum[k] / float(nk)).clone() for k in swa_sum}
+        # If SWA weights are finite, prefer them (variance-reduced); else fall
+        # back to the single best-epoch checkpoint.
+        if all(bool(torch.isfinite(swa_state[k]).all().item()) for k in swa_state):
+            net.load_state_dict(swa_state)
+        else:
+            net.load_state_dict(best_state)
+    else:
+        net.load_state_dict(best_state)
     net.eval()
 
     # representative gradient norm over all params on the best state
