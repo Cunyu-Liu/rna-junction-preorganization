@@ -24,6 +24,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_localctx,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
+    make_nonlinear_mlp_nuisance_only_t,
     _student_t_survival,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
@@ -379,6 +380,37 @@ def test_robust_t_dropout_threading():
         assert np.all(np.isfinite(mu)) and np.allclose(sigma, 0.7)
         assert cp.min() >= 0.0 and cp.max() <= 1.0
         assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
+def test_nuisance_only_t7_shapes_and_ablation():
+    """nuisance-only t7 (no ViennaRNA) must fit/predict cleanly, with gate.
+
+    This is the matched ablation for the 3x t7 ensemble.  The fit must be clean
+    even without ViennaRNA features, and the number of features must be exactly
+    [1 + n_motifs + n_scafs + 3] (motif one-hot, scaffold one-hot, topology).
+    """
+    fit, predict = make_nonlinear_mlp_nuisance_only_t(df=7.0)
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_nuisance_only_t"
+    assert model["df"] == 7.0
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    # no Vienna features: n_nuisance = 1 + 3 motifs + 3 scafs + 3 topology = 10
+    assert model["n_nuisance"] == 1 + len({r["motif"] for r in tr}) + len({r["scaf"] for r in tr}) + 3
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.allclose(sigma, 0.7)
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert support.dtype == bool and abstain.dtype == bool
+    # unseen scaffold must abstain
+    te2 = [{"source_row_id": "R999", "jid": "j99", "motif": "0x1", "scaf": 99,
+            "y": -6.0, "cens": 0, "junction_seq": "AAAA_BBBB",
+            "helix_seq": "h99", "symmetry_key": "AAAA_BBBB"}]
+    mu2, sigma2, cp2, support2, abstain2 = predict(model, te2)
+    assert bool(abstain2[0]) is True and bool(support2[0]) is False
 
 
 @needs_torch_vienna

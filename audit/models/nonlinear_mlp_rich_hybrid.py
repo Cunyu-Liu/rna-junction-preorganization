@@ -1081,3 +1081,55 @@ def make_nonlinear_mlp_rnafm_only_pca_hybrid(cache: dict, k: int = DEFAULT_K,
         return mu, sigma, cp, seen_scaf, ~seen_scaf
 
     return fit, predict
+
+
+def make_nonlinear_mlp_nuisance_only_t(df=_DEFAULT_DF, hidden=(96, 64, 32),
+                                       dropout=0.1, weight_decay=1e-2,
+                                       seed=_T_SEED):
+    """MATCHED ABLATION: reg_deep t7 MLP on the nuisance basis ONLY.
+
+    This is the no-ViennaRNA control for the winning 3x t7 ensemble.  The 3x t7
+    member (make_nonlinear_mlp_extended_hybrid_reg_deep_t) consumes
+    [nuisance(motif+scaffold+topology) + 21-D extended-ViennaRNA]; this variant
+    consumes ONLY the nuisance block with the SAME reg_deep architecture, SAME
+    Student-t (df) objective, SAME regularization budget and SAME seed.  The
+    contrast isolates how much of the ensemble's +19.17% gain vs the LINEAR
+    motif_topology_hierarchy baseline comes from the ViennaRNA sequence
+    representation vs the nonlinear head alone (contract P0.4 matched-head
+    ablation; benchmark-track attribution evidence).
+    """
+    def fit(train_rows):
+        motifs = sorted({str(r["motif"]) for r in train_rows})
+        scafs = sorted({int(r["scaf"]) for r in train_rows})
+        Xn = _nuisance_basis(train_rows, motifs, scafs)
+        y = np.asarray([r["y"] for r in train_rows], dtype=float)
+        cens = np.asarray([r["cens"] for r in train_rows], dtype=bool)
+        import torch
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        net, gate = _train_mlp_t(Xn, y, cens, device, Xn.shape[1],
+                                 hidden=hidden, dropout=dropout,
+                                 weight_decay=weight_decay, df=df, seed=seed)
+        return {"kind": "nonlinear_mlp_nuisance_only_t", "net": net,
+                "gate": gate, "motifs": motifs, "scafs": scafs,
+                "n_nuisance": Xn.shape[1], "device": device,
+                "hidden": list(hidden), "dropout": dropout,
+                "weight_decay": weight_decay, "df": float(df), "seed": int(seed)}
+
+    def predict(model, test_rows):
+        import torch
+        Xn = _nuisance_basis(test_rows, model["motifs"], model["scafs"])
+        model["net"].eval()
+        with torch.no_grad():
+            Xt = torch.tensor(Xn, dtype=torch.float32, device=model["device"])
+            mu = model["net"](Xt).squeeze(-1).cpu().numpy()
+        sigma = np.full(len(mu), 0.7)
+        from scipy.special import log_ndtr
+        a = (mu + 7.1) / 0.7
+        cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
+        seen_scaf = np.zeros(len(mu), dtype=bool)
+        for i, r in enumerate(test_rows):
+            if int(r["scaf"]) in model["scafs"]:
+                seen_scaf[i] = True
+        return mu, sigma, cp, seen_scaf, ~seen_scaf
+
+    return fit, predict

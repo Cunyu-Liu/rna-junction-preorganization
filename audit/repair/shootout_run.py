@@ -68,6 +68,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
     make_nonlinear_mlp_rnafm_extended_reg_deep,
+    make_nonlinear_mlp_nuisance_only_t,
 )
 from audit.models.nonlinear_latent_operator import make_nonlinear_latent_operator
 from audit.repair.fold_loader import build_joint_edit_context_folds
@@ -127,6 +128,8 @@ def _universe(rnafm_cache=None):
     # NONLINEAR LATENT-OPERATOR head (contract 9.1): MLP junction map -> latent q_j,
     # operator-aware head a_s + b_s q_j, GH-marginal right-censored training.
     U["nonlinear_latent_operator"] = make_nonlinear_latent_operator(df=7.0)
+    # MATCHED ABLATION: 3x t7's no-ViennaRNA control (nuisance-only, same arch).
+    U["nonlinear_mlp_nuisance_only_t7"] = make_nonlinear_mlp_nuisance_only_t(df=7.0)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)
