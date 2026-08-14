@@ -131,11 +131,24 @@ def main():
     print("\n=== 3x t7 ensemble (fixed evaluator, eligible-only) ===")
     print(f"  ensemble NLL={nll_e:.4f}  nuisance NLL={nll_n:.4f}  "
           f"rel_gain={100.0*(nll_n-nll_e)/nll_n:+.2f}%  n_junc={nj_e}")
+
+    # r31: nuisance-only t7 ablation (no ViennaRNA, same reg_deep t7 arch).
+    r31 = load(f"{R}/r31_nuisance_only_full/Predictions_v3.jsonl")
+    nus_t7 = [p for p in r31 if p["model_id"] == "nonlinear_mlp_nuisance_only_t7"]
+    nll_nt7, _ = pooled_nll(nus_t7)
+    print("\n=== matched ablation: nuisance-only t7 (no ViennaRNA) ===")
+    print(f"  nuisance-only t7 NLL={nll_nt7:.4f}  "
+          f"nonlinear-head gain vs nuisance={100.0*(nll_n-nll_nt7)/nll_n:+.2f}%  "
+          f"ViennaRNA increment under nonlinear head={100.0*(nll_nt7-nll_e)/nll_nt7:+.2f}%")
+
     out = {
         "r29_pooled": {m: round(pooled_nll(by_id[m])[0], 4) for m in by_id},
         "contrasts": {"v131_vs_noseq": c1, "motif_vs_noseq": c2, "v131_vs_motif": c3},
         "ensemble_3x_t7": {"nll": round(nll_e, 4), "nuisance_nll": round(nll_n, 4),
                            "rel_gain_pct": round(100.0 * (nll_n - nll_e) / nll_n, 2)},
+        "nuisance_only_t7_ablation": {"nll": round(nll_nt7, 4),
+            "nonlinear_head_gain_pct": round(100.0 * (nll_n - nll_nt7) / nll_n, 2),
+            "viennarna_increment_pct": round(100.0 * (nll_nt7 - nll_e) / nll_nt7, 2)},
     }
     Path(f"{R}/r29_p05_rerun/P05Analysis.json").write_text(
         json.dumps(out, indent=2, sort_keys=True) + "\n")
