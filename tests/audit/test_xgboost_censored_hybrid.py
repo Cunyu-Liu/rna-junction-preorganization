@@ -10,6 +10,7 @@ import pytest
 from audit.models.xgboost_censored_hybrid import (
     make_xgboost_censored_hybrid,
     _censored_nll_grad_hess,
+    _censored_t_nll_grad_hess,
     HAVE_XGB,
 )
 
@@ -88,6 +89,81 @@ def test_xgb_shapes_and_finiteness():
 @needs_xgb_vienna
 def test_xgb_unseen_scaffold_abstains():
     fit, predict = make_xgboost_censored_hybrid(n_estimators=50, max_depth=3)
+    tr = _rows()
+    te = [{"source_row_id": "R999", "jid": "j99", "motif": "0x1", "scaf": 99,
+           "y": -6.0, "cens": 0, "junction_seq": "AAAA_BBBB",
+           "helix_seq": "h99", "symmetry_key": "AAAA_BBBB"}]
+    model = fit(tr)
+    mu, sigma, cp, support, abstain = predict(model, te)
+    assert bool(abstain[0]) is True and bool(support[0]) is False
+
+
+# ---------------------------------------------------------------------------
+# Student-t (robust) censored objective: exact grad/hess vs finite difference.
+# ---------------------------------------------------------------------------
+def _t_nll_at(mu, y, cens, df, sigma=0.7, cap=-7.1):
+    """Scalar right-censored Student-t NLL at a single mu (for finite diff)."""
+    from scipy.stats import t as tdist
+    z = (y - mu) / sigma
+    nll_m = -tdist.logpdf(y, df, loc=mu, scale=sigma)
+    a = (mu - cap) / sigma
+    nll_c = -tdist.logcdf(a, df)
+    return float(nll_m if not cens else nll_c)
+
+
+def test_censored_t_grad_hess_matches_finite_diff():
+    """Numeric check of the Student-t grad AND hess (measured + censored rows)."""
+    rng = np.random.default_rng(3)
+    mus = np.concatenate([np.linspace(-6.0, -1.0, 5), np.linspace(0.5, 5.0, 5)])
+    for df in (3.0, 7.0, 10.0):
+        for mu in mus:
+            for y, cens in ((-7.1, True), (-6.0, False), (-5.2, False)):
+                eps = 1e-4
+                gp = (_t_nll_at(mu + eps, y, cens, df)
+                      - _t_nll_at(mu - eps, y, cens, df)) / (2 * eps)
+                gm = (_t_nll_at(mu + eps, y, cens, df)
+                      - 2 * _t_nll_at(mu, y, cens, df)
+                      + _t_nll_at(mu - eps, y, cens, df)) / (eps * eps)
+                g, h = _censored_t_nll_grad_hess(
+                    np.array([mu]), np.array([y]), np.array([cens]), df)
+                assert abs(gp - g[0]) < 2e-3, f"df={df} mu={mu} cens={cens}: g fd={gp} analytic={g[0]}"
+                assert abs(gm - h[0]) < 1e-2, f"df={df} mu={mu} cens={cens}: h fd={gm} analytic={h[0]}"
+
+
+def test_censored_t_grad_hess_gaussian_limit():
+    """As df->inf the Student-t grad/hess converge to the Gaussian values."""
+    rng = np.random.default_rng(11)
+    mus = np.array([-3.0, -1.0, 0.5, 2.0])
+    y = np.array([-7.1, -6.3, -5.1, -7.1])
+    cens = np.array([True, False, False, True])
+    for df in (1e8, 1e9):
+        gt, ht = _censored_t_nll_grad_hess(mus, y, cens, df)
+        gg, hg = _censored_nll_grad_hess(mus, y, cens)
+        assert np.allclose(gt, gg, atol=1e-3), f"df={df} grad mismatch"
+        assert np.allclose(ht, hg, atol=1e-2), f"df={df} hess mismatch"
+
+
+@needs_xgb_vienna
+def test_xgb_t7_shapes_and_finiteness():
+    fit, predict = make_xgboost_censored_hybrid(n_estimators=100, max_depth=3,
+                                                df=7.0)
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "xgboost_censored_hybrid_t"
+    assert model["df"] == 7.0
+    assert model["gate"]["eligible"] is True and model["best_iteration"] >= 1
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.allclose(sigma, 0.7)
+    assert np.all(np.isfinite(cp)) and cp.min() >= 0.0 and cp.max() <= 1.0
+
+
+@needs_xgb_vienna
+def test_xgb_t7_unseen_scaffold_abstains():
+    fit, predict = make_xgboost_censored_hybrid(n_estimators=50, max_depth=3,
+                                                df=7.0)
     tr = _rows()
     te = [{"source_row_id": "R999", "jid": "j99", "motif": "0x1", "scaf": 99,
            "y": -6.0, "cens": 0, "junction_seq": "AAAA_BBBB",

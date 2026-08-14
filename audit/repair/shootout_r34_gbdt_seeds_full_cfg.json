@@ -1,0 +1,10 @@
+{
+  "run_root": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z",
+  "canonical_source": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/source/tecto_v111_canonical_records.jsonl",
+  "out_subdir": "r34_gbdt_seeds_full",
+  "models": [
+    "xgboost_censored_hybrid_s99",
+    "xgboost_censored_hybrid_s2026"
+  ],
+  "max_folds": 37
+}

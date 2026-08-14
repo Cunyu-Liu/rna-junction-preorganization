@@ -136,6 +136,14 @@ def _universe(rnafm_cache=None):
     U["xgboost_censored_hybrid"] = make_xgboost_censored_hybrid()
     U["xgboost_censored_hybrid_strong"] = make_xgboost_censored_hybrid(
         max_depth=6, learning_rate=0.03, n_estimators=3000)
+    # independent seeds of the GBDT family (parity with the 3x t7 MLP side)
+    U["xgboost_censored_hybrid_s99"] = make_xgboost_censored_hybrid(seed=99)
+    U["xgboost_censored_hybrid_s2026"] = make_xgboost_censored_hybrid(seed=2026)
+    # robust Student-t objective for the GBDT family (matches the winning t7 MLP
+    # head; the df->inf limit is the Gaussian objective above)
+    U["xgboost_censored_hybrid_t7"] = make_xgboost_censored_hybrid(df=7.0)
+    U["xgboost_censored_hybrid_t7_s99"] = make_xgboost_censored_hybrid(df=7.0, seed=99)
+    U["xgboost_censored_hybrid_t7_s2026"] = make_xgboost_censored_hybrid(df=7.0, seed=2026)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)

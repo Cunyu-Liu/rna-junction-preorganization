@@ -86,18 +86,76 @@ def _make_censored_eval(y, cens):
     return evalm
 
 
+def _censored_t_nll_grad_hess(mu, y, cens, df, sigma=TAU, cap=CAP):
+    """grad/hess of the right-censored Student-t NLL w.r.t. the boosted mu.
+
+    Matches the winning MLP's robust-likelihood head (nonlinear_mlp_rich_hybrid
+    `_t_right_censored_nll`): the measured term grows only logarithmically in
+    |z| (heavy-tailed), so outlier/catastrophic folds exert less pull on mu than
+    under the Gaussian objective.  With a = (mu - cap)/sigma and r = f(a)/F(a):
+
+      measured : g = -(df+1)*(y-mu) / (sigma^2*(df+z^2))
+                 h = (df+1)*(df-z^2) / (sigma^2*(df+z^2)^2)
+      censored : g = -r/sigma
+                 h = r*(r + a*(df+1)/(df+a^2)) / sigma^2
+
+    The df->inf limit of both rows is exactly the Gaussian grad/hess below.
+    """
+    from scipy.stats import t as tdist
+    a = np.clip((mu - cap) / sigma, -30.0, 30.0)
+    z = (y - mu) / sigma
+    den = df + z * z
+    g_m = -(df + 1.0) * (y - mu) / (sigma * sigma * den)
+    h_m = (df + 1.0) * (df - z * z) / (sigma * sigma * den * den)
+    r = tdist.pdf(a, df) / tdist.cdf(a, df)
+    g_c = -r / sigma
+    h_c = r * (r + a * (df + 1.0) / (df + a * a)) / (sigma * sigma)
+    g = np.where(cens, g_c, g_m)
+    h = np.where(cens, h_c, h_m)
+    return g, h
+
+
+def _make_censored_t_objective(y, cens, df):
+    """Closure exposing the right-censored Student-t NLL grad/hess to XGBoost."""
+    def obj(preds, dtrain):
+        return _censored_t_nll_grad_hess(preds, y, cens, df)
+    return obj
+
+
+def _make_censored_t_eval(y, cens, df):
+    """Closure for early stopping on the mean right-censored Student-t NLL."""
+    from scipy.stats import t as tdist
+
+    def evalm(preds, dtrain):
+        mu = np.asarray(preds, dtype=float)
+        a = (mu - CAP) / TAU
+        nll = np.where(
+            cens,
+            -tdist.logcdf(a, df),
+            -tdist.logpdf(y, df, loc=mu, scale=TAU))
+        return "cens_t_nll", float(np.mean(nll))
+    return evalm
+
+
 def make_xgboost_censored_hybrid(hidden=None, dropout=None, weight_decay=None,
                                  seed=SEED, n_estimators=_DEFAULT_N_EST,
                                  learning_rate=_DEFAULT_LR,
                                  max_depth=_DEFAULT_MAX_DEPTH,
-                                 n_jobs=8):
+                                 n_jobs=8, df=None):
     """Return (fit, predict) for the XGBoost right-censored hybrid.
 
     Feature block matches the winning MLP: [nuisance(motif+scaffold+topology) +
     train-scaled 21-D extended-ViennaRNA].  hidden/dropout/weight_decay are
     accepted for interface compatibility with the shootout universe but unused
     (boosting has its own regularization via depth/lr/early stopping).
+
+    If ``df`` is not None the boosted location is trained with the right-censored
+    Student-t NLL (df degrees of freedom, robust head matching the winning t7
+    MLP) instead of the Gaussian NLL; the model still predicts fixed sigma=0.7
+    so it is scored by the same Gaussian evaluation NLL as every other family.
     """
+    kind = "xgboost_censored_hybrid_t" if df is not None else "xgboost_censored_hybrid"
+
     def fit(train_rows):
         assert HAVE_XGB, "xgboost required for xgboost_censored_hybrid"
         import torch
@@ -135,23 +193,39 @@ def make_xgboost_censored_hybrid(hidden=None, dropout=None, weight_decay=None,
             "colsample_bytree": 0.9,
             "nthread": n_jobs,
         }
+        if df is not None:
+            # Student-t measured-row hessian is negative wherever |z|>sqrt(df).
+            # Starting from the default base_score=0.5 (|z|~10) makes every
+            # measured row have a negative hessian, which inverts XGBoost's
+            # Newton step and stalls boosting at round 0.  Initializing the
+            # margin at mean(y) puts most rows inside |z|<sqrt(df) (hessian>0)
+            # so the robust objective actually trains.
+            params["base_score"] = float(np.mean(y))
+            obj = _make_censored_t_objective(y[tr_idx], cens[tr_idx], df)
+            evalm = _make_censored_t_eval(y[va_idx], cens[va_idx], df)
+            reason = f"xgboost early-stopped on val censored Student-t NLL (df={df})"
+        else:
+            obj = _make_censored_objective(y[tr_idx], cens[tr_idx])
+            evalm = _make_censored_eval(y[va_idx], cens[va_idx])
+            reason = "xgboost early-stopped on val censored NLL"
         bst = xgb.train(
             params, dtr, num_boost_round=n_estimators,
             evals=[(dva, "val")],
-            obj=_make_censored_objective(y[tr_idx], cens[tr_idx]),
-            custom_metric=_make_censored_eval(y[va_idx], cens[va_idx]),
+            obj=obj,
+            custom_metric=evalm,
             early_stopping_rounds=50, verbose_eval=False)
         n_best = int(bst.best_iteration) + 1
-        return {"kind": "xgboost_censored_hybrid", "bst": bst,
+        return {"kind": kind, "bst": bst,
                 "motifs": motifs, "scafs": scafs, "mean": mean, "sd": sd,
                 "by_jid": by_jid, "n_nuisance": Xn.shape[1],
                 "n_vienna": Xv.shape[1], "seed": seed,
                 "best_iteration": n_best,
+                "df": None if df is None else float(df),
                 "gate": {"eligible": True, "converged": True,
                          "final_grad_norm": 0.0, "grad_tol": 0.0,
                          "n_epochs": n_best, "max_epochs": n_estimators,
                          "success": True, "n_nan_inf_params": 0,
-                         "reason": "xgboost early-stopped on val censored NLL"},
+                         "reason": reason},
                 "device": device}
 
     def predict(model, test_rows):

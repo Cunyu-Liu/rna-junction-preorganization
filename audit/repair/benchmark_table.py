@@ -58,11 +58,19 @@ MODEL_RUNS = {
     "nonlinear_mlp_extended_hybrid_reg_deep_t7_s99": ("r21_seed99_replication", "r21_seed99_replication"),
     "nonlinear_mlp_extended_hybrid_reg_deep_t7_s2026": ("r23_seed2026_replication", "r23_seed2026_replication"),
     "nonlinear_mlp_extended_hybrid_reg_deep_t7_s7": ("r24_t7_seed7", "r24_t7_seed7"),
+    "xgboost_censored_hybrid": ("r33_xgboost_full", "r33_xgboost_full"),
+    "xgboost_censored_hybrid_s99": ("r34_gbdt_seeds_full", "r34_gbdt_seeds_full"),
+    "xgboost_censored_hybrid_s2026": ("r34_gbdt_seeds_full", "r34_gbdt_seeds_full"),
 }
 T7_MEMBERS = [
     "nonlinear_mlp_extended_hybrid_reg_deep_t7",
     "nonlinear_mlp_extended_hybrid_reg_deep_t7_s99",
     "nonlinear_mlp_extended_hybrid_reg_deep_t7_s2026",
+]
+GBDT_MEMBERS = [
+    "xgboost_censored_hybrid",
+    "xgboost_censored_hybrid_s99",
+    "xgboost_censored_hybrid_s2026",
 ]
 NUIS = "motif_topology_hierarchy"
 
@@ -74,6 +82,8 @@ LEDGER_PATHS = [
     f"{R}/r21_seed99_replication/ConvergenceLedger_v3.parquet",
     f"{R}/r23_seed2026_replication/ConvergenceLedger_v3.parquet",
     f"{R}/r24_t7_seed7/ConvergenceLedger_v3.parquet",
+    f"{R}/r33_xgboost_full/ConvergenceLedger_v3.parquet",
+    f"{R}/r34_gbdt_seeds_full/ConvergenceLedger_v3.parquet",
 ]
 
 
@@ -265,22 +275,70 @@ def main():
           f"{scaf_e[0] if scaf_e else float('nan'):7.4f} "
           f"{100*float(np.mean(cens)):5.1f} {rel_e:+7.2f}")
 
+    # 6-member mixed ensemble: GBDT 3x + t7 MLP 3x (equal mu-mean).
+    # The weight sweep on the family ensembles showed w=0.5 is optimal (the two
+    # families have matched quality), so equal weighting is the honest optimum.
+    MIXED_MEMBERS = T7_MEMBERS + GBDT_MEMBERS
+    mix_by_rid = defaultdict(dict)
+    for m in MIXED_MEMBERS:
+        for p in load_model(m, eligible):
+            if p["support"] and not p["abstain"]:
+                mix_by_rid[p["source_row_id"]][m] = p
+    mix_rows = []
+    for rid, d in mix_by_rid.items():
+        if not all(m in d for m in MIXED_MEMBERS):
+            continue
+        ref = d[MIXED_MEMBERS[0]]
+        mix_rows.append({
+            "source_row_id": rid, "jid": ref["jid"], "fold": ref["fold"],
+            "scaf": int(ref["scaf"]), "context": str(ref.get("context") or ref.get("helix_seq", "")),
+            "y": ref["y"], "cens": ref["cens"],
+            "mu": float(np.mean([d[m]["mu"] for m in MIXED_MEMBERS])),
+            "sigma": 0.7, "support": True, "abstain": False,
+        })
+    mu = np.array([p["mu"] for p in mix_rows])
+    sigma = np.array([p["sigma"] for p in mix_rows])
+    cens = np.array([p["cens"] for p in mix_rows], dtype=bool)
+    pooled_x = pooled_junction_macro(mix_rows, mu, sigma)
+    ctx_x = nested_context_macro(mix_rows, mu, sigma)
+    scaf_x = scaffold_bundle_macro(mix_rows, mu, sigma)
+    jid = defaultdict(list)
+    for p in mix_rows:
+        nll = float(row_nll([p["y"]], [p["cens"]], [p["mu"]], [p["sigma"]])[0])
+        jid[p["jid"]].append(nll)
+    my_nll = float(np.mean([np.mean(v) for v in jid.values()]))
+    rel_x = 100.0 * (nuis_nll - my_nll) / nuis_nll
+    out["ENSEMBLE_MIXED_6"] = {
+        "n_rows": len(mix_rows), "pooled_junction_macro": round(pooled_x, 4),
+        "nested_context_macro": round(ctx_x[0], 4) if ctx_x else None,
+        "scaffold_bundle_macro": round(scaf_x[0], 4) if scaf_x else None,
+        "censored_frac": round(float(np.mean(cens)), 4),
+        "rel_gain_pct_vs_nuisance": round(rel_x, 2),
+    }
+    print(f"{'ENSEMBLE_MIXED_6 (3x GBDT + 3x t7)':52s} {len(mix_rows):6d} {pooled_x:7.4f} "
+          f"{ctx_x[0] if ctx_x else float('nan'):7.4f} "
+          f"{scaf_x[0] if scaf_x else float('nan'):7.4f} "
+          f"{100*float(np.mean(cens)):5.1f} {rel_x:+7.2f}")
+
     # edit-cluster group-aware CI for the decisive contrasts
     t7s99 = load_model("nonlinear_mlp_extended_hybrid_reg_deep_t7_s99", eligible)
     ens_vs_nuis = edit_cluster_ci(ens_rows, nuis_rows)
     ens_vs_s99 = edit_cluster_ci(ens_rows, t7s99)
     nuis_vs_s99 = edit_cluster_ci(nuis_rows, t7s99)
+    mix_vs_nuis = edit_cluster_ci(mix_rows, nuis_rows)
     out["edit_cluster_CI"] = {
         "ensemble_vs_nuisance": ens_vs_nuis,
         "ensemble_vs_t7_s99": ens_vs_s99,
         "nuisance_vs_t7_s99": nuis_vs_s99,
+        "mixed6_vs_nuisance": mix_vs_nuis,
         "note": ("delta = (b - a); positive means the first (a) model is better. "
                  "Bootstrap unit = edit component (37)."),
     }
     print("\n=== edit-cluster group CI (positive => first better) ===")
     for name, d in (("ensemble_vs_nuisance", ens_vs_nuis),
                     ("ensemble_vs_t7_s99", ens_vs_s99),
-                    ("nuisance_vs_t7_s99", nuis_vs_s99)):
+                    ("nuisance_vs_t7_s99", nuis_vs_s99),
+                    ("mixed6_vs_nuisance", mix_vs_nuis)):
         print(f"  {name:24s} CI={d['ci']} lower_gt_0={d['ci_lower_gt_0']} "
               f"n_edit={d['n_edit']} leave1={d['leave_one_largest']}")
 

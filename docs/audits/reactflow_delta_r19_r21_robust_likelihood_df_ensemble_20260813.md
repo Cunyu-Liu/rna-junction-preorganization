@@ -345,3 +345,100 @@ nuisance 增益从 +19.17% 提升至 **+21.23%**，edit-cluster CI [0.179, 0.346
 - 单元测试：24 passed（r19-r26）；r27 新增 7 passed；P0.2 修复后全套 187 passed
   （1 项 pre-existing 失败 `test_shootout_report_only.py::test_paired_contrast_sign_and_semantics`
   由 source_row_id 不匹配的 fixture bug 引起，与本次改动无关）。
+
+## r34 混合集成扩展：多种子 GBDT 族 + 3x t7 MLP 族
+
+### 多样性诊断（只读，`analyze_diversity.py`）
+
+对已物化 preds 计算成员间逐行 signed-error 相关（Pearson on y-mu）：
+
+| 成员对 | 错误相关 |
+|--------|---------|
+| t7 vs t7_s99（MLP 同族） | 0.932 |
+| t7 vs t7_s2026（MLP 同族） | 0.935 |
+| t7_s99 vs t7_s2026（MLP 同族） | 0.952 |
+| xgb vs t7（跨族） | 0.840 |
+| xgb vs t7_s2026（跨族） | 0.839 |
+| xgb vs t7_s99（跨族） | 0.861 |
+
+跨族（GBDT vs MLP）错误相关显著低于同族（0.84-0.86 vs 0.93-0.95），这是
+混合集成降低方差的定量前提，也是"正交模型族"claim 的直接证据。
+
+**leave-one-out（4 成员 xgb + 3x t7）**：去掉 xgb 使 NLL 回到 0.8823
+（Δ=+0.0224，即混合增益全部来自 GBDT 成员）；去掉任一 MLP 种子改变 ≤0.0053，
+MLP 族内部部分冗余。**注意**：基于测试集的成员挑选属于 post-hoc selection，
+不用于声称（诚实评估约束），故 headline 仍为预注册的全成员混合集成。
+
+### Student-t GBDT 目标 —— 阴性结果（r35 smoke）
+
+实现 `_censored_t_nll_grad_hess`（右删失 Student-t NLL 的解析 grad/hess，
+df→∞ 与 Gaussian 完全一致；单元测试有限差分验证 grad+hess 及 Gaussian 极限，
+8 passed）。**关键坑**：Student-t 实测行的 hessian 在 |z|>√df 时为负；默认
+base_score=0.5 使所有行 |z|≈10 → hessian 全负 → XGBoost Newton 步反号、
+boosting 停在 round 0（预测恒为 0.5）。修复：t 目标下 base_score=mean(y)，
+使初始化落入 hessian>0 区域。
+
+2-fold smoke（`r34_gbdt_seeds_t7_smoke2`，Gaussian 评测 NLL）：
+
+| 模型 | NLL |
+|------|-----|
+| xgb（Gaussian s23） | 0.7852 |
+| xgb_s99（Gaussian） | 0.7763 |
+| xgb_s2026（Gaussian） | 0.7890 |
+| xgb_t7（Student-t s23） | 0.7925 |
+| xgb_t7_s2026 | 0.8056 |
+| xgb_t7_s99 | 1.2582（不稳定） |
+
+**结论**：Student-t 鲁棒似然从 MLP 迁移到 GBDT **不成立**——树模型的
+leaf 平均 + subsample 已提供鲁棒性，且负 hessian 在训练后期仍会破坏部分
+分裂。该方向 smoke 级否决，与 r15（RNA-FM）、r18（局部上下文）同属
+"表示/似然扩展在数据上不迁移"的负面证据，不进入 full run。
+
+### 多种子 Gaussian GBDT 族 + 混合集成（r34 full）
+
+r34 full 在 37 折叠补跑 GBDT 种子 s99/s2026（s23 复用 r33），与 r24 的
+3x t7 MLP 构成 6 成员混合集成（family-of-family：GBDT 3x 先平均，再与
+MLP 3x 等权 mu 平均，等价于 6 成员等权平均）。
+
+**单模型 pooled junction-macro NLL（37 folds，Gaussian 评测）**：
+
+| 模型 | NLL |
+|------|-----|
+| xgb_s99 | **0.8830** |
+| xgb（s23） | 0.8845 |
+| xgb_s2026 | 0.8957 |
+| t7 MLP（s99） | 0.8839 |
+| t7 MLP（s2026） | 0.9022 |
+| t7 MLP（s0） | 0.9129 |
+
+**集成 ladder（`analyze_mixed_gbdt_t7.py`）**：
+
+| 集成 | NLL | vs nuisance | edit-cluster CI |
+|------|-----|-----------|----------------|
+| GBDT 3x（Gaussian 种子） | 0.8817 | +19.23% | — |
+| MLP 3x t7 | 0.8823 | +19.17% | — |
+| xgb + 3x t7（4 成员，r33 headline） | 0.8599 | +21.23% | [0.179, 0.346] |
+| **GBDT 3x + MLP 3x（6 成员）** | **0.8524** | **+21.91%** | **[0.186, 0.362]** |
+
+6 成员混合集成成为新的最优方法（NLL 0.8599 → 0.8524），leave-one-largest
+0.282（37 编辑组件稳健）。
+
+**加权组合诊断（只读）**：对 2 族集成做权重扫描（w_gbdt ∈ [0,1]），最优恰为
+w=0.5（等权），因为两族单模型质量几乎相同（GBDT 3x 0.8817 vs MLP 3x 0.8823）。
+**等权 family averaging 在此是最优组合，不存在 re-weighting 增益**；这也让
+"6 成员等权 = 两族各 50%"的 headline 免于权重挑选偏差。
+
+**边际增益递减**：GBDT 3x 仅比单 xgb 好 +0.003（种子间相关 ~0.85+），
+4→6 成员只 +0.0075。跨族正交（GBDT vs MLP）才是主要方差缩减来源，
+族内扩种子的边际收益已近饱和。
+
+## r34 代码与提交
+
+- 修改：`audit/models/xgboost_censored_hybrid.py`（Student-t 删失目标
+  `_censored_t_nll_grad_hess` + `df`/`base_score` 支持）、`audit/repair/shootout_run.py`
+  （注册 `_s99`/`_s2026`/`_t7` 系列 GBDT 变体）、`tests/audit/test_xgboost_censored_hybrid.py`
+  （+4 项：t grad/hess 有限差分、Gaussian 极限、t7 形状、t7 unseen-scaffold）。
+- 新增：`audit/repair/analyze_diversity.py`（多样性/leave-one-out 诊断）、
+  `audit/repair/analyze_mixed_gbdt_t7.py`（GBDT 3x + t7 3x 混合分析）、
+  `shootout_r34_gbdt_seeds_t7_smoke_cfg.json`、`shootout_r34_gbdt_seeds_t7_smoke2_cfg.json`、
+  `shootout_r34_gbdt_seeds_full_cfg.json`。
