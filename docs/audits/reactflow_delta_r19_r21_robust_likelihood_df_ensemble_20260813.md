@@ -212,6 +212,43 @@ operator 头，GH48 边缘化右删失似然联合训练（`audit/models/nonline
 既有 P0.2 基建（FoldSpec、optimizer gate、joint zero-overlap、adjudication
 CI 穿零否决）早已就位且 10/10 passed；本次补齐了主榜消费 eligibility 的最后缺口。
 
+## P0.5 最小受影响重跑（r29，修复后 evaluator）+ P0.6 重新裁定
+
+按合同 P0.5 在修复后 runner 下重跑受 joint/optimizer 影响的参数模型（corrected
+v1.31 / no_sequence / motif_topology / train_only_scaffold），37 个 blocked
+joint folds，全部 fold optimizer+full-coverage 双门 eligible：
+
+- **rows_hash 端到端验证**：37 folds × 4 模型，0 个 fold 出现 train/test
+  rows_hash 分歧——所有模型确证消费同一行集（P0.2 修复验证通过）。
+- **决定性 true-joint 对比（pooled junction-macro NLL，固定 sigma=0.7）**：
+
+| 模型 | NLL | vs no-sequence |
+|------|-----|-----------|
+| corrected_v1_31（63-D 序列映射） | 1.4282 | **−24.5%（更差）** |
+| no_sequence_latent_operator（matched） | 1.1473 | — |
+| motif_topology_hierarchy | 1.0916 | +4.9% |
+| train_only_scaffold | 1.0938 | +4.7% |
+
+- **63-D 序列映射路线正式关闭**：corrected v1.31 在 true joint 下比 matched
+  no-sequence 差 24.5%（theta=−0.281），edit-cluster CI [−0.439, 0.0175]
+  上界亦未能排除 0。完全符合审计 D1 门的"不优于 matched no-seq"触发条件。
+- **3x t7 集成在修复后 evaluator 下增益稳健**：NLL 0.8823，vs nuisance
+  +19.17%，CI [0.166, 0.295]（因全部 fold 均 eligible，过滤不改变数字，
+  但已端到端验证 eligibility 正确消费）。
+
+P0.6 裁定（`/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication/`）：
+
+- `eligibility_status = VALID`
+- `scientific_verdict = NOT_SUPPORTED_AT_PRE_REGISTERED_GATE`
+- `D1 = TRACK_A_LOCKED`（63-D sequence-map 路线永久关闭；benchmark 轨锁定）
+- `ClaimAuthorization`：allowed 仅限 small conditional increment 措辞；
+  forbidden 包括 transferable mechanism / SOTA / noise ceiling 等；
+  submission/release 仍不授权。
+
+结论：修复后的 true joint 确认 63-D sequence map 无增量；当前唯一幸存的方法
+贡献是鲁棒似然 t7 跨种子 mu-集成（+19.17% over nuisance）。后续按 benchmark 轨
+整理（aggregation/support/nesting/censoring 认识），而非继续扩展 sequence-map。
+
 ## 代码与提交
 
 - 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 与 swa_n 参数）、
@@ -226,7 +263,10 @@ CI 穿零否决）早已就位且 10/10 passed；本次补齐了主榜消费 eli
   `audit/repair/per_component_diag.py`、`tests/audit/test_nonlinear_latent_operator.py`。
 - P0.2 修复：`audit/repair/shootout_run.py`（eligibility filter + rows_hash）、
   `tests/audit/test_repair_p02.py`（+3 项）。
-- 提交：`9fff7f2`、`62ddc91`、`0003bd5`、`5ae913b`、`075f8d9`、`6d4e223`（branch `r0_audit_repair_20260811`）。
+- P0.5/P0.6：`audit/repair/analyze_p05_rerun.py`、
+  `audit/repair/shootout_r29_p05_rerun_smoke_cfg.json`（commit `4f90015`）。
+- 提交：`9fff7f2`、`62ddc91`、`0003bd5`、`5ae913b`、`075f8d9`、`6d4e223`、`7a1f5fa`、
+  `f4c322f`、`4f90015`（branch `r0_audit_repair_20260811`）。
 - 单元测试：24 passed（r19-r26）；r27 新增 7 passed；P0.2 修复后全套 187 passed
   （1 项 pre-existing 失败 `test_shootout_report_only.py::test_paired_contrast_sign_and_semantics`
   由 source_row_id 不匹配的 fixture bug 引起，与本次改动无关）。
