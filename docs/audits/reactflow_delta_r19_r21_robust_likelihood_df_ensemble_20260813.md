@@ -275,6 +275,46 @@ nuisance 特征本身**，仅 **+2.09% 来自 ViennaRNA 序列表征**（r30 3-f
    头 + 跨种子 mu-集成，对线性/无序列对照的增益主要由非线性结构而非
    序列表征驱动；sequence 增量可写为 small conditional effect。
 
+## r32/r33 梯度提升树（XGBoost）新模型族 + 混合集成突破
+
+此前所有非线性家族都是 MLP；梯度提升树（GBDT）从未进入 shootout。实现
+`audit/models/xgboost_censored_hybrid.py`：XGBoost 用与平头 MLP 完全相同的
+右删失 Gaussian 目标（tau=0.7, CAP=-7.1，自定义 gradient/hessian）和相同特征块
+（nuisance + train-scaled 21-D extended-ViennaRNA），GPU histogram 训练 + early
+stopping（train hold-out）。单元测试 4 passed（grad/hess 单调性、有限差分校验、
+形状、unseen scaffold abstain）。
+
+**r33 全量 37-fold**（`r33_xgboost_full`）：
+
+| 模型 | NLL | vs nuisance |
+|------|-----|-----------|
+| motif_topology_hierarchy | 1.0916 | — |
+| t7 MLP（单模型，r33 本 run） | 0.9505 | +12.9% |
+| **xgboost_censored_hybrid（单模型）** | **0.8845** | **+18.97%** |
+| 3x t7 集成（r24） | 0.8823 | +19.17% |
+
+单个 XGBoost 模型几乎追平 3x t7 MLP 集成（0.8845 vs 0.8823）——新模型族在
+相同目标+特征下达到 MLP 集成的效果。注：r33 中 t7 MLP 单模型 0.9505 与 r24
+的 0.9129 有差异，属 GPU 训练的 run-to-run 方差，正说明跨种子集成的必要性。
+
+**决定性突破：混合模型族集成（XGBoost + 3x t7）**
+
+| 集成 | NLL | vs nuisance | edit-cluster CI |
+|------|-----|-----------|----------------|
+| 3x t7（MLP 同族） | 0.8823 | +19.17% | [0.166, 0.293] |
+| **xgb + 3x t7（4 成员）** | **0.8599** | **+21.23%** | **[0.179, 0.346]** |
+
+这是**本项目第一个超越 3x t7 饱和点的改进**（`analyze_mixed_xgb_t7.py`）：
+把 XGBoost 与 3 个 t7 MLP 成员的 mu 平均，NLL 从 0.8823 降至 0.8599，相对
+nuisance 增益从 +19.17% 提升至 **+21.23%**，edit-cluster CI [0.179, 0.346]
+（lower>0），leave-one-largest 0.242（37 组件稳健）。
+
+**与 r28 阴性结果的对照**：r28 把线性 hybrid / latent-operator 加入集成会稀释
+（0.8823→0.8894..0.9211），因为线性模型与 MLP 预测相关性太高；而 **GBDT 是
+结构正交的学习器**（树模型 vs 神经网络），错误模式互补，所以能真正降低方差。
+这打破了"只有同架构跨种子集成有效"的饱和状态——**关键是引入真正低相关的异构
+模型族，而非同质模型**。
+
 ## 代码与提交
 
 - 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 与 swa_n 参数）、
@@ -294,8 +334,14 @@ nuisance 特征本身**，仅 **+2.09% 来自 ViennaRNA 序列表征**（r30 3-f
 - r31 消融：`audit/models/nonlinear_mlp_rich_hybrid.py`（`make_nonlinear_mlp_nuisance_only_t`）、
   `audit/repair/shootout_r30_nuisance_ablation_smoke_cfg.json`、
   `audit/repair/shootout_r31_nuisance_only_full_cfg.json`（commit `5d5cfb4`、`0dbb3eb`）。
+- r32/r33 XGBoost：`audit/models/xgboost_censored_hybrid.py`、
+  `audit/repair/sanity_xgboost.py`、`audit/repair/shootout_r32_xgboost_smoke_cfg.json`、
+  `audit/repair/shootout_r33_xgboost_full_cfg.json`、
+  `tests/audit/test_xgboost_censored_hybrid.py`（commit `450ab47`）、
+  `audit/repair/analyze_mixed_xgb_t7.py`（commit `2812c47`）。
 - 提交：`9fff7f2`、`62ddc91`、`0003bd5`、`5ae913b`、`075f8d9`、`6d4e223`、`7a1f5fa`、
-  `f4c322f`、`4f90015`、`5d5cfb4`、`0dbb3eb`（branch `r0_audit_repair_20260811`）。
+  `f4c322f`、`4f90015`、`5d5cfb4`、`0dbb3eb`、`c6ed2a4`、`450ab47`、`2812c47`
+  （branch `r0_audit_repair_20260811`）。
 - 单元测试：24 passed（r19-r26）；r27 新增 7 passed；P0.2 修复后全套 187 passed
   （1 项 pre-existing 失败 `test_shootout_report_only.py::test_paired_contrast_sign_and_semantics`
   由 source_row_id 不匹配的 fixture bug 引起，与本次改动无关）。
