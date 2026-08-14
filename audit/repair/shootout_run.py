@@ -105,6 +105,10 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep_t_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=99)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, seed=99)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, seed=99)
+    # third independent seed (2026) for a larger cross-seed robust ensemble
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t_s2026"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, seed=2026)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_s2026"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, seed=2026)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t10_s2026"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, seed=2026)
     # SWA (stochastic weight averaging) over the last swa_n converged epochs:
     # variance reduction at the weight level, matching the mu-ensemble theme.
     U["nonlinear_mlp_extended_hybrid_reg_deep_t_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, swa_n=10)
