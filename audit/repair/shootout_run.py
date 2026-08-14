@@ -71,6 +71,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_nuisance_only_t,
 )
 from audit.models.nonlinear_latent_operator import make_nonlinear_latent_operator
+from audit.models.xgboost_censored_hybrid import make_xgboost_censored_hybrid
 from audit.repair.fold_loader import build_joint_edit_context_folds
 from audit.repair.optimizer_gate import gate_from_fit, unbounded_fit_gate
 
@@ -130,6 +131,11 @@ def _universe(rnafm_cache=None):
     U["nonlinear_latent_operator"] = make_nonlinear_latent_operator(df=7.0)
     # MATCHED ABLATION: 3x t7's no-ViennaRNA control (nuisance-only, same arch).
     U["nonlinear_mlp_nuisance_only_t7"] = make_nonlinear_mlp_nuisance_only_t(df=7.0)
+    # NEW FAMILY: gradient-boosted trees with the same right-censored Gaussian
+    # objective and the same feature block as the winning MLP.
+    U["xgboost_censored_hybrid"] = make_xgboost_censored_hybrid()
+    U["xgboost_censored_hybrid_strong"] = make_xgboost_censored_hybrid(
+        max_depth=6, learning_rate=0.03, n_estimators=3000)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)
