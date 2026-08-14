@@ -25,6 +25,9 @@ from audit.repair.optimizer_gate import (
     bounded_fit_gate, unbounded_fit_gate, gate_from_fit,
 )
 from audit.repair.p06_adjudicate import adjudicate
+from audit.repair.shootout_run import (
+    _rows_hash, _eligible_keys, _filter_eligible_preds, _pooled_nll_by_model,
+)
 
 
 def _admitted():
@@ -178,3 +181,55 @@ def test_foldspec_validate_rejects_overlap():
         FoldSpec(axis="edit_x_nested_context", fold="e:0",
                  train_ids=frozenset({"A", "B"}), test_ids=frozenset({"B"}))\
             .validate()
+
+
+def test_rows_hash_deterministic_and_order_invariant():
+    rows = [{"source_row_id": "B"}, {"source_row_id": "A"}, {"source_row_id": "C"}]
+    rows2 = [{"source_row_id": "C"}, {"source_row_id": "A"}, {"source_row_id": "B"}]
+    assert _rows_hash(rows) == _rows_hash(rows2)
+    assert len(_rows_hash(rows)) == 64  # sha256 hex
+    # different row sets must hash differently
+    assert _rows_hash(rows) != _rows_hash(rows[:-1])
+
+
+def test_eligible_keys_requires_both_gates():
+    conv = [
+        {"model_id": "m1", "fold": "e:A", "eligible": True,
+         "eligible_full_coverage": True},
+        {"model_id": "m1", "fold": "e:B", "eligible": True,
+         "eligible_full_coverage": False},   # optimizer ok, coverage fail
+        {"model_id": "m2", "fold": "e:A", "eligible": False,
+         "eligible_full_coverage": True},    # optimizer fail
+    ]
+    keys = _eligible_keys(conv)
+    assert ("m1", "e:A") in keys
+    assert ("m1", "e:B") not in keys
+    assert ("m2", "e:A") not in keys
+
+
+def test_filter_eligible_preds_excludes_ineligible_fold():
+    preds = [
+        {"model_id": "m1", "fold": "e:A", "source_row_id": "R1",
+         "jid": "J1", "y": -6.0, "cens": False, "mu": -6.0, "sigma": 0.7,
+         "abstain": False, "support": True},
+        {"model_id": "m1", "fold": "e:B", "source_row_id": "R2",
+         "jid": "J2", "y": -6.0, "cens": False, "mu": -6.0, "sigma": 0.7,
+         "abstain": False, "support": True},
+        {"model_id": "m1", "fold": "e:C", "source_row_id": "R3",
+         "jid": "J3", "y": -6.0, "cens": False, "mu": -6.0, "sigma": 0.7,
+         "abstain": False, "support": True},
+    ]
+    conv = [
+        {"model_id": "m1", "fold": "e:A", "eligible": True,
+         "eligible_full_coverage": True},
+        {"model_id": "m1", "fold": "e:B", "eligible": True,
+         "eligible_full_coverage": False},   # ineligible -> must drop from main board
+        {"model_id": "m1", "fold": "e:C", "eligible": False,
+         "eligible_full_coverage": True},    # ineligible -> must drop
+    ]
+    kept = _filter_eligible_preds(preds, conv)
+    assert len(kept) == 1
+    assert kept[0]["fold"] == "e:A"
+    # pooled NLL on the eligible subset must ignore the ineligible rows entirely
+    pooled = _pooled_nll_by_model(kept)
+    assert "m1" in pooled and np.isfinite(pooled["m1"])

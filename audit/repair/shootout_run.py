@@ -69,6 +69,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
     make_nonlinear_mlp_rnafm_extended_reg_deep,
 )
+from audit.models.nonlinear_latent_operator import make_nonlinear_latent_operator
 from audit.repair.fold_loader import build_joint_edit_context_folds
 from audit.repair.optimizer_gate import gate_from_fit, unbounded_fit_gate
 
@@ -123,6 +124,9 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep_t_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, swa_n=10)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, swa_n=10)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, swa_n=10)
+    # NONLINEAR LATENT-OPERATOR head (contract 9.1): MLP junction map -> latent q_j,
+    # operator-aware head a_s + b_s q_j, GH-marginal right-censored training.
+    U["nonlinear_latent_operator"] = make_nonlinear_latent_operator(df=7.0)
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)
@@ -184,6 +188,32 @@ def _convergence_row(axis, fold, model_id, model, gate, runtime, elig):
                  "plateau_reached")
                 if k in gate})}
     return base
+
+
+def _rows_hash(rows) -> str:
+    """SHA-256 over the exact sorted row IDs actually handed to fit/predict."""
+    import hashlib
+    h = hashlib.sha256()
+    for rid in sorted(str(r["source_row_id"]) for r in rows):
+        h.update(rid.encode("utf-8"))
+        h.update(b"\n")
+    return h.hexdigest()
+
+
+def _eligible_keys(conv_rows) -> set:
+    """(model_id, fold) pairs that passed BOTH optimizer and full-coverage gates.
+
+    Primary-leaderboard aggregation must only consume predictions whose fold is
+    optimizer-eligible AND full-coverage eligible (contract P0.5: "不合格 fold
+    不进入主榜"; abstention must not be scored as a placeholder value).
+    """
+    return {(str(r["model_id"]), str(r["fold"])) for r in conv_rows
+            if r.get("eligible") and r.get("eligible_full_coverage")}
+
+
+def _filter_eligible_preds(all_preds, conv_rows):
+    keys = _eligible_keys(conv_rows)
+    return [p for p in all_preds if (str(p["model_id"]), str(p["fold"])) in keys]
 
 
 def _pooled_nll_by_model(all_preds):
@@ -341,8 +371,13 @@ def main(cfg):
                         "fallback_type": None,
                     }
                 metric, elig = full_coverage_score(test_rows, preds_by_rowid)
-                conv_rows.append(_convergence_row(
-                    spec.axis, spec.fold, model_id, model, gate, runtime, elig))
+                tr_hash = _rows_hash(train_rows)
+                te_hash = _rows_hash(test_rows)
+                cr = _convergence_row(
+                    spec.axis, spec.fold, model_id, model, gate, runtime, elig)
+                cr["train_rows_hash"] = tr_hash
+                cr["test_rows_hash"] = te_hash
+                conv_rows.append(cr)
                 if preds_by_rowid:
                     for rid, p in preds_by_rowid.items():
                         r = next(x for x in test_rows if str(x["source_row_id"]) == rid)
@@ -386,38 +421,42 @@ def main(cfg):
     pd.DataFrame(conv_rows).to_parquet(out / "ConvergenceLedger_v3.parquet")
     dups = validate_unique_keys([{**p} for p in all_preds])
 
-    # Pooled junction-macro NLL per model (authoritative estimand).
-    pooled = _pooled_nll_by_model(all_preds)
+    # Pooled junction-macro NLL per model (authoritative estimand).  Primary
+    # leaderboard consumes ONLY folds that passed both the optimizer and the
+    # full-coverage eligibility gates (contract P0.5: ineligible folds must not
+    # enter the main board; abstained rows are never scored as placeholders).
+    eligible_preds = _filter_eligible_preds(all_preds, conv_rows)
+    pooled = _pooled_nll_by_model(eligible_preds)
 
     # Core contrast: does ViennaRNA representation beat matched no-sequence?
     vienna_vs_noseq = _pooled_contrast(
-        all_preds, "vienna_latent_operator", "no_sequence_latent_operator",
+        eligible_preds, "vienna_latent_operator", "no_sequence_latent_operator",
         "vienna_latent_operator", "no_sequence_latent_operator",
         "pooled-OOF junction-macro NLL delta (no_sequence - vienna_latent_operator)")
     vienna_cluster = _edit_cluster_ci(
-        all_preds, admitted, "vienna_latent_operator", "no_sequence_latent_operator")
+        eligible_preds, admitted, "vienna_latent_operator", "no_sequence_latent_operator")
 
     # Reference: does ViennaRNA beat the 63-D representation?
     vienna_vs_63d = _pooled_contrast(
-        all_preds, "vienna_latent_operator", "corrected_v1_31",
+        eligible_preds, "vienna_latent_operator", "corrected_v1_31",
         "vienna_latent_operator", "corrected_v1_31(63D)",
         "pooled-OOF junction-macro NLL delta (corrected_v1_31 - vienna_latent_operator)")
 
     # Reference: does k-mer beat the 63-D representation and matched no-seq?
     kmer_vs_63d = _pooled_contrast(
-        all_preds, "kmer_latent_operator", "corrected_v1_31",
+        eligible_preds, "kmer_latent_operator", "corrected_v1_31",
         "kmer_latent_operator", "corrected_v1_31(63D)",
         "pooled-OOF junction-macro NLL delta (corrected_v1_31 - kmer_latent_operator)")
     kmer_vs_noseq = _pooled_contrast(
-        all_preds, "kmer_latent_operator", "no_sequence_latent_operator",
+        eligible_preds, "kmer_latent_operator", "no_sequence_latent_operator",
         "kmer_latent_operator", "no_sequence_latent_operator",
         "pooled-OOF junction-macro NLL delta (no_sequence - kmer_latent_operator)")
     kmer_cluster = _edit_cluster_ci(
-        all_preds, admitted, "kmer_latent_operator", "no_sequence_latent_operator")
+        eligible_preds, admitted, "kmer_latent_operator", "no_sequence_latent_operator")
 
     # Reference: does ViennaRNA beat the strongest simple baseline?
     vienna_vs_scaffold = _pooled_contrast(
-        all_preds, "vienna_latent_operator", "train_only_scaffold",
+        eligible_preds, "vienna_latent_operator", "train_only_scaffold",
         "vienna_latent_operator", "train_only_scaffold",
         "pooled-OOF junction-macro NLL delta (train_only_scaffold - vienna_latent_operator)")
 
@@ -425,147 +464,147 @@ def main(cfg):
     # block vs the same nuisance-only model (identical head class). Positive theta
     # = the sequence block adds predictive increment over the strongest simple model.
     hybrid_vs_nuisance = _pooled_contrast(
-        all_preds, "vienna_linear_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "vienna_linear_hybrid", "motif_topology_hierarchy",
         "vienna_linear_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - vienna_linear_hybrid)")
     hybrid_cluster = _edit_cluster_ci(
-        all_preds, admitted, "vienna_linear_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "vienna_linear_hybrid", "motif_topology_hierarchy")
 
     # Enrichment test: extended ViennaRNA vs base 11-D ViennaRNA (same winning head).
     ext_vs_base = _pooled_contrast(
-        all_preds, "vienna_extended_linear_hybrid", "vienna_linear_hybrid",
+        eligible_preds, "vienna_extended_linear_hybrid", "vienna_linear_hybrid",
         "vienna_extended_linear_hybrid", "vienna_linear_hybrid",
         "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - vienna_extended_linear_hybrid)")
     ext_vs_nuisance = _pooled_contrast(
-        all_preds, "vienna_extended_linear_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "vienna_extended_linear_hybrid", "motif_topology_hierarchy",
         "vienna_extended_linear_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - vienna_extended_linear_hybrid)")
     ext_cluster = _edit_cluster_ci(
-        all_preds, admitted, "vienna_extended_linear_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "vienna_extended_linear_hybrid", "motif_topology_hierarchy")
 
     # RNA-FM: does a frozen learned sequence representation beat the folding
     # proxy and the nuisance-only model (same winning head)?
     rnafm_vs_nuisance = _pooled_contrast(
-        all_preds, "rnafm_linear_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "rnafm_linear_hybrid", "motif_topology_hierarchy",
         "rnafm_linear_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - rnafm_linear_hybrid)")
     rnafm_vs_vienna = _pooled_contrast(
-        all_preds, "rnafm_linear_hybrid", "vienna_linear_hybrid",
+        eligible_preds, "rnafm_linear_hybrid", "vienna_linear_hybrid",
         "rnafm_linear_hybrid", "vienna_linear_hybrid",
         "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - rnafm_linear_hybrid)")
     rnafm_cluster = _edit_cluster_ci(
-        all_preds, admitted, "rnafm_linear_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "rnafm_linear_hybrid", "motif_topology_hierarchy")
     rnafmvienna_vs_vienna = _pooled_contrast(
-        all_preds, "rnafm_vienna_linear_hybrid", "vienna_linear_hybrid",
+        eligible_preds, "rnafm_vienna_linear_hybrid", "vienna_linear_hybrid",
         "rnafm_vienna_linear_hybrid", "vienna_linear_hybrid",
         "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - rnafm_vienna_linear_hybrid)")
     rnafmvienna_vs_nuisance = _pooled_contrast(
-        all_preds, "rnafm_vienna_linear_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "rnafm_vienna_linear_hybrid", "motif_topology_hierarchy",
         "rnafm_vienna_linear_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - rnafm_vienna_linear_hybrid)")
     rnafmvienna_cluster = _edit_cluster_ci(
-        all_preds, admitted, "rnafm_vienna_linear_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "rnafm_vienna_linear_hybrid", "motif_topology_hierarchy")
     rnafm_pca_vs_vienna = _pooled_contrast(
-        all_preds, "rnafm_pca_linear_hybrid", "vienna_linear_hybrid",
+        eligible_preds, "rnafm_pca_linear_hybrid", "vienna_linear_hybrid",
         "rnafm_pca_linear_hybrid", "vienna_linear_hybrid",
         "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - rnafm_pca_linear_hybrid)")
     rnafm_pca_vs_nuisance = _pooled_contrast(
-        all_preds, "rnafm_pca_linear_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "rnafm_pca_linear_hybrid", "motif_topology_hierarchy",
         "rnafm_pca_linear_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - rnafm_pca_linear_hybrid)")
     rnafm_pca_cluster = _edit_cluster_ci(
-        all_preds, admitted, "rnafm_pca_linear_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "rnafm_pca_linear_hybrid", "motif_topology_hierarchy")
 
     # NONLINEAR/INTERACTION: does adding Vienna x scaffold/motif interactions or
     # replacing the linear head with an MLP capture the residual sequence signal?
     interact_vs_nuisance = _pooled_contrast(
-        all_preds, "vienna_interaction_linear_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "vienna_interaction_linear_hybrid", "motif_topology_hierarchy",
         "vienna_interaction_linear_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - vienna_interaction_linear_hybrid)")
     interact_vs_vienna = _pooled_contrast(
-        all_preds, "vienna_interaction_linear_hybrid", "vienna_linear_hybrid",
+        eligible_preds, "vienna_interaction_linear_hybrid", "vienna_linear_hybrid",
         "vienna_interaction_linear_hybrid", "vienna_linear_hybrid",
         "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - vienna_interaction_linear_hybrid)")
     interact_cluster = _edit_cluster_ci(
-        all_preds, admitted, "vienna_interaction_linear_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "vienna_interaction_linear_hybrid", "motif_topology_hierarchy")
 
     mlp_vs_nuisance = _pooled_contrast(
-        all_preds, "nonlinear_mlp_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "nonlinear_mlp_hybrid", "motif_topology_hierarchy",
         "nonlinear_mlp_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_hybrid)")
     mlp_vs_vienna = _pooled_contrast(
-        all_preds, "nonlinear_mlp_hybrid", "vienna_linear_hybrid",
+        eligible_preds, "nonlinear_mlp_hybrid", "vienna_linear_hybrid",
         "nonlinear_mlp_hybrid", "vienna_linear_hybrid",
         "pooled-OOF junction-macro NLL delta (vienna_linear_hybrid - nonlinear_mlp_hybrid)")
     mlp_cluster = _edit_cluster_ci(
-        all_preds, admitted, "nonlinear_mlp_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "nonlinear_mlp_hybrid", "motif_topology_hierarchy")
 
     # RICHER-FEATURE NONLINEAR step: does the nonlinear head finally unlock the
     # richer representations (21-D ViennaRNA, RNA-FM-PCA) that saturated the
     # linear head?  Contrast each against the base nonlinear MLP and nuisance.
     ext_mlp_vs_nuisance = _pooled_contrast(
-        all_preds, "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy",
         "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_extended_hybrid)")
     ext_mlp_vs_mlp = _pooled_contrast(
-        all_preds, "nonlinear_mlp_extended_hybrid", "nonlinear_mlp_hybrid",
+        eligible_preds, "nonlinear_mlp_extended_hybrid", "nonlinear_mlp_hybrid",
         "nonlinear_mlp_extended_hybrid", "nonlinear_mlp_hybrid",
         "pooled-OOF junction-macro NLL delta (nonlinear_mlp_hybrid - nonlinear_mlp_extended_hybrid)")
     ext_mlp_cluster = _edit_cluster_ci(
-        all_preds, admitted, "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "nonlinear_mlp_extended_hybrid", "motif_topology_hierarchy")
 
     rnafm_mlp_vs_nuisance = _pooled_contrast(
-        all_preds, "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy",
         "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_rnafm_pca_hybrid)")
     rnafm_mlp_vs_mlp = _pooled_contrast(
-        all_preds, "nonlinear_mlp_rnafm_pca_hybrid", "nonlinear_mlp_hybrid",
+        eligible_preds, "nonlinear_mlp_rnafm_pca_hybrid", "nonlinear_mlp_hybrid",
         "nonlinear_mlp_rnafm_pca_hybrid", "nonlinear_mlp_hybrid",
         "pooled-OOF junction-macro NLL delta (nonlinear_mlp_hybrid - nonlinear_mlp_rnafm_pca_hybrid)")
     rnafm_mlp_vs_rnafm_lin = _pooled_contrast(
-        all_preds, "nonlinear_mlp_rnafm_pca_hybrid", "rnafm_pca_linear_hybrid",
+        eligible_preds, "nonlinear_mlp_rnafm_pca_hybrid", "rnafm_pca_linear_hybrid",
         "nonlinear_mlp_rnafm_pca_hybrid", "rnafm_pca_linear_hybrid",
         "pooled-OOF junction-macro NLL delta (rnafm_pca_linear_hybrid - nonlinear_mlp_rnafm_pca_hybrid)")
     rnafm_mlp_cluster = _edit_cluster_ci(
-        all_preds, admitted, "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "nonlinear_mlp_rnafm_pca_hybrid", "motif_topology_hierarchy")
 
     rnafm_only_mlp_vs_nuisance = _pooled_contrast(
-        all_preds, "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy",
+        eligible_preds, "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy",
         "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_rnafm_only_pca_hybrid)")
     rnafm_only_mlp_vs_mlp = _pooled_contrast(
-        all_preds, "nonlinear_mlp_rnafm_only_pca_hybrid", "nonlinear_mlp_hybrid",
+        eligible_preds, "nonlinear_mlp_rnafm_only_pca_hybrid", "nonlinear_mlp_hybrid",
         "nonlinear_mlp_rnafm_only_pca_hybrid", "nonlinear_mlp_hybrid",
         "pooled-OOF junction-macro NLL delta (nonlinear_mlp_hybrid - nonlinear_mlp_rnafm_only_pca_hybrid)")
     rnafm_only_mlp_cluster = _edit_cluster_ci(
-        all_preds, admitted, "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy")
+        eligible_preds, admitted, "nonlinear_mlp_rnafm_only_pca_hybrid", "motif_topology_hierarchy")
 
     # LOCAL-CONTEXT step: does the position-anchored join-local-context one-hot
     # block add signal beyond the folding aggregates under the reg_deep arch?
     localctx_vs_nuisance = _pooled_contrast(
-        all_preds, "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy",
+        eligible_preds, "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy",
         "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_extended_hybrid_localctx)")
     localctx_vs_reg_deep = _pooled_contrast(
-        all_preds, "nonlinear_mlp_extended_hybrid_localctx", "nonlinear_mlp_extended_hybrid_reg_deep",
+        eligible_preds, "nonlinear_mlp_extended_hybrid_localctx", "nonlinear_mlp_extended_hybrid_reg_deep",
         "nonlinear_mlp_extended_hybrid_localctx", "nonlinear_mlp_extended_hybrid_reg_deep",
         "pooled-OOF junction-macro NLL delta (nonlinear_mlp_extended_hybrid_reg_deep - nonlinear_mlp_extended_hybrid_localctx)")
     localctx_cluster = _edit_cluster_ci(
-        all_preds, admitted, "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy")
+        eligible_preds, admitted, "nonlinear_mlp_extended_hybrid_localctx", "motif_topology_hierarchy")
 
     # ROBUST-LIKELIHOOD step: does training reg_deep with a heavy-tailed
     # Student-t objective (down-weighting outlier/catastrophic folds) lower the
     # Gaussian evaluation NLL vs the Gaussian-trained reg_deep?
     robust_t_vs_nuisance = _pooled_contrast(
-        all_preds, "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy",
+        eligible_preds, "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy",
         "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy",
         "pooled-OOF junction-macro NLL delta (motif_topology_hierarchy - nonlinear_mlp_extended_hybrid_reg_deep_t)")
     robust_t_vs_reg_deep = _pooled_contrast(
-        all_preds, "nonlinear_mlp_extended_hybrid_reg_deep_t", "nonlinear_mlp_extended_hybrid_reg_deep",
+        eligible_preds, "nonlinear_mlp_extended_hybrid_reg_deep_t", "nonlinear_mlp_extended_hybrid_reg_deep",
         "nonlinear_mlp_extended_hybrid_reg_deep_t", "nonlinear_mlp_extended_hybrid_reg_deep",
         "pooled-OOF junction-macro NLL delta (nonlinear_mlp_extended_hybrid_reg_deep - nonlinear_mlp_extended_hybrid_reg_deep_t)")
     robust_t_cluster = _edit_cluster_ci(
-        all_preds, admitted, "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy")
+        eligible_preds, admitted, "nonlinear_mlp_extended_hybrid_reg_deep_t", "motif_topology_hierarchy")
 
     report = {
         "axis": "edit_x_nested_context",
