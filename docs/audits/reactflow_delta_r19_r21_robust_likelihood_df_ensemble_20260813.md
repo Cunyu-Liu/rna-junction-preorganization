@@ -94,6 +94,22 @@ seed=2026 的 t5/t7/t10 单模型 NLL：
 不带来增益，说明瓶颈不在最后一轮权重的噪声，而在逐 fold/逐样本的结构（已被 mu-集成、
 鲁棒目标覆盖）。不再沿此方向扩展。
 
+### r25 Bagging（bootstrap 数据级方差缩减）—— 阴性结果
+
+实现 `make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag`：每个 bag 对训练行做有放回重采样
+（满 train scaler，逐 bag 独立种子），训练 t7 MLP 后平均 mu。2-fold 冒烟对照：
+
+| 模型 | NLL（2 folds） |
+|------|-----|
+| t7（单模型） | 0.7886 |
+| t7_s2026 | 0.8016 |
+| t7_s99 | 0.8194 |
+| **t7_bag5** | **0.8194** |
+
+**Bagging 是阴性结果**：数据级扰动引入的噪声无法被 Student-t 目标补偿，两个 fold 均
+差于其基础成员。与项目一贯规律一致——只有干净的 seed 级方差缩减有效，数据/特征级扰动
+（RNA-FM、localctx、het-sigma、SWA、bagging）全部失败。冒烟阶段即否决，不再全量运行。
+
 ## 结论
 
 - **鲁棒似然头部有效**：df≥5 的 Student-t 训练目标在等容量下稳定优于 Gaussian（约 +3.6%，
@@ -101,16 +117,18 @@ seed=2026 的 t5/t7/t10 单模型 NLL：
 - **t7 跨种子 mu-集成是当前最佳方法**：+19.17%，edit-cluster CI [0.166, 0.289]，
   跨 3 个独立种子、聚焦最优 df=7 均以排除 0 的 CI 通过 10% gate。
 - **SWA 阴性**：权重级方差缩减无增益。
+- **Bagging 阴性**：数据级 bootstrap 扰动无增益（冒烟否决）。
 - 复现产物、manifest 与预测存于 `/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/`
-  `r20_robust_t_df_sweep/`、`r21_seed99_replication/`、`r22_swa/`、`r23_seed2026_replication/`。
+  `r20_robust_t_df_sweep/`、`r21_seed99_replication/`、`r22_swa/`、`r23_seed2026_replication/`、
+  `r24_t7_seed7/`、`r25_bag_smoke/`。
 
 ## 代码与提交
 
 - 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 与 swa_n 参数）、
   `audit/models/nonlinear_mlp_rich_hybrid.py`（Student-t 训练目标、seed/swa_n 线程化、
-  seed-diverse 与 SWA 变体）、`audit/repair/shootout_run.py`（注册 t3/t5/t7/t10、_s99、
-  _swa 变体）、`tests/audit/test_nonlinear_mlp_rich_hybrid.py`。
+  seed-diverse 与 SWA/Bag 变体）、`audit/repair/shootout_run.py`（注册 t3/t5/t7/t10、_s99、
+  _s2026、_swa、_bag 变体）、`tests/audit/test_nonlinear_mlp_rich_hybrid.py`。
 - 新增配置：`shootout_r20_robust_t_df_sweep_cfg.json`、`shootout_r21_seed99_replication_cfg.json`、
-  `shootout_r22_swa_cfg.json`。
-- 提交：`9fff7f2`（branch `r0_audit_repair_20260811`）。
-- 单元测试：22 passed。
+  `shootout_r22_swa_cfg.json`、`shootout_r24_t7_seed7_cfg.json`、`shootout_r25_bag_smoke_cfg.json`。
+- 提交：`9fff7f2`、`62ddc91`、`0003bd5`、`5ae913b`、`075f8d9`、`6d4e223`（branch `r0_audit_repair_20260811`）。
+- 单元测试：24 passed。
