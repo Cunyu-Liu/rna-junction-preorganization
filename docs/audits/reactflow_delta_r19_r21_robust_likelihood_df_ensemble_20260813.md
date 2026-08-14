@@ -130,9 +130,20 @@ seed=2026 的 t5/t7/t10 单模型 NLL：
   跨 3 个独立种子、聚焦最优 df=7 均以排除 0 的 CI 通过 10% gate。
 - **SWA 阴性**：权重级方差缩减无增益。
 - **Bagging 阴性**：数据级 bootstrap 扰动无增益（冒烟否决）。
+- **完整消融梯次（ablation ladder）**（pooled junction-macro NLL，固定 sigma=0.7）：
+
+| 方法 | NLL | vs nuisance |
+|------|-----|-----------|
+| nuisance baseline | 1.0916 | — |
+| +Vienna21 nonlinear 2-layer reg | 0.9569 | +12.35% |
+| reg_deep 3-layer | 0.9479 | +13.17% |
+| +robust Student-t df=5 | 0.9140 | +16.28% |
+| +df=7 best single | 0.9129 | +16.37% |
+| **3x t7 ensemble (seed 0/99/2026)** | **0.8823** | **+19.17%** |
+
 - 复现产物、manifest 与预测存于 `/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/`
-  `r20_robust_t_df_sweep/`、`r21_seed99_replication/`、`r22_swa/`、`r23_seed2026_replication/`、
-  `r24_t7_seed7/`、`r25_bag_smoke/`。
+  `r14_extended_mlp_scan/`、`r20_robust_t_df_sweep/`、`r21_seed99_replication/`、
+  `r22_swa/`、`r23_seed2026_replication/`、`r24_t7_seed7/`、`r25_bag_smoke/`。
 
 ## 代码与提交
 
