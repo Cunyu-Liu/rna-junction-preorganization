@@ -64,6 +64,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_het,
     make_nonlinear_mlp_extended_hybrid_localctx,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
     make_nonlinear_mlp_rnafm_extended_reg_deep,
@@ -111,6 +112,8 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_s2026"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, seed=2026)
     # fourth independent seed (7) of the optimal t7 member only (saturation test)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_s7"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, seed=7)
+    # bagged t7: bootstrap-resample train rows (data-level variance reduction)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_bag5"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag(df=7.0, n_bags=5)
     # SWA (stochastic weight averaging) over the last swa_n converged epochs:
     # variance reduction at the weight level, matching the mu-ensemble theme.
     U["nonlinear_mlp_extended_hybrid_reg_deep_t_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, swa_n=10)

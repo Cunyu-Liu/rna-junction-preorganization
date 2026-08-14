@@ -23,6 +23,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_het,
     make_nonlinear_mlp_extended_hybrid_localctx,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
     _student_t_survival,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
@@ -329,6 +330,37 @@ def test_robust_t_swa_shapes_and_finiteness():
     m0 = fit0(tr)
     mu0, s0, cp0, su0, ab0 = pred0(m0, te)
     assert not np.allclose(mu, mu0)  # SWA vs best-epoch differ on the same seed
+
+
+@needs_torch_vienna
+def test_robust_t_bag_shapes_and_finiteness():
+    """Bagged t7 (n_bags>1) must fit/predict cleanly and average mu over bags."""
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    fit, predict = make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag(
+        df=7.0, n_bags=3)
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_extended_hybrid_reg_deep_t_bag"
+    assert model["df"] == 7.0
+    assert model["n_bags"] == 3
+    assert len(model["nets"]) == 3 and len(model["gates"]) == 3
+    for g in model["gates"]:
+        assert "eligible" in g and "final_grad_norm" in g
+        assert g["df"] == 7.0
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+    assert np.allclose(sigma, 0.7)
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert np.all(np.isfinite(cp))
+    assert support.dtype == bool and abstain.dtype == bool
+    # bagging with different seeds must differ (independent bags)
+    fit2, pred2 = make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag(
+        df=7.0, n_bags=3, seed=99)
+    m2 = fit2(tr)
+    mu2, s2, cp2, su2, ab2 = pred2(m2, te)
+    assert not np.allclose(mu, mu2)  # distinct bag seeds -> distinct mu
 
 
 @needs_torch_vienna

@@ -784,6 +784,87 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
     return fit, predict
 
 
+def make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag(df=_DEFAULT_DF,
+                                                      hidden=(96, 64, 32),
+                                                      dropout=0.1,
+                                                      weight_decay=1e-2,
+                                                      seed=_T_SEED,
+                                                      n_bags=5):
+    """Bagged t7 MLP: bootstrap-resample train rows, average mu across bags.
+
+    Orthogonal variance-reduction axis to seed-diversity: each bag draws a
+    bootstrap sample (with replacement, same size) of the training rows and
+    trains a t7 (Student-t df) reg_deep MLP with a distinct per-bag seed.
+    The ViennaRNA scaler / unseen-scaffold map is fit on the FULL train set
+    (no test leakage).  Prediction averages mu across bags; sigma stays 0.7.
+    """
+    def fit(train_rows):
+        import torch
+        motifs = sorted({str(r["motif"]) for r in train_rows})
+        scafs = sorted({int(r["scaf"]) for r in train_rows})
+        Xn = _nuisance_basis(train_rows, motifs, scafs)
+        tr_jids = sorted({str(r["jid"]) for r in train_rows})
+        by_jid = vienna_ext_build_raw(train_rows)
+        mean, sd = vienna_ext_fit_scaler(tr_jids, by_jid)
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        rng = np.random.default_rng(int(seed) + 1000)
+        nets = []
+        gates = []
+        n = len(train_rows)
+        for b in range(n_bags):
+            idx = rng.integers(0, n, size=n)
+            bag = [train_rows[i] for i in idx]
+            Xnb = _nuisance_basis(bag, motifs, scafs)
+            # feature scaling uses the FULL-train scaler (consistent train/test)
+            Xv_b = np.zeros((len(bag), len(mean)))
+            for i, r in enumerate(bag):
+                Xv_b[i] = vienna_ext_transform(
+                    [str(r["jid"])], by_jid, mean, sd)[0]
+            X = np.hstack([Xnb, Xv_b])
+            y = np.asarray([r["y"] for r in bag], dtype=float)
+            cens = np.asarray([r["cens"] for r in bag], dtype=bool)
+            net, gate = _train_mlp_t(X, y, cens, device, X.shape[1],
+                                     hidden=hidden, dropout=dropout,
+                                     weight_decay=weight_decay, df=df,
+                                     seed=int(seed) + 100 + b)
+            nets.append(net)
+            gates.append(gate)
+        return {"kind": "nonlinear_mlp_extended_hybrid_reg_deep_t_bag",
+                "nets": nets, "gates": gates, "motifs": motifs, "scafs": scafs,
+                "mean": mean, "sd": sd, "by_jid": by_jid,
+                "n_nuisance": Xn.shape[1], "n_vienna": len(mean),
+                "device": device, "hidden": list(hidden),
+                "dropout": dropout, "weight_decay": weight_decay, "df": float(df),
+                "seed": int(seed), "n_bags": int(n_bags)}
+
+    def predict(model, test_rows):
+        import torch
+        Xn = _nuisance_basis(test_rows, model["motifs"], model["scafs"])
+        by_jid = vienna_ext_build_raw(test_rows)
+        Xv = np.zeros((len(test_rows), model["n_vienna"]))
+        for i, r in enumerate(test_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, model["mean"], model["sd"])[0]
+        X = np.hstack([Xn, Xv])
+        mu_acc = np.zeros(len(test_rows))
+        with torch.no_grad():
+            Xt = torch.tensor(X, dtype=torch.float32, device=model["device"])
+            for net in model["nets"]:
+                net.eval()
+                mu_acc += net(Xt).squeeze(-1).cpu().numpy()
+        mu = mu_acc / len(model["nets"])
+        sigma = np.full(len(mu), 0.7)
+        from scipy.special import log_ndtr
+        a = (mu + 7.1) / 0.7
+        cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
+        seen_scaf = np.zeros(len(mu), dtype=bool)
+        for i, r in enumerate(test_rows):
+            if int(r["scaf"]) in model["scafs"]:
+                seen_scaf[i] = True
+        return mu, sigma, cp, seen_scaf, ~seen_scaf
+
+    return fit, predict
+
+
 def make_nonlinear_mlp_rnafm_extended_reg_deep(cache: dict, k: int = DEFAULT_K,
                                                hidden=(96, 64, 32), dropout=0.1,
                                                weight_decay=1e-2):
