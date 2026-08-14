@@ -39,23 +39,43 @@
 | 原始 seed 4x | 0.9012 | +17.44% | [0.145, 0.250] |
 | **seed=99 复现 4x** | **0.8866** | **+18.78%** | **[0.159, 0.286]** |
 | 跨 seed 8x | 0.8896 | +18.51% | [0.156, 0.277] |
+| **纯鲁棒跨种子 6x（t5/t7/t10×2 seeds）** | **0.8855** | **+18.88%** | **[0.157, 0.277]** |
 
-两个独立种子均以 CI 排除 0 通过 10% gate，增益稳定在 **+17.4%~+18.8%**。
+两个独立种子均以 CI 排除 0 通过 10% gate，增益稳定在 **+17.4%~+18.9%**。
+**当前最佳为纯鲁棒跨种子 6x 集成（0.8855，+18.88%）**。
+
+### r22 SWA（随机权重平均）—— 阴性结果
+
+在 `_train_mlp`/`_train_mlp_t` 中加入 `swa_n=10` 的滚动权重平均（对最后 10 个收敛 epoch
+的权重求平均），注册 t5/t7/t10 的 SWA 变体，37 fold 全量对照：
+
+| 模型 | NLL（SWA=10） | NLL（best-epoch） | 结论 |
+|------|-----|-----------|------|
+| t5_swa | 0.9129 | 0.9140 | 微升 |
+| t7_swa | 0.9246 | 0.9129 | 变差 |
+| t10_swa | 0.9256 | 0.9138 | 变差 |
+
+将 t5_swa 并入 6x 集成也变差（0.8855→0.8879）。**SWA 是阴性结果**：权重级方差缩减
+不带来增益，说明瓶颈不在最后一轮权重的噪声，而在逐 fold/逐样本的结构（已被 mu-集成、
+鲁棒目标覆盖）。不再沿此方向扩展。
 
 ## 结论
 
 - **鲁棒似然头部有效**：df≥5 的 Student-t 训练目标在等容量下稳定优于 Gaussian（约 +3.6%，
   robust_t_vs_reg_deep）；df=3 过重尾有害。
-- **df 多样集成是当前最佳方法**：跨两个独立种子复现均以排除 0 的 CI 通过 10% gate。
+- **纯鲁棒跨种子 6x 集成是当前最佳方法**：+18.88%，edit-cluster CI [0.157, 0.277]，
+  跨两个独立种子、df 多样均以排除 0 的 CI 通过 10% gate。
+- **SWA 阴性**：权重级方差缩减无增益。
 - 复现产物、manifest 与预测存于 `/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/`
-  `r20_robust_t_df_sweep/` 与 `r21_seed99_replication/`。
+  `r20_robust_t_df_sweep/`、`r21_seed99_replication/`、`r22_swa/`。
 
 ## 代码与提交
 
-- 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 参数）、
-  `audit/models/nonlinear_mlp_rich_hybrid.py`（Student-t 训练目标、seed 线程化、
-  seed-diverse 变体）、`audit/repair/shootout_run.py`（注册 t3/t5/t7/t10 与 _s99 变体）、
-  `tests/audit/test_nonlinear_mlp_rich_hybrid.py`。
-- 新增配置：`shootout_r20_robust_t_df_sweep_cfg.json`、`shootout_r21_seed99_replication_cfg.json`。
+- 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 与 swa_n 参数）、
+  `audit/models/nonlinear_mlp_rich_hybrid.py`（Student-t 训练目标、seed/swa_n 线程化、
+  seed-diverse 与 SWA 变体）、`audit/repair/shootout_run.py`（注册 t3/t5/t7/t10、_s99、
+  _swa 变体）、`tests/audit/test_nonlinear_mlp_rich_hybrid.py`。
+- 新增配置：`shootout_r20_robust_t_df_sweep_cfg.json`、`shootout_r21_seed99_replication_cfg.json`、
+  `shootout_r22_swa_cfg.json`。
 - 提交：`9fff7f2`（branch `r0_audit_repair_20260811`）。
 - 单元测试：22 passed。
