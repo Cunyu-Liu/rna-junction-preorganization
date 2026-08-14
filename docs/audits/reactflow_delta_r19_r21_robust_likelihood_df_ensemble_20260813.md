@@ -249,6 +249,32 @@ P0.6 裁定（`/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication/`
 贡献是鲁棒似然 t7 跨种子 mu-集成（+19.17% over nuisance）。后续按 benchmark 轨
 整理（aggregation/support/nesting/censoring 认识），而非继续扩展 sequence-map。
 
+## r31 匹配消融：方法贡献归属分解（决定性）
+
+实现 `nonlinear_mlp_nuisance_only_t`（同 reg_deep t7 MLP 架构 + Student-t df=7
+目标，但**去掉 21-D extended-ViennaRNA 特征**，仅保留 nuisance 基
+= motif+scaffold+topology），37-fold 全量对照：
+
+| 方法 | NLL | vs 线性 nuisance |
+|------|-----|-----------------|
+| motif_topology_hierarchy（线性基线） | 1.0916 | — |
+| nuisance-only t7（非线性头，无 ViennaRNA） | 0.9012 | **+17.45%** |
+| 3x t7 集成（非线性头 + ViennaRNA） | 0.8823 | **+19.17%** |
+| **ViennaRNA 增量（非线性头下）** | — | **+2.09%** |
+
+**决定性发现**：3x t7 相对线性基线的 +19.17% 中，**+17.45% 来自非线性头 +
+nuisance 特征本身**，仅 **+2.09% 来自 ViennaRNA 序列表征**（r30 3-fold 冒烟
++4.36% 方向一致但更小）。这直接解释了三件事：
+
+1. **为何"模型效果太差、无领先成果"**：sequence 信号在此单 study 数据上
+   确实很小（63-D 序列映射差 24.5%、ViennaRNA 增量仅 ~2%）；方法贡献不在
+   sequence 表征，而在**右删失鲁棒非线性头**的结构。
+2. **为何所有"加序列特征"方向失败**（RNA-FM、localctx、deep4/5）：序列
+   信息增量天花板就在 ~2%，远不足以支撑更复杂表征。
+3. **论文方法的真实可主张贡献**：censor-aware 鲁棒（Student-t）非线性
+   头 + 跨种子 mu-集成，对线性/无序列对照的增益主要由非线性结构而非
+   序列表征驱动；sequence 增量可写为 small conditional effect。
+
 ## 代码与提交
 
 - 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 与 swa_n 参数）、
@@ -265,8 +291,11 @@ P0.6 裁定（`/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication/`
   `tests/audit/test_repair_p02.py`（+3 项）。
 - P0.5/P0.6：`audit/repair/analyze_p05_rerun.py`、
   `audit/repair/shootout_r29_p05_rerun_smoke_cfg.json`（commit `4f90015`）。
+- r31 消融：`audit/models/nonlinear_mlp_rich_hybrid.py`（`make_nonlinear_mlp_nuisance_only_t`）、
+  `audit/repair/shootout_r30_nuisance_ablation_smoke_cfg.json`、
+  `audit/repair/shootout_r31_nuisance_only_full_cfg.json`（commit `5d5cfb4`、`0dbb3eb`）。
 - 提交：`9fff7f2`、`62ddc91`、`0003bd5`、`5ae913b`、`075f8d9`、`6d4e223`、`7a1f5fa`、
-  `f4c322f`、`4f90015`（branch `r0_audit_repair_20260811`）。
+  `f4c322f`、`4f90015`、`5d5cfb4`、`0dbb3eb`（branch `r0_audit_repair_20260811`）。
 - 单元测试：24 passed（r19-r26）；r27 新增 7 passed；P0.2 修复后全套 187 passed
   （1 项 pre-existing 失败 `test_shootout_report_only.py::test_paired_contrast_sign_and_semantics`
   由 source_row_id 不匹配的 fixture bug 引起，与本次改动无关）。
