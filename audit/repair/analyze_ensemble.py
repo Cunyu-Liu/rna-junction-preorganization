@@ -65,11 +65,12 @@ def pooled_nll_by_model(all_preds):
     return out
 
 
-def build_ensemble_rows(all_preds, members):
-    """Return list of synthetic ENSEMBLE predictions (mu = mean of member mus).
+def build_ensemble_rows(all_preds, members, combine="mean"):
+    """Return list of synthetic ENSEMBLE predictions (mu = combine of member mus).
 
     A row is admitted only if it is supported+non-abstain in EVERY member, so
     the comparison is coverage-matched across the whole ensemble.
+    combine: "mean" (default) or "median" (robust center across members).
     """
     by_member = {}
     for m in members:
@@ -83,11 +84,15 @@ def build_ensemble_rows(all_preds, members):
     for rid in common:
         ms = [by_member[m][rid]["mu"] for m in members]
         ref = by_member[members[0]][rid]
+        if combine == "median":
+            mu = float(np.median(ms))
+        else:
+            mu = float(np.mean(ms))
         ens.append({
             "axis": ref["axis"], "fold": ref["fold"], "source_row_id": rid,
             "jid": ref["jid"], "scaf": ref["scaf"], "context": ref["context"],
             "model_id": ENSEMBLE_ID, "y": ref["y"], "cens": ref["cens"],
-            "mu": float(np.mean(ms)), "sigma": 0.7,
+            "mu": mu, "sigma": 0.7,
             "abstain": False, "support": True, "fallback_type": None,
         })
     return ens
@@ -170,10 +175,11 @@ def main():
     ap.add_argument("--members", nargs="+", default=DEFAULT_MEMBERS)
     ap.add_argument("--base", default=BASE)
     ap.add_argument("--ref-single", default=REF_SINGLE)
+    ap.add_argument("--combine", default="mean", choices=["mean", "median"])
     args = ap.parse_args()
 
     all_preds = load_preds(args.preds)
-    ens_rows = build_ensemble_rows(all_preds, args.members)
+    ens_rows = build_ensemble_rows(all_preds, args.members, combine=args.combine)
     combined = list(all_preds) + ens_rows
 
     pooled = pooled_nll_by_model(combined)
@@ -182,9 +188,11 @@ def main():
         "n_predictions": len(all_preds),
         "n_ensemble_members": len(args.members),
         "members": args.members,
+        "combine": args.combine,
         "n_ensemble_rows": len(ens_rows),
         "pooled_junction_macro_nll": pooled,
-        "single_best_member_nll": pooled.get("nonlinear_mlp_extended_hybrid_reg_deep"),
+        "single_best_member_nll": min((pooled.get(m) for m in args.members
+                                       if pooled.get(m) is not None), default=None),
         "contrasts": {},
     }
     name_a = f"{ENSEMBLE_ID} ({len(args.members)}x mu-ensemble)"
