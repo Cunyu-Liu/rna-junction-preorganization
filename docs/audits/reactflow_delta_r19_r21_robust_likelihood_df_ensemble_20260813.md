@@ -158,6 +158,60 @@ df=7 下重扫 dropout（Gaussian 调参最优为 0.1）：3-fold 冒烟对照
   `r14_extended_mlp_scan/`、`r20_robust_t_df_sweep/`、`r21_seed99_replication/`、
   `r22_swa/`、`r23_seed2026_replication/`、`r24_t7_seed7/`、`r25_bag_smoke/`。
 
+## r27 非线性 latent-operator 头 —— 阴性结果（合同 §9.1 空白组合）
+
+实现合同 §9.1 要求的"统一 operator-aware head"下真正未试的组合：MLP 非线性映射
+junction 特征 → latent q_j，经 scaffold 专属 intercept/slope（a_s + b_s·q_j）
+operator 头，GH48 边缘化右删失似然联合训练（`audit/models/nonlinear_latent_operator.py`）。
+与线性 latent-operator 系（v1.31）唯一差异是序列映射非线性化；与平头 MLP 系唯一
+差异是显式 junction latent + scaffold slope。
+
+3-fold 冒烟（r27，matched folds）pooled junction-macro NLL：
+
+| 模型 | NLL（3 folds） | vs nuisance |
+|------|-----|-----------|
+| motif_topology_hierarchy（nuisance） | 0.9667 | — |
+| vienna_latent_operator（线性 GH） | 1.0708 | 更差 |
+| nonlinear_mlp_extended_hybrid_reg_deep_t7（平头 MLP） | **0.8242** | **+14.7%** |
+| **nonlinear_latent_operator（MLP + GH 头）** | **1.1200** | **更差（-15.9%）** |
+
+**否决**：GH 边缘化优化远难于平头 row-level NLL；junction 级 latent + scaffold
+约束对非线性情形过强。连线性 latent-operator 也差于 nuisance，证实 GH 目标本身
+在此数据上不是瓶颈——平头 MLP 直接优化 row-level mu 更有效。单元测试 7 passed
+（含 GH 边际 NLL 可微、删失一致性、unseen scaffold abstain、scaffold 不入 MLP 特征）。
+
+## r28 异构模型族集成 —— 阴性结果（稀释）
+
+把不同模型族的 mu 一起平均（跨 r06/r08/r24 三个 run root，37 folds 与 11,893 rows
+完全一致，无泄漏）：
+
+| 集成 | NLL | Rel Gain | CI |
+|------|-----|---------|-----|
+| **3x t7（当前最优）** | **0.8823** | **+19.17%** | **[0.166, 0.295]** |
+| 3x t7 + 扩展线性 hybrid | 0.8894 | +18.53% | [0.164, 0.284] |
+| 3x t7 + 线性 hybrid | 0.9036 | +17.23% | [0.154, 0.265] |
+| 3x t7 + latent-operator | 0.9095 | +16.68% | [0.150, 0.256] |
+| 3x t7 + 扩展 + latent | 0.9211 | +15.62% | [0.141, 0.242] |
+
+**否决**：异构族成员的预测相关性并不比同架构种子低到足以补偿其更强的单个误差。
+同架构 3x t7 集成是饱和点。
+
+## P0.2 joint evaluator 修复（2026-08-14）
+
+修复前主榜聚合 `_pooled_nll_by_model` 只按 support/abstain 过滤，未消费
+`optimizer_eligible`/`eligible_full_coverage`；虽然当前恰好全 eligible，但 evaluator
+不满足合同 P0.5"不合格 fold 不进入主榜"的 fail-closed 要求。修复：
+
+1. **主榜 eligibility 过滤**：新增 `_eligible_keys`/`_filter_eligible_preds`，
+   pooled NLL 与全部 contrast/CI 只消费 optimizer 与 full-coverage 双门均通过的 fold。
+2. **fit 行集 hash 记录**：`_rows_hash` 记录每个 model×fold 实际传入 fit 的
+   train/test row-ID SHA-256，写入 ConvergenceLedger，证明所有模型共享同一行集。
+3. **单元测试**：`test_repair_p02.py` 新增 3 项（rows_hash 确定性/顺序无关、
+   双门过滤、ineligible fold 排除），共 13 passed。
+
+既有 P0.2 基建（FoldSpec、optimizer gate、joint zero-overlap、adjudication
+CI 穿零否决）早已就位且 10/10 passed；本次补齐了主榜消费 eligibility 的最后缺口。
+
 ## 代码与提交
 
 - 修改：`audit/models/nonlinear_mlp_hybrid.py`（`_train_mlp` 增加 seed 与 swa_n 参数）、
@@ -165,6 +219,14 @@ df=7 下重扫 dropout（Gaussian 调参最优为 0.1）：3-fold 冒烟对照
   seed-diverse 与 SWA/Bag 变体）、`audit/repair/shootout_run.py`（注册 t3/t5/t7/t10、_s99、
   _s2026、_swa、_bag 变体）、`tests/audit/test_nonlinear_mlp_rich_hybrid.py`。
 - 新增配置：`shootout_r20_robust_t_df_sweep_cfg.json`、`shootout_r21_seed99_replication_cfg.json`、
-  `shootout_r22_swa_cfg.json`、`shootout_r24_t7_seed7_cfg.json`、`shootout_r25_bag_smoke_cfg.json`。
+  `shootout_r22_swa_cfg.json`、`shootout_r24_t7_seed7_cfg.json`、`shootout_r25_bag_smoke_cfg.json`、
+  `shootout_r27_latent_operator_smoke_cfg.json`。
+- 新增模型：`audit/models/nonlinear_latent_operator.py`（r27）、
+  `audit/repair/analyze_hetero_ensemble.py`（r28）、`audit/repair/analyze_r27_smoke.py`、
+  `audit/repair/per_component_diag.py`、`tests/audit/test_nonlinear_latent_operator.py`。
+- P0.2 修复：`audit/repair/shootout_run.py`（eligibility filter + rows_hash）、
+  `tests/audit/test_repair_p02.py`（+3 项）。
 - 提交：`9fff7f2`、`62ddc91`、`0003bd5`、`5ae913b`、`075f8d9`、`6d4e223`（branch `r0_audit_repair_20260811`）。
-- 单元测试：24 passed。
+- 单元测试：24 passed（r19-r26）；r27 新增 7 passed；P0.2 修复后全套 187 passed
+  （1 项 pre-existing 失败 `test_shootout_report_only.py::test_paired_contrast_sign_and_semantics`
+  由 source_row_id 不匹配的 fixture bug 引起，与本次改动无关）。
