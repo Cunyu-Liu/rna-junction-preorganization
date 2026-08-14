@@ -114,6 +114,10 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_s7"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, seed=7)
     # bagged t7: bootstrap-resample train rows (data-level variance reduction)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_bag5"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag(df=7.0, n_bags=5)
+    # regularization x df interaction: Student-t already down-weights outliers,
+    # so lighter/heavier dropout at df=7 may beat the Gaussian-tuned 0.1
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_light"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, dropout=0.05)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_strong"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, dropout=0.2)
     # SWA (stochastic weight averaging) over the last swa_n converged epochs:
     # variance reduction at the weight level, matching the mu-ensemble theme.
     U["nonlinear_mlp_extended_hybrid_reg_deep_t_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, swa_n=10)

@@ -364,6 +364,24 @@ def test_robust_t_bag_shapes_and_finiteness():
 
 
 @needs_torch_vienna
+def test_robust_t_dropout_threading():
+    """df=7 t7 factory must thread dropout through the model dict."""
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    for do in (0.05, 0.1, 0.2):
+        fit, predict = make_nonlinear_mlp_extended_hybrid_reg_deep_t(
+            df=7.0, dropout=do)
+        model = fit(tr)
+        assert model["df"] == 7.0
+        assert model["dropout"] == do
+        assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+        mu, sigma, cp, support, abstain = predict(model, te)
+        assert np.all(np.isfinite(mu)) and np.allclose(sigma, 0.7)
+        assert cp.min() >= 0.0 and cp.max() <= 1.0
+        assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
 def test_student_t_survival_matches_scipy():
     import torch
     from scipy import stats as spstats
