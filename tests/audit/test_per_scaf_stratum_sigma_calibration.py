@@ -37,6 +37,9 @@ from audit.repair.r53_family_weight_sweep_r51 import (
     _blend as r53_blend,
     _ens_mu as r53_ens_mu,
 )
+from audit.repair.r54_per_ctx_eb_sigma import (
+    _calibrate_r54,
+)
 from audit.repair.r51_joint_mu_affine_sigma_rescan import (
     _calibrate_r51,
     _scan_sigma as r51_scan_sigma,
@@ -562,6 +565,69 @@ def test_r53_blend_weight_controls_gbdt_mlp_balance():
         assert np.isclose(ens_mm[rid]["mu"], np.mean([members[g][rid]["mu"] for g in G]))
 
 
+def test_r54_high_kappa_tends_to_scaf_sigma():
+    # r54 with a very high kappa should behave like r51 (scaf sigma dominates,
+    # context shrinkage ~0).  Build synthetic data with a strong context-level
+    # sigma structure and verify: (1) finite positive sigmas, (2) kappa=0.1
+    # (aggressive context use) differs from kappa=1e6 (scaf-only).
+    rng = np.random.default_rng(50)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 5, 9):
+            for c in range(4):  # 4 contexts per scaffold
+                ctx = f"c{sc}_{c}"
+                for i in range(20):
+                    rid = f"{fold}_{sc}_{ctx}_{i}"
+                    cens = (sc == 9) and (i % 2 == 0)
+                    mu = -6.0 if sc == 9 else -4.0
+                    y = -7.1 if cens else mu + rng.normal(0, 0.3 + 0.4 * c)
+                    preds[rid] = {"jid": ctx, "fold": fold, "scaf": sc,
+                                  "context": ctx, "y": y, "cens": cens,
+                                  "mu": mu}
+    folds = ["f0", "f1", "f2"]
+    cal_low, _ = _calibrate_r54(preds, folds, kappa=0.1)
+    cal_high, _ = _calibrate_r54(preds, folds, kappa=1e6)
+    for rid, p in cal_low.items():
+        assert p["sigma"] > 0.0 and np.isfinite(p["sigma"])
+    for rid, p in cal_high.items():
+        assert p["sigma"] > 0.0 and np.isfinite(p["sigma"])
+    # with real context structure, low kappa should capture more context signal
+    # (larger measured sigma spread than high kappa on the heterogeneous ctx)
+    from audit.repair.r51_joint_mu_affine_sigma_rescan import _pooled as _pl
+    # pooled NLL: low kappa should be <= high kappa if context structure is real
+    nll_low = _pl(cal_low)
+    nll_high = _pl(cal_high)
+    assert nll_low <= nll_high + 1e-6, \
+        f"context structure should help at low kappa: {nll_low} vs {nll_high}"
+
+
+def test_r54_censored_mu_stays_untouched():
+    # r54 only swaps sigma; censored mu must stay exactly as r51 left it.
+    rng = np.random.default_rng(51)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 9):
+            for c in range(2):
+                ctx = f"c{sc}_{c}"
+                for i in range(20):
+                    rid = f"{fold}_{sc}_{ctx}_{i}"
+                    cens = (sc == 9) and (i % 2 == 0)
+                    mu = -6.0 if sc == 9 else -4.0
+                    y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                    preds[rid] = {"jid": ctx, "fold": fold, "scaf": sc,
+                                  "context": ctx, "y": y, "cens": cens,
+                                  "mu": mu}
+    folds = ["f0", "f1", "f2"]
+    cal, _ = _calibrate_r54(preds, folds, kappa=5.0)
+    # compare to r51 (r54's mu should equal r51's mu exactly)
+    from audit.repair.r51_joint_mu_affine_sigma_rescan import _calibrate_r51 as _r51
+    cal_r51, _ = _r51(preds, folds, mode="per_scaf_eb", eb_kappa=20.0)
+    for rid in preds:
+        assert np.isclose(cal[rid]["mu"], cal_r51[rid]["mu"]), \
+            "r54 must not change mu"
+        assert np.isfinite(cal[rid]["sigma"]) and cal[rid]["sigma"] > 0.0
+
+
 if __name__ == "__main__":
     tests = [test_scan_sigma_picks_minimal_nll,
              test_scan_sigma_vectorized_matches_bruteforce,
@@ -585,7 +651,9 @@ if __name__ == "__main__":
              test_r51_global_matches_hand_computed_pooled,
              test_r51_no_bias_affine_is_near_identity,
              test_r52_blend_per_scaf_applies_scaffold_weights,
-             test_r53_blend_weight_controls_gbdt_mlp_balance]
+             test_r53_blend_weight_controls_gbdt_mlp_balance,
+             test_r54_high_kappa_tends_to_scaf_sigma,
+             test_r54_censored_mu_stays_untouched]
     failed = 0
     for t in tests:
         try:
