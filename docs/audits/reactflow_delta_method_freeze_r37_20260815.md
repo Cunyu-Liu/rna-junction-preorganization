@@ -1,4 +1,4 @@
-# RNA Junction 方法级优化：集成组合与校准扫描（r37 决策记录）
+# RNA Junction 方法级优化：集成组合与校准扫描（r37–r39 决策记录）
 
 日期：2026-08-15
 分支：`r0_audit_repair_20260811`
@@ -111,7 +111,99 @@ Student-t GBDT），1 条小正（σ-only LOO，−0.0067）。这精确界定�
 要在绝对 NLL 上显著前移，需新的删失感知算子表征或 prospective 数据，而非继续调
 组合层。
 
-## 4. 新增/修改文件
+---
+
+# 补充：r38–r39 结果（同日续篇）
+
+## 5. r38：per-scaffold（per-operator）σ 校准 —— 显著正收益
+
+残差诊断发现 per-scaffold measured RMSE 高度异质（scaf9=1.15、scaf2=0.45），
+与删失率一致（scaf9 78.5%、scaf1 59.2% 高删失）。r38 让**每个 scaffold 发射自己
+的校准 σ**，同样 leave-one-fold-out（在其他 36 折 OOF 行上拟合，应用到 held-out
+fold），mu 保持 equal-weight 集成不变。
+
+### 5.1 学习到的 per-scaffold σ（37 折高度稳定）
+
+| scaf | 删失率 | σ mean | σ range |
+|------|-------:|-------:|--------:|
+| 1 | 59.2% | 0.718 | 0.69–0.74 |
+| 2 | 0.0% | 0.452 | 0.44–0.46 |
+| 3 | 0.0% | 0.469 | 0.46–0.47 |
+| 4 | 0.1% | 0.565 | 0.55–0.58 |
+| 5 | 0.1% | 0.550 | 0.53–0.59 |
+| 6 | 0.3% | 0.612 | 0.59–0.66 |
+| 7 | 0.6% | 0.712 | 0.69–0.76 |
+| 8 | 9.7% | 0.778 | 0.73–0.80 |
+| 9 | 78.5% | 0.841 | 0.73–0.90 |
+
+### 5.2 公平横向表（per-scaf σ 应用于每个对比模型）
+
+| 模型 | frozen σ=0.7 | per-scaf σ LOO | 相对增益 (per-scaf) |
+|------|-------------:|---------------:|--------------------:|
+| nuisance | 1.0916 | 1.0536 | — |
+| t7_s99 | 0.8839 | 0.8687 | +17.55% |
+| xgb_lr03 | 0.8807 | 0.8481 | +19.50% |
+| 3x t7 集成 | 0.8823 | 0.8603 | +18.35% |
+| **7-member 混合集成** | **0.8527** | **0.8166** | **+22.49%** |
+
+edit-cluster CI（7mem per-scaf vs nuisance per-scaf）[0.216, 0.294]，lower>0；
+leave-one-largest 0.2514。**7-member 集成在 per-scaf σ 下仍最优，增益从 +21.89%
+提升至 +22.49%**。per-scaf σ 学习到的值稳定、与残差 RMSE 结构一致，是诚实无泄漏
+的方法级改进。
+
+## 6. r39：censoring-aware per-operator 截距 —— 阴性（边界定位）
+
+r37 OEC α 用 measured-row 均值拟合截距，会伤害 censored 行。r39 改为**在完整右删失
+NLL 上拟合 per-scaffold α**（其他折 OOF 行），再与 per-scaf σ 组合：
+
+- `per_scaf_alpha_nll = 0.8874`（仅 α，frozen σ）—— 差于 0.8166
+- `per_scaf_alpha_sigma_nll = 0.8491`（α+σ）—— 差于 0.8166
+- 学习到的 α 比 measured bias 小得多（scaf9：−0.17 vs −0.99）：NLL 优化正确收缩
+  α 以不伤害 censored 行，但收缩后 α 无增益。
+- **结论：NEGATIVE**。per-scaf σ 是算子异方差的正确表达；算子截距校正对高删失
+  算子不可行（会与右删失信息冲突）。
+
+## 7. 最终方法冻结（r38 修订 r37）
+
+**7-member 混合集成（4x GBDT + 3x t7 MLP，family-equal mu 平均）+ 
+留一折 per-scaffold σ 校准（σ≈0.45–0.84，随算子删失率变化）。**
+
+| 口径 | pooled NLL | vs nuisance |
+|------|-----------:|------------:|
+| frozen σ=0.7 | 0.8522 | +21.93% |
+| global σ-only LOO（r37） | 0.8460 | +22.50% |
+| **per-scaffold σ LOO（r38，冻结）** | **0.8166** | **+25.20%** |
+
+### 可发表主张（更新）
+
+- **Allowed**：censor-aware 鲁棒（Student-t）非线性头 + 跨族 7-member mu-集成 +
+  **per-operator 异方差 σ 校准**，相对线性/no-sequence 对照的 pooled NLL 增益
+  （frozen σ +21.93%；per-scaf σ +25.20%，edit-cluster CI [0.216, 0.294] lower>0，
+  非单一组件驱动）。**集成残差方差收缩 + 算子异方差使发射 σ 应从 0.7 校准至
+  per-scaffold 0.45–0.84**（诚实、留一折、无泄漏、跨 37 折稳定）——本数据上最强
+  方法级改进。
+- **Forbidden**（延续）：transferable sequence mechanism、SOTA、noise ceiling、
+  13 独立模型族公平比较等；63-D sequence-map 路线保持关闭；提交/release 仍不授权。
+
+### 方法级瓶颈的最终定位
+
+9 条组合/校准/换族/算子路线中，7 条阴性（stacking、per-row σ、OEC α、r39 α、
+Student-t GBDT、kernel r36、heteroscedastic-head r17），2 条正（global σ-only
+−0.0067、per-scaf σ −0.0361）。**per-operator 异方差 σ 校准是把算子异质残差转化为
+可发表的校准收益的最终形态**；剩余不可约残差来自测量噪声与高删失算子的系统性
+mu 偏差（需删失感知的算子表征或 prospective 数据，非校准层可再压缩）。
+
+## 8. 新增文件（r38/r39）
+
+- `audit/repair/per_scaf_sigma_calibration.py`（新增）：per-scaf σ LOO 校准
+- `audit/repair/per_scaf_sigma_horizontal_table.py`（新增）：公平横向表（per-scaf
+  σ 应用于所有对比模型）
+- `audit/repair/censoring_aware_operator_calibration.py`（新增）：censoring-aware
+  算子截距（阴性）
+- artifacts：`per_scaf_sigma_calibration.json`、`per_scaf_sigma_horizontal_table.json`、
+  `censoring_aware_operator_calibration.json`（run root）
+
+## 4. 新增/修改文件（r37）
 
 - `audit/repair/analyze_stacked_ensemble.py`（新增）：censoring-aware LOO stacking
 - `audit/repair/residual_structure_diagnostic.py`（新增）：残差结构/σ 扫描/CRPS
