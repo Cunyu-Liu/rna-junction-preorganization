@@ -40,6 +40,9 @@ from audit.repair.r53_family_weight_sweep_r51 import (
 from audit.repair.r54_per_ctx_eb_sigma import (
     _calibrate_r54,
 )
+from audit.repair.r56b_per_ctx_eb_mu_floor import (
+    _calibrate_r56b,
+)
 from audit.repair.r51_joint_mu_affine_sigma_rescan import (
     _calibrate_r51,
     _scan_sigma as r51_scan_sigma,
@@ -628,6 +631,68 @@ def test_r54_censored_mu_stays_untouched():
         assert np.isfinite(cal[rid]["sigma"]) and cal[rid]["sigma"] > 0.0
 
 
+def test_r56b_censored_mu_stays_untouched():
+    # r56b core honesty: censored mu must stay exactly as r51 left it; only
+    # measured rows receive the per-context correction.
+    rng = np.random.default_rng(60)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 9):
+            for c in range(3):
+                ctx = f"c{sc}_{c}"
+                for i in range(15):
+                    rid = f"{fold}_{sc}_{ctx}_{i}"
+                    cens = (sc == 9) and (i % 2 == 0)
+                    mu = -6.0 if sc == 9 else -4.0
+                    y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                    preds[rid] = {"jid": ctx, "fold": fold, "scaf": sc,
+                                  "context": ctx, "y": y, "cens": cens,
+                                  "mu": mu}
+    folds = ["f0", "f1", "f2"]
+    cal, _ = _calibrate_r56b(preds, folds, kappa=2.0, min_meas=3)
+    from audit.repair.r51_joint_mu_affine_sigma_rescan import _calibrate_r51 as _r51
+    cal_r51, _ = _r51(preds, folds, mode="per_scaf_eb", eb_kappa=20.0)
+    for rid in preds:
+        if preds[rid]["cens"]:
+            assert np.isclose(cal[rid]["mu"], cal_r51[rid]["mu"]), \
+                "r56b must not shift censored mu"
+        assert np.isfinite(cal[rid]["sigma"]) and cal[rid]["sigma"] > 0.0
+        assert np.isfinite(cal[rid]["mu"])
+
+
+def test_r56b_corrects_context_bias():
+    # Synthetic data where one context has a systematic +1.0 measured bias:
+    # r56b (min_meas floor) should correct the held-out fold's measured mu for
+    # that context toward y, reducing measured residual bias vs r51.
+    rng = np.random.default_rng(61)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 9):
+            for c in range(3):
+                ctx = f"c{sc}_{c}"
+                bias = 1.0 if (sc == 2 and c == 1) else 0.0
+                for i in range(15):
+                    rid = f"{fold}_{sc}_{ctx}_{i}"
+                    cens = (sc == 9) and (i % 2 == 0)
+                    mu = -4.0 if sc == 2 else -6.0
+                    # y = true(mu) + bias measured with noise
+                    y = -7.1 if cens else (mu + bias) + rng.normal(0, 0.3)
+                    preds[rid] = {"jid": ctx, "fold": fold, "scaf": sc,
+                                  "context": ctx, "y": y, "cens": cens,
+                                  "mu": mu}
+    folds = ["f0", "f1", "f2"]
+    cal, _ = _calibrate_r56b(preds, folds, kappa=2.0, min_meas=3)
+    # For the biased context c1 on scaf2, held-out measured mu should move toward y
+    # (i.e., mu_cal > mu_raw on average, since y = mu + 1.0).
+    deltas = []
+    for rid, p in cal.items():
+        if (p["scaf"] == 2 and p["context"] == "c2_1" and not p["cens"]):
+            deltas.append(p["mu"] - preds[rid]["mu"])
+    assert len(deltas) > 0
+    assert float(np.mean(deltas)) > 0.3, \
+        f"context bias should be corrected (delta>0), got {np.mean(deltas):.3f}"
+
+
 if __name__ == "__main__":
     tests = [test_scan_sigma_picks_minimal_nll,
              test_scan_sigma_vectorized_matches_bruteforce,
@@ -653,7 +718,9 @@ if __name__ == "__main__":
              test_r52_blend_per_scaf_applies_scaffold_weights,
              test_r53_blend_weight_controls_gbdt_mlp_balance,
              test_r54_high_kappa_tends_to_scaf_sigma,
-             test_r54_censored_mu_stays_untouched]
+             test_r54_censored_mu_stays_untouched,
+             test_r56b_censored_mu_stays_untouched,
+             test_r56b_corrects_context_bias]
     failed = 0
     for t in tests:
         try:

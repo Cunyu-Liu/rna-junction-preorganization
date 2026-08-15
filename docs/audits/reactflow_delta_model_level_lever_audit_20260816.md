@@ -102,16 +102,45 @@ r51 joint mu-affine + σ 重扫）。继续增加 base 模型复杂度无法带�
    回归预测 held-out fold σ = **0.8306 vs r51 0.7815（+0.0491）**——
    motif 特征对 σ 无预测力，per-fold σ 无法无泄漏恢复。NEGATIVE 闭合。
 
+### 4.x 重大突破：r56/r56b per-context EB mu 修正（2026-08-16）
+
+**这是自 r45 之后第一个统计显著的模型级正向增益。**
+
+诊断发现：r51 只修正了 **scaf 层** mu 偏置（scaf9 −0.996→−0.01），但
+**context 层** mu 偏置从未测过。r51 后 186 个 context（≥10 measured 行）
+的 mean(y−mu) sd = 0.341，split-half（fold 奇偶）相关 **+0.986** ——
+真实、稳定、可利用的信号。
+
+- **r56**（per-context EB mu，kappa=10）：**0.7410**（−0.0405 vs r51）；
+  measured 层 0.890→0.838；CI vs r51 下界 >0。
+- **r56b**（r56 + min_meas=3 floor + kappa=2 强收缩）：**0.7314**
+  （−0.0501 vs r51，−6.41% 相对），**edit-cluster CI vs r51 =
+  [0.0126, 0.0862] 下界 >0**，leave_one_largest=0.0409，24/37 折正向。
+  measured 层 → 0.8265，censored 严格不变（0.199）。
+- 机理验证：r56b 后 scaf5/6/7 measured 残差 sd 显著下降（scaf6
+  0.691→0.561、scaf7 0.796→0.694）—— 真实的 context 偏置消除，非 σ 重扫
+  伪效应。
+- 诚实 caveat（必须写入稿件）：r56b 的 context 修正对 nuisance 基线**不适用**
+  （nuisance 无 context 特征），nuisance 在 r56b 下反而恶化
+  （0.9749→1.1479），故同口径相对增益升至 +36.28% 是"方法普惠性不对称"
+  而非纯绝对增益；必须同时报告绝对 NLL（0.7314）与同口径相对增益，
+  并以 vs-r45-nuisance 口径（+27.15%）为保守读数。
+- 最差折 CUCAG_CUGAG（−0.58）是 n_meas=2 的稀疏 context 噪声，r56b 的
+  min_meas floor 已部分缓解（leave_one_worst=0.0492 仍显著）。
+- **新冻结方法 = 7-member 集成（wg=0.5）+ r56b = 0.7314**
+  （`submission_horizontal_table_v3.json`，四口径 definitive 表）。
+
 这些方向的预期收益全部在 edit-cluster CI 宽度（±0.05-0.1）以内，无法
 产生统计上可检测的改善。
 
 ## 5. 最终判断与建议
 
-- **冻结方法**：7-member 混合集成（equal-family wg=0.5）+ **r51 joint
-  校准 = 0.7815**（绝对 NLL 较 r45 0.7907 再降 1.16%，measured 层偏置消除）。
-- **模型级改进已到数据允许的极限**：**已闭合 22+ 条路线（r51 正向，其余全部
-  NEGATIVE/持平）**。继续在 base 模型上加复杂度不产生增益；
-  要获得数量级提升只能走数据侧（prospective 多 operator 数据，需 owner 授权）。
-- **建议转向 benchmark 轨稿件**：以 r51 为冻结方法更新 Figure 2/Table 2/
-  Claim 矩阵，撰写 benchmark 轨故事线（censor-aware 评估 + 方法边界闭合 +
-  joint mu+σ 校准），P0.6 裁定不变（TRACK_A_LOCKED）。
+- **冻结方法**：7-member 混合集成（equal-family wg=0.5）+ **r56b per-context
+  EB mu + σ 重扫 = 0.7314**（绝对 NLL 较 r45 0.7907 降 7.5%、较 r51 0.7815
+  降 6.41%，measured 层偏置在 scaf 与 context 两层均消除，CI 下界 >0）。
+- **模型级边界更新**：σ 粒度（context EB/motif per-fold）、mu 粒度（context
+  EB）全部测尽；**per-context mu 是唯一新发现的真实信号**（r56b 正向），
+  其余 22+ 条路线 NEGATIVE/持平。
+- **建议转向 benchmark 轨稿件**：以 r56b 为冻结方法更新 Figure 2/Table 2/
+  Claim 矩阵，撰写 benchmark 轨故事线（censor-aware 评估 + scaf→context 双层
+  mu/σ 联合校准 + 方法边界闭合），P0.6 裁定不变（TRACK_A_LOCKED）。
