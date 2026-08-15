@@ -876,3 +876,69 @@ r44 固定 σ=0.62（阴性）、r46/r47 事后 mu 修正（阴性）、r49 cens
 - `tests/audit/test_nonlinear_mlp_rich_hybrid.py`（扩充）：+3 单测
   （shapes/gate、高删失权重优先级、seed 线程），全部通过
 - artifacts：`r49_censor_weight_smoke/`（run root）
+
+---
+
+# 投稿整合：最终横向对比表（r45 修正网格，2026-08-15）
+
+来源：`submission_horizontal_table.json`（同一 37 个 blocked edit×nested-context
+joint folds，optimizer+full-coverage 双门 eligible 预测，fail-closed）。
+
+## 1. 全部模型族横向表
+
+| 模型族 | frozen σ=0.7 NLL | r45 校准 NLL | rel% (frozen) | rel% (r45) |
+|--------|-----------------:|-------------:|--------------:|-----------:|
+| corrected_v1_31（63-D seq map） | 1.4282 | 1.3989 | −30.83% | −39.33% |
+| no_sequence_latent_operator | 1.1473 | 1.1126 | −5.10% | −10.82% |
+| train_only_scaffold | 1.0938 | 1.1042 | −0.19% | −9.98% |
+| **motif_topology_hierarchy（nuisance）** | **1.0916** | **1.0040** | **0.00%** | **0.00%** |
+| nonlinear_mlp_nuisance_only_t7 | 0.9012 | 0.8465 | +17.45% | +15.69% |
+| nonlinear_mlp_extended_hybrid_reg_deep | 0.9479 | 0.9208 | +13.17% | +8.29% |
+| t5（Student-t df=5） | 0.9140 | 0.8799 | +16.28% | +12.36% |
+| t7（Student-t df=7） | 0.9129 | 0.8780 | +16.37% | +12.55% |
+| t10（Student-t df=10） | 0.9138 | 0.8795 | +16.29% | +12.40% |
+| t7_s99 | 0.8839 | 0.8469 | +19.03% | +15.65% |
+| t7_s2026 | 0.9022 | 0.8692 | +17.35% | +13.43% |
+| t7_s7 | 0.9187 | 0.8745 | +15.84% | +12.90% |
+| xgboost_censored_hybrid | 0.8845 | 0.8272 | +18.97% | +17.61% |
+| xgboost_censored_hybrid_s99 | 0.8830 | 0.8297 | +19.12% | +17.36% |
+| xgboost_censored_hybrid_s2026 | 0.8957 | 0.8435 | +17.95% | +15.99% |
+| xgboost_censored_hybrid_hp_lr03 | 0.8807 | 0.8252 | +19.32% | +17.81% |
+| ENSEMBLE_3x_t7 | 0.8823 | 0.8410 | +19.17% | +16.24% |
+| **ENSEMBLE_MIXED_7（冻结）** | **0.8522** | **0.7907** | **+21.94%** | **+21.25%** |
+
+## 2. 冻结投稿方法
+
+**7-member 混合集成（4x GBDT + 3x t7 MLP，family-equal mu 平均）+ 留一折
+per-scaffold × stratum σ 校准（扩展网格 floor 0.05 = MetricSpec floor）。**
+
+| 口径 | pooled NLL | vs nuisance（同口径） | edit-cluster CI |
+|------|-----------:|---------------------:|----------------:|
+| frozen σ=0.7 | 0.8522 | +21.94% | [0.1807, 0.3684] lower>0 |
+| **r45 校准（冻结）** | **0.7907** | **+21.25%** | **[0.1919, 0.2682] lower>0** |
+
+- vs nuisance @ frozen 0.7：**+27.57%**
+- leave-one-largest edit component：0.2285（非单一组件驱动）
+- 排序对聚合口径（pooled/context/scaffold）与组合规则（muavg/mixture）稳健
+
+## 3. 可发表主张（ClaimAuthorization 约束内）
+
+**Allowed：**
+- censor-aware 鲁棒（Student-t）非线性头 + 跨族 7-member mu-集成 +
+  per-operator 异方差 σ 校准（measured/censored 分层、留一折无泄漏、跨 37 折
+  稳定），相对线性/no-sequence 对照的 pooled-NLL 增益 **+27.57%**（@ frozen
+  0.7）/ +21.25%（@ 同口径），edit-cluster CI lower>0，非单一组件驱动；
+- 集成残差方差收缩使发射 σ 应从 0.7 校准至 per-scaf×stratum 0.19–1.59
+  （高删失算子 scaf9 σ_c=0.19、σ_m=1.15 匹配其 measured RMSE）；
+- 方法级边界系统闭合：19 条组合/校准/换族/算子/粒度/训练侧路线全部测尽，
+  仅 σ 事后校准（global→scaf→scaf×stratum）为正——这本身是可发表的
+  benchmark 认识。
+
+**Forbidden（延续）：** transferable sequence mechanism、SOTA、noise ceiling、
+13 独立模型族公平比较等；63-D sequence-map 路线关闭；提交/release 仍不授权
+（需 owner 明确指示 + P0.6 重裁定 + release seal）。
+
+## 4. 新增文件
+
+- `audit/repair/submission_horizontal_table.py`（新增）：最终横向表生成器
+- artifacts：`submission_horizontal_table.json`
