@@ -337,6 +337,49 @@ per-scaffold 系统性 mu 偏差（scaf9 −0.99、scaf1 −0.44），且 sigma 
 可榨取的全部边界；剩余不可约残差来自测量噪声与高删失算子系统偏差，需
 prospective 数据或新测量，非进一步结构调参可解。
 
+---
+
+# 补充五：r43 结果（同日续篇）
+
+## 15. r43：per-helix-context σ 校准 —— 阴性（粒度边界闭合）
+
+残差诊断显示 context 内部也存在异质性（如 scaf1 的 context RMSE 0.53–1.62，
+25 个 context）。r43 测试比 per-scaf 更细的 per-context σ 校准（234 个 context，
+嵌套于 9 个 scaffold；context 行数不足时回退到 scaffold σ，再回退全局 σ），
+同样 leave-one-fold-out 诚实校准：
+
+| 粒度 | pooled NLL | vs frozen 0.7 |
+|------|-----------:|--------------:|
+| frozen σ=0.7 | 0.8527 | — |
+| per-scaf σ（r38，冻结） | **0.8166** | −0.0361 |
+| per-context σ（r43） | 0.8310 | −0.0217 |
+
+**结论：NEGATIVE。** per-context σ（0.831）差于 per-scaf σ（0.8166，+0.0144）。
+原因：每个 held-out fold 平均只有 ~18/234 个 context 有 ≥15 行可独立学 σ，其余
+回退到 scaffold σ；234 个 context 平均 ~50 行/context，σ 估计噪声大，校准收益
+被噪声抵消。**per-scaf 是正确粒度**——context 内异质性不足以支撑更细的 σ 校准。
+
+## 16. 方法级边界最终闭合（r37–r43 总结，12 条路线）
+
+| # | 方向 | 形态 | 结果 |
+|---|------|------|------|
+| 1 | kernel RBF 成员 | r36 | NEGATIVE |
+| 2 | 学习式 stacking 权重 | r37 | NEGATIVE |
+| 3 | per-row 校准 σ | r37 | NEGATIVE |
+| 4 | 算子加性截距 α | r37 | NEGATIVE |
+| 5 | Student-t GBDT 族 | r34 | DEAD END |
+| 6 | global σ-only 校准 | r37 | **POSITIVE（0.8460）** |
+| 7 | **per-scaf σ 事后校准** | **r38** | **POSITIVE（0.8166, +25.20%）** |
+| 8 | censoring-aware 算子截距 | r39 | NEGATIVE |
+| 9 | per-scaf σ 训练期联合 | r40 | NEGATIVE |
+| 10 | mixture-of-predictives | r41 | 排序稳健 |
+| 11 | per-scaf mu 输出头 | r42 | NEGATIVE |
+| 12 | per-context σ | r43 | NEGATIVE |
+
+**最终冻结方法保持**：7-member 混合集成 + 留一折 per-scaf σ 校准 = **0.8166
+（+25.20%）**。12 条方法路线测尽，σ 粒度（global→scaf→ctx）与 mu 结构
+（共享头→scaf 头）均已闭合。剩余不可约残差需 prospective 数据或新测量。
+
 ## 4. 新增/修改文件（r37）
 
 - `audit/repair/analyze_stacked_ensemble.py`（新增）：censoring-aware LOO stacking
