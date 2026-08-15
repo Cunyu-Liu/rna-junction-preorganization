@@ -96,6 +96,11 @@ r51 joint mu-affine + σ 重扫）。继续增加 base 模型复杂度无法带�
    多数 context 仅 1-2 条删失行）。κ 单调递增时 NLL 单调趋近 r51
    （κ→∞ 才等于 r51）→ **context-level σ 结构不存在或不可检测**，
    r43 的硬分桶失败不是稀疏性而是真实无结构。NEGATIVE 闭合。
+7. **r55 edit-motif 回归 per-fold σ**（2026-08-16 已跑）：fold σ 变化
+   0.25–1.07，但 motif 特征（donor/acceptor 长度、GC、总长）与 σ 相关
+   极弱（总长 +0.185、donor GC −0.10、acceptor GC −0.01）。LOO 线性
+   回归预测 held-out fold σ = **0.8306 vs r51 0.7815（+0.0491）**——
+   motif 特征对 σ 无预测力，per-fold σ 无法无泄漏恢复。NEGATIVE 闭合。
 
 这些方向的预期收益全部在 edit-cluster CI 宽度（±0.05-0.1）以内，无法
 产生统计上可检测的改善。
@@ -104,7 +109,8 @@ r51 joint mu-affine + σ 重扫）。继续增加 base 模型复杂度无法带�
 
 - **冻结方法**：7-member 混合集成（equal-family wg=0.5）+ **r51 joint
   校准 = 0.7815**（绝对 NLL 较 r45 0.7907 再降 1.16%，measured 层偏置消除）。
-- **模型级改进已到数据允许的极限**：继续在 base 模型上加复杂度不产生增益；
+- **模型级改进已到数据允许的极限**：**已闭合 22+ 条路线（r51 正向，其余全部
+  NEGATIVE/持平）**。继续在 base 模型上加复杂度不产生增益；
   要获得数量级提升只能走数据侧（prospective 多 operator 数据，需 owner 授权）。
 - **建议转向 benchmark 轨稿件**：以 r51 为冻结方法更新 Figure 2/Table 2/
   Claim 矩阵，撰写 benchmark 轨故事线（censor-aware 评估 + 方法边界闭合 +
