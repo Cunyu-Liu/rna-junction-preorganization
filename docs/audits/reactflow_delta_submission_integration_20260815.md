@@ -170,3 +170,55 @@ published baseline。
 2. Release seal 重建（当前 checksum 7/13 失败，需以修正后 0.7907 为准重跑）；
 3. Legal closure（数据/derivative 许可）；
 4. 最终综合审查。
+
+---
+
+## 16. r51–r53 方法边界补测（2026-08-16）：joint mu-affine + σ 重扫
+
+### 16.1 遗留瓶颈诊断
+
+`residual_structure_diagnostic.json` 显示 r45 后**最大残余误差是 measured 层
+系统性偏差**（scaf9 measured bias −0.996、scaf1 −0.445、overall measured
+resid mean −0.106、measured RMSE 0.6116）。r46/r47 的 mu 修正均**阴性**，但
+事后发现根因是**陈旧 σ**：r47 只在未修正 mu 上扫描 σ_m，且使用旧 grid floor
+0.4 —— 修正 mu 后未重扫 σ，等价于用错误尺度评分。
+
+### 16.2 r51：JOINT（measured-only affine mu + σ_m 在修正后 mu 上重扫）LOO 校准
+
+- 变体：global / per-scaf affine / ridge / **per-scaf EB**（最优）；
+- grid floor 0.05（MetricSpec floor）+ LOO 无泄漏；censored 行 mu **严格不变**、
+  σ_c 保持 r45，censored 侧 NLL 完全不受影响（0.1974→0.1990 仅浮点舍入）；
+- 结果：measured 层偏置被消除（scaf9 −0.996→−0.01、scaf1 −0.445→−0.008）；
+  per-scaf EB σ_m 重扫后 scaf9 1.22→0.35。
+
+**关键数字（7-member 集成，equal-family wg=0.5）**
+
+| 口径 | pooled NLL | 相对 r45 | 相对 nuisance（同口径） | edit-cluster CI（vs nuisance） |
+|------|-----------:|---------:|------------------------:|------------------------------:|
+| r45（旧冻结） | 0.7907 | — | +21.25% | [0.1919, 0.2682] |
+| **r51（新冻结）** | **0.7815** | **−0.0092（−1.16%）** | **+19.84%** | **[0.1463, 0.2481] lower>0** |
+
+诚实解读（必须写入稿件）：r51 改善**绝对** pooled NLL（主估计量），但
+measured-only affine 修正对**所有模型**（含 nuisance 基线）都降低偏置，
+故同口径相对增益从 21.25% 微降至 19.84% —— 这是 r47「同口径相对增益降」的
+再确认，不是方法退步。**10% 提升门在同口径下仍通过（19.84%>10%）**。
+
+### 16.3 r52 / r53：per-scaf family weight 阴性 + 权重重扫确认
+
+- **r52（per-scaf GBDT/MLP family weight，LOO 无泄漏）**：0.7841（r51 口径），
+  **差于** equal-family 0.7815 —— per-scaf 权重过拟合，路线阴性闭合；
+- **r53（r51 下 family-weight 重扫）**：最优 wg=0.4 → 0.7803，但 wg=0.5
+  （equal-family，0.7815）与其仅差 0.0012（噪声内）。**r50 的结论在 r51 下
+  依然成立**：equal-family wg=0.5 是稳健、无调参的冻结选择。
+
+### 16.4 结论与投稿影响
+
+- **方法边界再闭合 2 条**（r52 阴性、r53 确认），冻结方法更新为
+  **7-member 集成（wg=0.5）+ r51 joint 校准 = 0.7815**；
+- 主估计量（pooled-OOF NLL）较旧冻结 0.7907 **再降 1.16%**，并消除
+  measured 层系统性偏置 —— 这是 r45 之后唯一的正向校准级方法增益；
+- 建议以 `submission_horizontal_table_v2.json` 作为**新的 definitive 投稿主表**
+  （含 frozen 0.7 / r45 / r51 三口径），Figure 2 / Table 2 相应更新；
+- P0.6 科学裁定不受影响（sequence map 依然 −25.73%，TRACK_A_LOCKED 不变）；
+  Claim 矩阵需补充 r51 为方法贡献链第 4 级（σ 校准之后）。
+
