@@ -53,9 +53,11 @@ from audit.models.rnafm_pca_linear_hybrid import _fit_pca, _apply_pca
 
 try:
     import torch
+    import torch.nn as nn  # noqa: F401  (used by _MLPScafHeads)
     HAVE_TORCH = True
 except Exception:  # noqa: BLE001
     torch = None
+    nn = None
     HAVE_TORCH = False
 
 DEFAULT_K = 64
@@ -469,6 +471,211 @@ def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1):
     a = (cap - mu) / sigma
     nll_c = -torch.log(_student_t_survival(a, float(df)))
     return torch.where(cens, nll_c, nll_m).mean()
+
+
+class _MLPScafHeads(nn.Module):
+    """Shared hidden trunk + per-scaffold output heads.
+
+    The hidden layers (reg_deep: in -> 96 -> 64 -> 32) are shared across all
+    operators, then `n_scaf` parallel Linear(32, 1) heads produce mu; the row's
+    scaffold selects which head to apply.  This lets each operator learn its own
+    nonlinear mu mapping (capturing the per-scaffold systematic bias found in
+    the residual diagnostic) while still sharing the folding representation.
+    """
+
+    def __init__(self, in_dim, n_scaf, hidden=(96, 64, 32), dropout=0.1):
+        super().__init__()
+        layers = []
+        d = in_dim
+        for h in hidden:
+            layers.append(nn.Linear(d, h))
+            layers.append(nn.ReLU())
+            if dropout > 0.0:
+                layers.append(nn.Dropout(dropout))
+            d = h
+        self.trunk = nn.Sequential(*layers)
+        self.heads = nn.ModuleList([nn.Linear(d, 1) for _ in range(n_scaf)])
+
+    def forward(self, x, scaf_idx):
+        h = self.trunk(x)
+        # gather the per-scaffold head output for each row
+        out = torch.empty((x.shape[0],), dtype=x.dtype, device=x.device)
+        for i in range(len(self.heads)):
+            mask = scaf_idx == i
+            if mask.any():
+                out[mask] = self.heads[i](h[mask]).squeeze(-1)
+        return out
+
+
+def _train_mlp_t_scafmu(Xtr, ytr, cens_tr, scaf_tr, device, in_dim,
+                        hidden=(96, 64, 32), dropout=0.1, weight_decay=1e-2,
+                        df=_DEFAULT_DF, seed=_T_SEED,
+                        lr=LR, max_epochs=MAX_EPOCHS, patience=PATIENCE,
+                        loss_tol=LOSS_TOL, plateau_window=PLATEAU_WINDOW,
+                        plateau_rel_tol=PLATEAU_REL_TOL):
+    """Train the reg_deep MLP with per-scaffold output heads (Student-t NLL).
+
+    Shared hidden trunk + per-scaffold final Linear heads.  The training
+    objective is the right-censored Student-t NLL with the FROZEN sigma=0.7
+    (mu is the only thing that varies per scaffold -- unlike r40 where the
+    sigma table was the free parameter and degraded mu fit).  This directly
+    targets the per-scaffold systematic mu bias (scaf9 -0.99, scaf1 -0.44)
+    that the shared-head ensemble leaves on the table.
+    """
+    import torch
+    from audit.models.nonlinear_mlp_hybrid import (
+        MAX_EPOCHS, PATIENCE, LOSS_TOL, PLATEAU_WINDOW, PLATEAU_REL_TOL,
+        BATCH, GRAD_TOL,
+    )
+    torch.manual_seed(seed)
+    scafs_sorted = sorted({int(s) for s in scaf_tr})
+    n_scaf = len(scafs_sorted)
+    scaf_index = {s: i for i, s in enumerate(scafs_sorted)}
+    net = _MLPScafHeads(in_dim, n_scaf, hidden=hidden, dropout=dropout).to(device)
+    opt = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+
+    Xt = torch.tensor(Xtr, dtype=torch.float32, device=device)
+    yt = torch.tensor(ytr, dtype=torch.float32, device=device)
+    ct = torch.tensor(cens_tr, dtype=torch.bool, device=device)
+    st = torch.tensor([scaf_index[int(s)] for s in scaf_tr],
+                      dtype=torch.long, device=device)
+    n = Xt.shape[0]
+
+    best_loss = float("inf")
+    best_state = None
+    epochs_since_best = 0
+    n_epochs = 0
+    final_loss = float("inf")
+    loss_history = []
+    plateau_reached = False
+    for epoch in range(max_epochs):
+        net.train()
+        perm = torch.randperm(n, device=device)
+        epoch_losses = []
+        for start in range(0, n, BATCH):
+            idx = perm[start:start + BATCH]
+            opt.zero_grad()
+            mu = net(Xt[idx], st[idx])
+            loss = _t_right_censored_nll(mu, yt[idx], ct[idx], df=df)
+            loss.backward()
+            opt.step()
+            epoch_losses.append(float(loss.detach().cpu()))
+        final_loss = float(np.mean(epoch_losses))
+        loss_history.append(final_loss)
+        n_epochs = epoch + 1
+        if final_loss < best_loss - loss_tol:
+            best_loss = final_loss
+            best_state = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
+            epochs_since_best = 0
+        else:
+            epochs_since_best += 1
+            if epochs_since_best >= patience:
+                plateau_reached = True
+                break
+        if len(loss_history) >= plateau_window:
+            base = abs(loss_history[-plateau_window]) or 1e-8
+            rel = abs(final_loss - loss_history[-plateau_window]) / base
+            if rel < plateau_rel_tol:
+                plateau_reached = True
+                break
+
+    net.load_state_dict(best_state)
+    net.eval()
+
+    net.zero_grad()
+    mu_all = net(Xt, st)
+    lossg = _t_right_censored_nll(mu_all, yt, ct, df=df)
+    lossg.backward()
+    gn = 0.0
+    for p in net.parameters():
+        if p.grad is not None:
+            gn += float(torch.norm(p.grad).item() ** 2)
+    total_grad_norm = float(np.sqrt(gn))
+    net.eval()
+
+    params_finite = all(bool(torch.isfinite(p).all().item()) for p in net.parameters())
+    converged = bool(plateau_reached and params_finite and np.isfinite(final_loss))
+    eligible = bool(converged and np.isfinite(total_grad_norm))
+    gate = {
+        "eligible": eligible, "converged": converged,
+        "final_grad_norm": total_grad_norm, "grad_tol": GRAD_TOL,
+        "n_epochs": n_epochs, "max_epochs": MAX_EPOCHS,
+        "final_train_nll": final_loss, "best_train_nll": best_loss,
+        "plateau_reached": plateau_reached, "success": converged,
+        "n_nan_inf_params": int(not params_finite), "df": float(df),
+        "n_scaf": n_scaf,
+    }
+    return net, scaf_index, gate
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_deep_t_scafmu(df=_DEFAULT_DF,
+                                                         hidden=(96, 64, 32),
+                                                         dropout=0.1,
+                                                         weight_decay=1e-2,
+                                                         seed=_T_SEED):
+    """reg_deep MLP with per-scaffold output heads (shared trunk, frozen sigma).
+
+    Directly targets the per-scaffold systematic mu bias from the residual
+    diagnostic (scaf9 -0.99, scaf1 -0.44) by giving each operator its own
+    nonlinear final mapping over the shared hidden representation.  Sigma stays
+    frozen at 0.7 in training (unlike r40 where the sigma table degraded mu),
+    and prediction emits the frozen 0.7 for a fair primary comparison.  This is
+    the last untested structural axis: per-operator mu, not per-operator sigma.
+    """
+    def fit(train_rows):
+        motifs = sorted({str(r["motif"]) for r in train_rows})
+        scafs = sorted({int(r["scaf"]) for r in train_rows})
+        Xn = _nuisance_basis(train_rows, motifs, scafs)
+        tr_jids = sorted({str(r["jid"]) for r in train_rows})
+        by_jid = vienna_ext_build_raw(train_rows)
+        mean, sd = vienna_ext_fit_scaler(tr_jids, by_jid)
+        Xv = np.zeros((len(train_rows), len(mean)))
+        for i, r in enumerate(train_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, mean, sd)[0]
+        X = np.hstack([Xn, Xv])
+        y = np.asarray([r["y"] for r in train_rows], dtype=float)
+        cens = np.asarray([r["cens"] for r in train_rows], dtype=bool)
+        scaf_tr = np.asarray([int(r["scaf"]) for r in train_rows], dtype=int)
+        import torch
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        net, scaf_index, gate = _train_mlp_t_scafmu(
+            X, y, cens, scaf_tr, device, X.shape[1], hidden=hidden,
+            dropout=dropout, weight_decay=weight_decay, df=df, seed=seed)
+        return {"kind": "nonlinear_mlp_extended_hybrid_reg_deep_t_scafmu",
+                "net": net, "scaf_index": scaf_index,
+                "gate": gate, "motifs": motifs, "scafs": scafs, "mean": mean,
+                "sd": sd, "by_jid": by_jid, "n_nuisance": Xn.shape[1],
+                "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
+                "dropout": dropout, "weight_decay": weight_decay, "df": float(df),
+                "seed": int(seed)}
+
+    def predict(model, test_rows):
+        import torch
+        Xn = _nuisance_basis(test_rows, model["motifs"], model["scafs"])
+        by_jid = vienna_ext_build_raw(test_rows)
+        Xv = np.zeros((len(test_rows), model["n_vienna"]))
+        for i, r in enumerate(test_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, model["mean"], model["sd"])[0]
+        X = np.hstack([Xn, Xv])
+        scaf_idx = np.asarray(
+            [model["scaf_index"].get(int(r["scaf"]), 0) for r in test_rows],
+            dtype=np.int64)
+        model["net"].eval()
+        with torch.no_grad():
+            Xt = torch.tensor(X, dtype=torch.float32, device=model["device"])
+            st = torch.tensor(scaf_idx, dtype=torch.long, device=model["device"])
+            mu = model["net"](Xt, st).cpu().numpy()
+        sigma = np.full(len(mu), 0.7)
+        from scipy.special import log_ndtr
+        a = (mu + 7.1) / 0.7
+        cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
+        seen_scaf = np.zeros(len(mu), dtype=bool)
+        for i, r in enumerate(test_rows):
+            if int(r["scaf"]) in model["scafs"]:
+                seen_scaf[i] = True
+        return mu, sigma, cp, seen_scaf, ~seen_scaf
+
+    return fit, predict
 
 
 def _t_right_censored_nll_scaf(mu, y, cens, df, sigma_per_row, cap=-7.1):

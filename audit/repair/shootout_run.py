@@ -65,6 +65,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_localctx,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t_scafmu,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
@@ -133,6 +134,12 @@ def _universe(rnafm_cache=None):
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scaf"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scaf_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0, seed=99)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scaf_s2026"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0, seed=2026)
+    # r42: per-scaffold output heads (shared hidden trunk, per-scaffold Linear
+    # final layer).  Directly targets the per-scaffold mu bias (scaf9 -0.99)
+    # that the shared-head ensemble leaves on the table.  Sigma stays frozen at
+    # 0.7 -- unlike r40 where the sigma table was the free parameter, this one
+    # varies mu only, which is the genuine bottleneck.
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scafmu"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scafmu(df=7.0)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, swa_n=10)
     # NONLINEAR LATENT-OPERATOR head (contract 9.1): MLP junction map -> latent q_j,
     # operator-aware head a_s + b_s q_j, GH-marginal right-censored training.
