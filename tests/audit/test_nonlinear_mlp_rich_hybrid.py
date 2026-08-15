@@ -23,6 +23,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_het,
     make_nonlinear_mlp_extended_hybrid_localctx,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
     make_nonlinear_mlp_nuisance_only_t,
     _student_t_survival,
@@ -380,6 +381,59 @@ def test_robust_t_dropout_threading():
         assert np.all(np.isfinite(mu)) and np.allclose(sigma, 0.7)
         assert cp.min() >= 0.0 and cp.max() <= 1.0
         assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
+def test_robust_t_scaf_sigma_shapes_and_finiteness():
+    """Per-scaffold sigma (r40) must fit/predict cleanly with a learned table.
+
+    The jointly-learned per-scaffold sigma head keeps the reg_deep mu network
+    but adds a ~9-param log-sigma table indexed by scaffold.  The gate must
+    record the learned per-scaffold sigmas, and prediction must emit per-row
+    sigma from that table (not the fixed 0.7).  This is the auditable ablation
+    probe for the r40 negative result (training-time sigma degrades mu fit).
+    """
+    fit, predict = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0)
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_extended_hybrid_reg_deep_t_scaf"
+    assert model["n_vienna"] == 21
+    assert model["hidden"] == [96, 64, 32]
+    assert model["df"] == 7.0
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    assert "scaf_sigma" in model["gate"]      # learned per-scaffold table recorded
+    assert len(model["gate"]["scaf_sigma"]) >= 1
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.all(np.isfinite(sigma))
+    # prediction must NOT be forced to fixed 0.7: sigma comes from the table
+    assert not np.allclose(sigma, 0.7) or model["gate"]["scaf_sigma"].get(
+        str(int(te[0]["scaf"])), 0.7) == 0.7
+    assert np.all(sigma >= 0.05)
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert np.all(np.isfinite(cp))
+    assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
+def test_robust_t_scaf_sigma_seed_threading():
+    """Different seeds must thread through the scaf-sigma factory."""
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    fit1, pred1 = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0, seed=23)
+    fit2, pred2 = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0, seed=99)
+    m1 = fit1(tr)
+    m2 = fit2(tr)
+    assert m1["seed"] == 23 and m2["seed"] == 99
+    assert m1["df"] == m2["df"] == 7.0
+    for m in (m1, m2):
+        assert "eligible" in m["gate"] and "final_grad_norm" in m["gate"]
+        assert "scaf_sigma" in m["gate"]
+    mu1, s1, cp1, su1, ab1 = pred1(m1, te)
+    mu2, s2, cp2, su2, ab2 = pred2(m2, te)
+    assert np.all(np.isfinite(mu1)) and np.all(np.isfinite(mu2))
 
 
 @needs_torch_vienna

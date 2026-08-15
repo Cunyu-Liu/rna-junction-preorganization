@@ -471,6 +471,143 @@ def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1):
     return torch.where(cens, nll_c, nll_m).mean()
 
 
+def _t_right_censored_nll_scaf(mu, y, cens, df, sigma_per_row, cap=-7.1):
+    """Right-censored Student-t NLL with PER-ROW sigma (mean over batch).
+
+    Identical to _t_right_censored_nll but `sigma_per_row` is a tensor of the
+    same length as mu/y/cens (e.g. one learned sigma per scaffold/operator
+    broadcast to the rows of that scaffold).  Keeps the heavy-tailed measured
+    term and the exact survival for censored rows.
+    """
+    import torch
+    dist = torch.distributions.StudentT(
+        df=torch.full_like(mu, float(df)), loc=mu, scale=sigma_per_row)
+    nll_m = -dist.log_prob(y)
+    a = (cap - mu) / sigma_per_row
+    nll_c = -torch.log(_student_t_survival(a, float(df)))
+    return torch.where(cens, nll_c, nll_m).mean()
+
+
+def _train_mlp_t_scaf(Xtr, ytr, cens_tr, scaf_tr, device, in_dim,
+                      hidden=(96, 64, 32), dropout=0.1, weight_decay=1e-2,
+                      df=_DEFAULT_DF, seed=_T_SEED, swa_n=0,
+                      lr=LR, max_epochs=MAX_EPOCHS, patience=PATIENCE,
+                      loss_tol=LOSS_TOL, plateau_window=PLATEAU_WINDOW,
+                      plateau_rel_tol=PLATEAU_REL_TOL):
+    """Train the reg_deep MLP with the robust right-censored Student-t objective
+    AND a per-scaffold (per-operator) sigma, jointly learned.
+
+    The mu network is the same reg_deep MLP as _train_mlp_t.  In addition a
+    small per-scaffold log-sigma table (one scalar per operator) is learned with
+    the same Adam optimizer, initialised at sigma=0.7.  The training NLL uses the
+    per-row sigma (sigma of the row's scaffold), so rows on low-noise operators
+    are weighted more and the mu fit itself can improve -- this is the
+    training-time analogue of the r38 post-hoc per-scaffold sigma calibration.
+    Only ~9 free sigma parameters (n_operators), heavily constrained by data,
+    unlike the r17 per-input heteroscedastic head that overfit.
+    """
+    import torch
+    from audit.models.nonlinear_mlp_hybrid import (
+        _MLP, MAX_EPOCHS, PATIENCE, LOSS_TOL, PLATEAU_WINDOW, PLATEAU_REL_TOL,
+        BATCH, GRAD_TOL,
+    )
+    torch.manual_seed(seed)
+    net = _MLP(in_dim, hidden=hidden, dropout=dropout).to(device)
+    scafs_sorted = sorted({int(s) for s in scaf_tr})
+    n_scaf = len(scafs_sorted)
+    scaf_index = {s: i for i, s in enumerate(scafs_sorted)}
+    # log-sigma table: initialize at log(0.7) so training starts from the frozen
+    # scale; the RBF-free version stays close unless the data demands otherwise.
+    log_sigma = torch.nn.Parameter(
+        torch.full((n_scaf,), float(np.log(0.7)), dtype=torch.float32,
+                   device=device))
+    opt = torch.optim.Adam(
+        list(net.parameters()) + [log_sigma], lr=lr, weight_decay=weight_decay)
+
+    Xt = torch.tensor(Xtr, dtype=torch.float32, device=device)
+    yt = torch.tensor(ytr, dtype=torch.float32, device=device)
+    ct = torch.tensor(cens_tr, dtype=torch.bool, device=device)
+    st = torch.tensor([scaf_index[int(s)] for s in scaf_tr],
+                      dtype=torch.long, device=device)
+    n = Xt.shape[0]
+
+    best_loss = float("inf")
+    best_net_state = None
+    best_log_sigma = None
+    epochs_since_best = 0
+    n_epochs = 0
+    final_loss = float("inf")
+    loss_history = []
+    plateau_reached = False
+    for epoch in range(max_epochs):
+        net.train()
+        perm = torch.randperm(n, device=device)
+        epoch_losses = []
+        for start in range(0, n, BATCH):
+            idx = perm[start:start + BATCH]
+            opt.zero_grad()
+            mu = net(Xt[idx]).squeeze(-1)
+            sigma_rows = torch.exp(log_sigma[st[idx]])
+            loss = _t_right_censored_nll_scaf(mu, yt[idx], ct[idx], df=df,
+                                              sigma_per_row=sigma_rows)
+            loss.backward()
+            opt.step()
+            epoch_losses.append(float(loss.detach().cpu()))
+        final_loss = float(np.mean(epoch_losses))
+        loss_history.append(final_loss)
+        n_epochs = epoch + 1
+        if final_loss < best_loss - loss_tol:
+            best_loss = final_loss
+            best_net_state = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
+            best_log_sigma = log_sigma.detach().cpu().clone()
+            epochs_since_best = 0
+        else:
+            epochs_since_best += 1
+            if epochs_since_best >= patience:
+                plateau_reached = True
+                break
+        if len(loss_history) >= plateau_window:
+            base = abs(loss_history[-plateau_window]) or 1e-8
+            rel = abs(final_loss - loss_history[-plateau_window]) / base
+            if rel < plateau_rel_tol:
+                plateau_reached = True
+                break
+
+    net.load_state_dict(best_net_state)
+    with torch.no_grad():
+        log_sigma.copy_(best_log_sigma)
+    net.eval()
+
+    net.zero_grad()
+    mu_all = net(Xt).squeeze(-1)
+    sigma_all = torch.exp(log_sigma[st])
+    lossg = _t_right_censored_nll_scaf(mu_all, yt, ct, df=df,
+                                       sigma_per_row=sigma_all)
+    lossg.backward()
+    gn = 0.0
+    for p in list(net.parameters()) + [log_sigma]:
+        if p.grad is not None:
+            gn += float(torch.norm(p.grad).item() ** 2)
+    total_grad_norm = float(np.sqrt(gn))
+    net.eval()
+
+    params_finite = all(bool(torch.isfinite(p).all().item())
+                        for p in list(net.parameters()) + [log_sigma])
+    converged = bool(plateau_reached and params_finite and np.isfinite(final_loss))
+    eligible = bool(converged and np.isfinite(total_grad_norm))
+    gate = {
+        "eligible": eligible, "converged": converged,
+        "final_grad_norm": total_grad_norm, "grad_tol": GRAD_TOL,
+        "n_epochs": n_epochs, "max_epochs": MAX_EPOCHS,
+        "final_train_nll": final_loss, "best_train_nll": best_loss,
+        "plateau_reached": plateau_reached, "success": converged,
+        "n_nan_inf_params": int(not params_finite), "df": float(df),
+        "scaf_sigma": {str(s): float(torch.exp(log_sigma[i]).item())
+                       for s, i in scaf_index.items()},
+    }
+    return net, log_sigma, scaf_index, gate
+
+
 def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
                  dropout=0.1, weight_decay=1e-2, df=_DEFAULT_DF,
                  seed=_T_SEED, swa_n=0,
@@ -774,6 +911,81 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
         sigma = np.full(len(mu), 0.7)
         from scipy.special import log_ndtr
         a = (mu + 7.1) / 0.7
+        cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
+        seen_scaf = np.zeros(len(mu), dtype=bool)
+        for i, r in enumerate(test_rows):
+            if int(r["scaf"]) in model["scafs"]:
+                seen_scaf[i] = True
+        return mu, sigma, cp, seen_scaf, ~seen_scaf
+
+    return fit, predict
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=_DEFAULT_DF,
+                                                       hidden=(96, 64, 32),
+                                                       dropout=0.1,
+                                                       weight_decay=1e-2,
+                                                       seed=_T_SEED,
+                                                       swa_n=0):
+    """reg_deep MLP with a JOINTLY learned per-scaffold (per-operator) sigma.
+
+    Training-time analogue of the r38 post-hoc per-scaffold sigma calibration:
+    the mu network is the same reg_deep t7, and a per-scaffold log-sigma table
+    (one scalar per operator, ~9 params) is learned with the same optimizer
+    using the exact right-censored Student-t NLL with per-row sigma.  This
+    weights low-noise operators more in the mu fit (which the post-hoc
+    calibration cannot do) and emits the calibrated per-scaffold sigma at
+    prediction time.  Crucially it is NOT the r17 per-input heteroscedastic
+    head -- sigma is a small, data-constrained table indexed by scaffold.
+    """
+    def fit(train_rows):
+        motifs = sorted({str(r["motif"]) for r in train_rows})
+        scafs = sorted({int(r["scaf"]) for r in train_rows})
+        Xn = _nuisance_basis(train_rows, motifs, scafs)
+        tr_jids = sorted({str(r["jid"]) for r in train_rows})
+        by_jid = vienna_ext_build_raw(train_rows)
+        mean, sd = vienna_ext_fit_scaler(tr_jids, by_jid)
+        Xv = np.zeros((len(train_rows), len(mean)))
+        for i, r in enumerate(train_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, mean, sd)[0]
+        X = np.hstack([Xn, Xv])
+        y = np.asarray([r["y"] for r in train_rows], dtype=float)
+        cens = np.asarray([r["cens"] for r in train_rows], dtype=bool)
+        scaf_tr = np.asarray([int(r["scaf"]) for r in train_rows], dtype=int)
+        import torch
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        net, log_sigma, scaf_index, gate = _train_mlp_t_scaf(
+            X, y, cens, scaf_tr, device, X.shape[1], hidden=hidden,
+            dropout=dropout, weight_decay=weight_decay, df=df, seed=seed,
+            swa_n=swa_n)
+        return {"kind": "nonlinear_mlp_extended_hybrid_reg_deep_t_scaf",
+                "net": net, "log_sigma": log_sigma, "scaf_index": scaf_index,
+                "gate": gate, "motifs": motifs, "scafs": scafs, "mean": mean,
+                "sd": sd, "by_jid": by_jid, "n_nuisance": Xn.shape[1],
+                "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
+                "dropout": dropout, "weight_decay": weight_decay, "df": float(df),
+                "seed": int(seed), "swa_n": int(swa_n)}
+
+    def predict(model, test_rows):
+        import torch
+        Xn = _nuisance_basis(test_rows, model["motifs"], model["scafs"])
+        by_jid = vienna_ext_build_raw(test_rows)
+        Xv = np.zeros((len(test_rows), model["n_vienna"]))
+        for i, r in enumerate(test_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, model["mean"], model["sd"])[0]
+        X = np.hstack([Xn, Xv])
+        model["net"].eval()
+        with torch.no_grad():
+            Xt = torch.tensor(X, dtype=torch.float32, device=model["device"])
+            mu = model["net"](Xt).squeeze(-1).cpu().numpy()
+        # emit per-scaffold learned sigma (fallback 0.7 for unseen scaffold)
+        sigma = np.full(len(mu), 0.7)
+        for i, r in enumerate(test_rows):
+            sc = int(r["scaf"])
+            if sc in model["scaf_index"]:
+                sigma[i] = float(torch.exp(model["log_sigma"][model["scaf_index"][sc]]).item())
+        from scipy.special import log_ndtr
+        a = (mu + 7.1) / sigma
         cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
         seen_scaf = np.zeros(len(mu), dtype=bool)
         for i, r in enumerate(test_rows):

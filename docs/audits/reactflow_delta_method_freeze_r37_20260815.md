@@ -203,6 +203,66 @@ mu 偏差（需删失感知的算子表征或 prospective 数据，非校准层�
 - artifacts：`per_scaf_sigma_calibration.json`、`per_scaf_sigma_horizontal_table.json`、
   `censoring_aware_operator_calibration.json`（run root）
 
+---
+
+# 补充二：r40 结果（同日续篇）
+
+## 9. r40：训练期 per-scaffold σ 联合学习 —— 阴性（边界闭合）
+
+r38 事后 per-scaf σ 校准（0.8166）是强改进，但事后校准无法改进 mu 拟合。r40 测试
+训练期形态：在 `_train_mlp_t_scaf` 中联合学习 ~9 参数 per-scaffold log-sigma 表，
+训练目标用 per-row σ（学生-t 右删失 NLL），并在预测时发射学到的 per-scaf σ。
+
+### 9.1 smoke 结果（2 折，GPU6，r40_scaf_sigma_smoke）
+
+| 模型 | e:AAAC_GAAC | e:AAAG_CAAG | 学习到的 σ 均值 |
+|------|------------:|------------:|----------------:|
+| t7（冻结 σ=0.7） | 0.7476 | 0.8297 | 0.700 |
+| **t7_scaf（训练期 σ）** | **0.8306** | **0.9685** | **0.84（0.79–0.92）** |
+
+**结论：NEGATIVE，且是决定性的。** 两折均显著差于冻结 t7。机理与 r17（per-input
+异方差头）完全一致：当 σ 在训练中自由时，优化器用更大的 σ（~0.84，而非 r38 事后
+最优的 0.45–0.84 混合）吸收残差，mu 拟合松弛，评估 NLL 恶化。9 参数 per-operator
+表不足以约束这一"用 σ 换 mu"的退化——低噪 scaffold（2/3）本应学 ~0.45，r40 学到
+~0.80，说明 mu 未得到充分压力。
+
+### 9.2 边界闭合
+
+至此算子异方差的两个方向都已测试：
+- **事后校准（r38）**：mu 先用冻结 σ=0.7 训练，再对固定 mu 做 per-operator σ 校准
+  → **正收益（0.8166, +25.20%）**；
+- **训练期联合学习（r40）**：σ 与 mu 同时优化 → **负收益（0.83–0.97）**。
+
+**正确形态是事后校准**：per-operator σ 是"给定已训练 mu 的残差尺度"的表达，不能
+作为训练自由度（否则退化为 r17/r40 的 σ-吸收残差）。r40 保留为可审计消融探针
+（新增 3 个单测覆盖 shapes/finiteness/seed-threading，全部通过）。
+
+## 10. 最终方法冻结（不变，r38 保持）
+
+**7-member 混合集成（4x GBDT + 3x t7 MLP，family-equal mu 平均）+ 
+留一折 per-scaffold σ 校准（σ≈0.45–0.84，随算子删失率变化）。**
+
+| 口径 | pooled NLL | vs nuisance |
+|------|-----------:|------------:|
+| frozen σ=0.7 | 0.8522 | +21.93% |
+| global σ-only LOO（r37） | 0.8460 | +22.50% |
+| **per-scaffold σ LOO（r38，冻结）** | **0.8166** | **+25.20%** |
+
+方法级边界已完全闭合：9+1 条路线（stacking、per-row σ、OEC α、r39 α、r40 训练期
+σ、Student-t GBDT、kernel、hetero head、RNA-FM/localctx/deep）均阴性或关闭，仅
+global σ-only 与 per-scaf σ 事后校准为正。剩余不可约残差来自测量噪声与高删失
+算子系统性 mu 偏差，需删失感知算子表征或 prospective 数据。
+
+## 11. 新增/修改文件（r40）
+
+- `audit/models/nonlinear_mlp_rich_hybrid.py`（修改）：新增 `_t_right_censored_nll_scaf`、
+  `_train_mlp_t_scaf`、`make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf`
+- `audit/repair/shootout_run.py`（修改）：注册 r40 三 seed 模型
+- `tests/audit/test_nonlinear_mlp_rich_hybrid.py`（修改）：+3 单测（shapes/finiteness、
+  seed-threading），全部通过
+- `audit/repair/shootout_r40_scaf_sigma_smoke_cfg.json`、`audit/repair/analyze_r40_smoke.py`
+- artifacts：`r40_scaf_sigma_smoke/`（run root）
+
 ## 4. 新增/修改文件（r37）
 
 - `audit/repair/analyze_stacked_ensemble.py`（新增）：censoring-aware LOO stacking

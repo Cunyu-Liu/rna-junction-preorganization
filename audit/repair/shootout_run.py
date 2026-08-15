@@ -64,6 +64,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_het,
     make_nonlinear_mlp_extended_hybrid_localctx,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
@@ -126,6 +127,12 @@ def _universe(rnafm_cache=None):
     # variance reduction at the weight level, matching the mu-ensemble theme.
     U["nonlinear_mlp_extended_hybrid_reg_deep_t_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=5.0, swa_n=10)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, swa_n=10)
+    # r40: jointly-learned per-scaffold (per-operator) sigma -- training-time
+    # analogue of the r38 post-hoc per-scaffold sigma calibration.  Small ~9
+    # param log-sigma table; NOT the r17 per-input heteroscedastic head.
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scaf"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scaf_s99"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0, seed=99)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scaf_s2026"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf(df=7.0, seed=2026)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, swa_n=10)
     # NONLINEAR LATENT-OPERATOR head (contract 9.1): MLP junction map -> latent q_j,
     # operator-aware head a_s + b_s q_j, GH-marginal right-censored training.
