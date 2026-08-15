@@ -152,17 +152,39 @@ r51 joint mu-affine + σ 重扫）。继续增加 base 模型复杂度无法带�
 **结论：r56b（mm3, κ=2）= 0.7314 是 context mu 校准的收敛点**；
    kappa0.5 vs r51 的 CI [0.0096, 0.0871] 下界 > 0 确认该家族显著正向。
 
+### 4.z r58–r64（2026-08-16）：r62 解耦 σ 修正 —— 最终冻结 0.7243
+
+r59 分布诊断发现 measured 标准化残差 kurtosis +1.117（重尾），但 MetricSpec
+冻结 Gaussian likelihood，不能换 Student-t。r59b 重测 context σ（r54 在 r51
+mu 上失败）在 **r56b mu** 上有微弱正增益。更关键的是 r62 揭示 **r56b 的耦合
+实现缺陷**：σ 在含 context 修正的 corr_other 上扫，与 held-out 实际发射的 mu
+不完全一致 → 发射 σ_m 系统性偏小（scaf8 0.530 vs 独立重扫 0.599），在重尾下
+惩罚极端残差。
+
+- **r62 = r56b mu（Stage 1）+ 独立 per-scaf×stratum σ 重扫（Stage 2）=
+  0.7243**（vs r56b −0.0071/−0.97%；measured 0.8265→0.8182，censored 严格
+  不变 0.199）。37/37 折 σ_m 增大，19 折 NLL 改善、18 折略恶化 —— 增益集中在
+  重尾折（CUAAG_CUUAG 3.06→2.77、CUCAG_CUGAG 3.11→2.82），是真实分布自适应。
+- **诚实 caveat（必须写入稿件）**：r62 vs r56b 的 edit-cluster CI
+  [-0.0073, 0.0197] **穿 0** —— 这是实现修正（解耦 σ 扫描）而非新杠杆；
+  pooled 主估计量在所有 mm3 配置一致更低，以 pooled 为准。
+- **最终冻结方法 = 7-member 集成（wg=0.5）+ r62（κ=1, mm3）= 0.7243**
+  （`submission_horizontal_table_v4.json` 五口径 definitive 表）。
+  vs nuisance r45 相对增益 **+27.86%**，CI [0.2416, 0.3794] 下界 > 0。
+- 方法贡献链最终：nuisance 1.0916 → r45 0.7907 → r51 0.7815 → r56b 0.7314
+  → **r62 0.7243**（绝对 NLL 累计降 33.7%）。
+
 这些方向的预期收益全部在 edit-cluster CI 宽度（±0.05-0.1）以内，无法
 产生统计上可检测的改善。
 
 ## 5. 最终判断与建议
 
-- **冻结方法**：7-member 混合集成（equal-family wg=0.5）+ **r56b per-context
-  EB mu + σ 重扫 = 0.7314**（绝对 NLL 较 r45 0.7907 降 7.5%、较 r51 0.7815
-  降 6.41%，measured 层偏置在 scaf 与 context 两层均消除，CI 下界 >0）。
+- **冻结方法**：7-member 混合集成（equal-family wg=0.5）+ **r62（r56b
+  per-context EB mu + 独立 σ 重扫）= 0.7243**（绝对 NLL 较 r45 0.7907 降
+  8.4%、较 r56b 0.7314 降 0.97%，measured 层 0.8182，censored 不变 0.199）。
 - **模型级边界更新**：σ 粒度（context EB/motif per-fold）、mu 粒度（context
-  EB）全部测尽；**per-context mu 是唯一新发现的真实信号**（r56b 正向），
-  其余 22+ 条路线 NEGATIVE/持平。
-- **建议转向 benchmark 轨稿件**：以 r56b 为冻结方法更新 Figure 2/Table 2/
+  EB）、分布（重尾诊断）、实现耦合（r62 解耦）全部测尽；**scaf→context 双层
+  mu 修正 + σ 解耦是方法贡献链核心**。
+- **建议转向 benchmark 轨稿件**：以 r62 为冻结方法更新 Figure 2/Table 2/
   Claim 矩阵，撰写 benchmark 轨故事线（censor-aware 评估 + scaf→context 双层
-  mu/σ 联合校准 + 方法边界闭合），P0.6 裁定不变（TRACK_A_LOCKED）。
+  mu 修正 + 解耦 σ 校准 + 方法边界闭合），P0.6 裁定不变（TRACK_A_LOCKED）。

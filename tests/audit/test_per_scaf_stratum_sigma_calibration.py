@@ -43,6 +43,9 @@ from audit.repair.r54_per_ctx_eb_sigma import (
 from audit.repair.r56b_per_ctx_eb_mu_floor import (
     _calibrate_r56b,
 )
+from audit.repair.r62_decoupled_frozen import (
+    _calibrate_r62,
+)
 from audit.repair.r51_joint_mu_affine_sigma_rescan import (
     _calibrate_r51,
     _scan_sigma as r51_scan_sigma,
@@ -693,6 +696,65 @@ def test_r56b_corrects_context_bias():
         f"context bias should be corrected (delta>0), got {np.mean(deltas):.3f}"
 
 
+def test_r62_censored_sigma_stays_unchanged():
+    # r62 only re-scans the measured sigma; censored rows keep r56b sigma_c and
+    # r56b mu.  Verify censored mu/sigma are untouched vs r56b.
+    rng = np.random.default_rng(70)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 9):
+            for c in range(3):
+                ctx = f"c{sc}_{c}"
+                for i in range(15):
+                    rid = f"{fold}_{sc}_{ctx}_{i}"
+                    cens = (sc == 9) and (i % 2 == 0)
+                    mu = -6.0 if sc == 9 else -4.0
+                    y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                    preds[rid] = {"jid": ctx, "fold": fold, "scaf": sc,
+                                  "context": ctx, "y": y, "cens": cens,
+                                  "mu": mu}
+    folds = ["f0", "f1", "f2"]
+    cal56, _ = _calibrate_r56b(preds, folds, kappa=2.0, min_meas=3)
+    cal62, _ = _calibrate_r62(preds, folds, kappa=1.0, min_meas=3)
+    for rid in preds:
+        assert np.isfinite(cal62[rid]["sigma"]) and cal62[rid]["sigma"] > 0.0
+        assert np.isfinite(cal62[rid]["mu"])
+        if preds[rid]["cens"]:
+            assert np.isclose(cal62[rid]["mu"], cal56[rid]["mu"])
+            assert np.isclose(cal62[rid]["sigma"], cal56[rid]["sigma"]), \
+                "r62 must not change censored sigma"
+
+
+def test_r62_scans_sigma_on_corrected_mu():
+    # On heavy-tail measured data (Cauchy-like), r62's independent sigma scan
+    # should pick a larger sigma than r56b's coupled scan, lowering NLL.
+    rng = np.random.default_rng(71)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 5):
+            for c in range(3):
+                ctx = f"c{sc}_{c}"
+                for i in range(20):
+                    rid = f"{fold}_{sc}_{ctx}_{i}"
+                    mu = -4.0
+                    # heavy tails via occasional large noise
+                    noise = rng.normal(0, 0.3)
+                    if rng.random() < 0.08:
+                        noise += rng.choice([-2.0, 2.0])
+                    y = mu + noise
+                    preds[rid] = {"jid": ctx, "fold": fold, "scaf": sc,
+                                  "context": ctx, "y": y, "cens": False,
+                                  "mu": mu}
+    folds = ["f0", "f1", "f2"]
+    cal56, _ = _calibrate_r56b(preds, folds, kappa=2.0, min_meas=3)
+    cal62, _ = _calibrate_r62(preds, folds, kappa=1.0, min_meas=3)
+    sig56 = np.mean([cal56[rid]["sigma"] for rid in preds])
+    sig62 = np.mean([cal62[rid]["sigma"] for rid in preds])
+    assert sig62 > sig56, f"decoupled sigma should be larger: {sig62} vs {sig56}"
+    from audit.repair.r62_decoupled_frozen import _pooled as _pl
+    assert _pl(cal62) <= _pl(cal56) + 1e-6
+
+
 if __name__ == "__main__":
     tests = [test_scan_sigma_picks_minimal_nll,
              test_scan_sigma_vectorized_matches_bruteforce,
@@ -720,7 +782,9 @@ if __name__ == "__main__":
              test_r54_high_kappa_tends_to_scaf_sigma,
              test_r54_censored_mu_stays_untouched,
              test_r56b_censored_mu_stays_untouched,
-             test_r56b_corrects_context_bias]
+             test_r56b_corrects_context_bias,
+             test_r62_censored_sigma_stays_unchanged,
+             test_r62_scans_sigma_on_corrected_mu]
     failed = 0
     for t in tests:
         try:
