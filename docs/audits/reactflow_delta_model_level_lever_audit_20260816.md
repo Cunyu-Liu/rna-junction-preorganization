@@ -192,6 +192,8 @@ mu 上失败）在 **r56b mu** 上有微弱正增益。更关键的是 r62 揭�
 | row-level σ 用 train-legal Vienna+nuisance 特征回归 | r73 | 0.8194–0.8271（GBDT/Ridge，全部 > 0.7243）| NEGATIVE：合法特征无法预测逐行残差幅度，r70 增益只能来自 label-derived err10 |
 | 联合 per-context (mu,σ) 2-参数 EB | r74 | mm3 0.8520 / mm5 0.8181（edit CI [-0.1599,-0.0695] 穿 0）| NEGATIVE：逐 context 联合 σ 严重过拟合，证实 r56b mu→r62 σ 的顺序结构是正确解 |
 | ensemble family 权重在 r62 下重扫 | r75 | wg=0.5 → 0.7243（最优；wg0/0.25/0.75/1 = 0.757/0.729/0.743/0.777）| 确认 equal-family 在 r62 下仍最优，冻结不动 |
+| 非线性单调 mu 校准（isotonic / poly2-3）| r76 | 0.7386–0.7454（全部 > 0.7243，edit CI [-0.0283,-0.0081] 穿 0）| NEGATIVE：residual-vs-mu 表观非线性是 context 结构/噪声，不是可学单调变换 |
+| per-context y~mu 斜率稳定性 | r77 (diag) | split-half slope corr = 0.527（n=18，不稳定）vs intercept corr = 0.993 | 斜率是噪声；intercept 仍是唯一稳定 context 结构（r56b 已用）|
 
 **Gaussian 信息底（measured 层，决定性证据）**：r62 measured NLL = 0.8182，而其发射 σ_m
 （0.42–0.68）对应的 Gaussian 信息下界 0.5·log(2π)+log σ+0.5 = 0.55–1.03（σ=0.54 时为 0.803）。
