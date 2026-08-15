@@ -380,6 +380,28 @@ prospective 数据或新测量，非进一步结构调参可解。
 （+25.20%）**。12 条方法路线测尽，σ 粒度（global→scaf→ctx）与 mu 结构
 （共享头→scaf 头）均已闭合。剩余不可约残差需 prospective 数据或新测量。
 
+## 17. 投稿整合建议（当前最强允许主张）
+
+**最终冻结方法**：censor-aware 鲁棒（Student-t）非线性头 + 跨族 7-member
+mu-集成 + **留一折 per-operator 异方差 σ 校准**（σ 随算子删失率 0.45–0.84）。
+
+| 口径 | pooled NLL | vs nuisance | edit-cluster CI |
+|------|-----------:|------------:|----------------:|
+| frozen σ=0.7 | 0.8522 | +21.93% | — |
+| **per-scaf σ LOO（冻结）** | **0.8166** | **+25.20%** | [0.216, 0.294] lower>0 |
+
+**核心可发表主张**（ClaimAuthorization 约束内）：
+- censor-aware 鲁棒非线性头 + 跨族集成 + per-operator 异方差 σ 校准，相对
+  线性/no-sequence 对照的 pooled-NLL 增益 +25.20%，edit-cluster CI 不含 0，
+  非单一组件驱动；
+- 排序对聚合口径（pooled/context/scaffold）与组合规则（muavg/mixture）稳健；
+- **方法级边界已系统闭合**：12 条组合/校准/换族/算子/粒度路线全部测尽，只有
+  σ 事后校准（global→scaf）为正——这本身是可发表的 benchmark 认识。
+
+**禁止主张**（延续）：transferable sequence mechanism、SOTA、noise ceiling、
+13 独立模型族公平比较等；63-D sequence-map 路线关闭；提交/release 仍不授权
+（需 owner 明确指示 + P0.6 重裁定 + release seal）。
+
 ## 4. 新增/修改文件（r37）
 
 - `audit/repair/analyze_stacked_ensemble.py`（新增）：censoring-aware LOO stacking
