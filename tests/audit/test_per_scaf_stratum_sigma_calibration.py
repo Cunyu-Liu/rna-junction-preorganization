@@ -26,6 +26,10 @@ from audit.repair.r47_measured_affine_mu_correction import (
     _ridge_ols,
     _calibrate_r47,
 )
+from audit.repair.r50_family_weight_sweep_r45 import (
+    _blend,
+    _ens_mu,
+)
 
 
 def _row(rid, fold, scaf, y, cens, mu, jid=None):
@@ -215,6 +219,42 @@ def test_r46_shrink_zero_equals_r45():
         assert np.isclose(cal_zero[rid]["sigma"], cal_ref[rid]["sigma"])
 
 
+def test_r50_ens_mu_averages_over_member_subset():
+    # _ens_mu must produce the member-mean mu for the given key subset.
+    rng = np.random.default_rng(20)
+    members = {}
+    common = [f"r{i}" for i in range(40)]
+    for m in ("g1", "g2", "m1", "m2"):
+        members[m] = {rid: _row(rid, "f0", 1, y=-6.0, cens=False,
+                                mu=float(rng.normal(0, 1)) + int(m.startswith("g")) * 2.0)
+                      for rid in common}
+    GBDT = ["g1", "g2"]
+    MLP = ["m1", "m2"]
+    ens_g = _ens_mu(members, GBDT, common)
+    assert len(ens_g) == len(common)
+    for rid in common:
+        assert np.isclose(ens_g[rid]["mu"], np.mean([members[g][rid]["mu"] for g in GBDT]))
+    ens_m = _ens_mu(members, MLP, common)
+    for rid in common:
+        assert np.isclose(ens_m[rid]["mu"], np.mean([members[m2][rid]["mu"] for m2 in MLP]))
+    # mixture: mean over g1+m1 is between the two means
+    ens_mix = _ens_mu(members, ["g1", "m1"], common)
+    for rid in common:
+        assert np.isclose(ens_mix[rid]["mu"],
+                          0.5 * (members["g1"][rid]["mu"] + members["m1"][rid]["mu"]))
+
+
+def test_r50_member_names_match_shootout_universe():
+    # The hard-coded member ids in r50 must all exist in the shootout universe.
+    from audit.repair.shootout_run import _universe
+    from audit.repair import r50_family_weight_sweep_r45 as mod
+    U = _universe()
+    for m in mod.ALL_MEMBERS:
+        assert m in U, f"{m} not registered"
+    assert set(mod.GBDT) | set(mod.MLP) == set(mod.ALL_MEMBERS)
+    assert len(mod.GBDT) == 4 and len(mod.MLP) == 3
+
+
 def test_r46_sigma_stays_positive_and_finite():
     rng = np.random.default_rng(9)
     preds = {}
@@ -337,7 +377,9 @@ if __name__ == "__main__":
              test_ridge_ols_shrinks_toward_prior,
              test_r47_global_affine_applies_only_to_measured_rows,
              test_r47_per_scaf_affine_changes_measured_mu_per_scaf,
-             test_r47_global_matches_hand_computed_pooled]
+             test_r47_global_matches_hand_computed_pooled,
+             test_r50_ens_mu_averages_over_member_subset,
+             test_r50_member_names_match_shootout_universe]
     failed = 0
     for t in tests:
         try:

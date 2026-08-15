@@ -942,3 +942,64 @@ per-scaffold × stratum σ 校准（扩展网格 floor 0.05 = MetricSpec floor�
 
 - `audit/repair/submission_horizontal_table.py`（新增）：最终横向表生成器
 - artifacts：`submission_horizontal_table.json`
+
+---
+
+# 补充十二：r50 结果（2026-08-15 续篇）
+
+## 36. r50：修正 r45 校准下的 family-weight 扫描 —— 确认冻结（稳健性）
+
+所有此前集成权重分析（r34/r35 weight sweep、r37 learned stacking）都在
+**frozen σ=0.7** 下评估。修正后的 r45 per-scaf×stratum σ 校准（扩展网格
+floor 0.05）改变了成员排序：GBDT 成员（0.8252–0.8297）个体**优于** MLP
+成员（0.8469–0.8780），因此 equal-family 权重（wg=0.5）在 r45 下是否仍最优
+是一个真正开放的问题。r50 在 r45 校准下扫描 family blend 权重 wg。
+
+### 36.1 成员级 r45 校准 NLL（修正网格）
+
+| 成员 | r45 NLL |
+|------|--------:|
+| xgb_lr03 | 0.8252 |
+| xgb | 0.8272 |
+| xgb_s99 | 0.8297 |
+| xgb_s2026 | 0.8435 |
+| t7_s99 | 0.8469 |
+| t7_s2026 | 0.8692 |
+| t7 | 0.8780 |
+
+GBDT 成员确实全部优于 MLP 成员 —— 若只看单成员，MLP 应被淘汰。
+
+### 36.2 family-weight 扫描（r45 校准）
+
+| wg（GBDT 权重） | frozen 0.7 | **r45 校准** |
+|------|-----------:|------------:|
+| 0.40 | 0.8535 | 0.7940 |
+| **0.50（equal）** | **0.8522** | **0.7909** |
+| 0.60 | 0.8532 | 0.7911 |
+| 0.65 | 0.8546 | 0.7931 |
+| 0.70 | 0.8565 | 0.7955 |
+| 0.80 | 0.8621 | 0.8021 |
+| 0.90 | 0.8700 | 0.8117 |
+| 1.00（GBDT-only） | 0.8801 | 0.8243 |
+
+### 36.3 关键结论：equal-family 仍是 r45 下的最优
+
+- **wg=0.5 在两个口径下都是最小**（frozen 0.8522、r45 0.7909）。
+- GBDT-only（wg=1.0，r45 0.8243）远差于 7-member（0.7909，−0.0334）——
+  **MLP 成员虽个体更差，但提供误差多样性，在 r45 下依然显著贡献**。
+- MLP-only（3mem，r45 0.8410）也差于混合。
+- 这验证了 equal-family 7-member 混合集成在**修正后校准**下仍是最优组成，
+  冻结投稿方法稳健（不依赖校准口径）。
+
+**结论：POSITIVE-CONFIRMATION（无方法变更）。** 冻结方法保持：7-member
+混合集成（4x GBDT + 3x t7，family-equal mu 平均）+ 留一折 per-scaf×stratum
+σ 校准 = **0.7907（+27.57%）**。方法边界 19 条路线 + r50 确认，仍为 19 条
+（r50 是冻结方法的稳健性确认，非新方向）。
+
+## 37. 新增文件（r50）
+
+- `audit/repair/r50_family_weight_sweep_r45.py`（新增）：r45 下 family-weight
+  扫描
+- `tests/audit/test_per_scaf_stratum_sigma_calibration.py`（扩充）：+2 单测
+  （_ens_mu 均值、成员 id 与 universe 一致），共 16 全过
+- artifacts：`r50_family_weight_sweep_r45.json`
