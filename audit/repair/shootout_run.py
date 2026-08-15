@@ -72,6 +72,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
 )
 from audit.models.nonlinear_latent_operator import make_nonlinear_latent_operator
 from audit.models.xgboost_censored_hybrid import make_xgboost_censored_hybrid
+from audit.models.kernel_censored_hybrid import make_kernel_censored_hybrid
 from audit.repair.fold_loader import build_joint_edit_context_folds
 from audit.repair.optimizer_gate import gate_from_fit, unbounded_fit_gate
 
@@ -155,6 +156,10 @@ def _universe(rnafm_cache=None):
     U["xgboost_censored_hybrid_t7"] = make_xgboost_censored_hybrid(df=7.0)
     U["xgboost_censored_hybrid_t7_s99"] = make_xgboost_censored_hybrid(df=7.0, seed=99)
     U["xgboost_censored_hybrid_t7_s2026"] = make_xgboost_censored_hybrid(df=7.0, seed=2026)
+    # r36: kernel (RBF) ridge member with the right-censored Gaussian objective
+    # (IRLS).  Structurally orthogonal to both MLP and GBDT; gamma/lam are
+    # selected on a train subsample by held-out censored NLL.
+    U["kernel_censored_hybrid"] = make_kernel_censored_hybrid()
     if rnafm_cache is not None:
         U["rnafm_linear_hybrid"] = make_rnafm_linear_hybrid(rnafm_cache)
         U["rnafm_vienna_linear_hybrid"] = make_rnafm_vienna_linear_hybrid(rnafm_cache)

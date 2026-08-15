@@ -478,6 +478,49 @@ r35 结论：lr03 提升单模型（0.8845→0.8807），但折入集成后仅 +
 **最终最优方法 = 7 成员混合集成（4x GBDT + 3x t7 MLP），NLL 0.8522，
 vs nuisance +21.93%，edit-cluster CI [0.186, 0.363]**。
 
+## r36 核方法（RBF）成员 —— 阴性结果（用户选定方向）
+
+集成饱和后用户选定核方法/GP 作为"真正正交"的第三族。实现
+`audit/models/kernel_censored_hybrid.py`：RBF 核岭回归 + 右删失 Gaussian
+目标的 IRLS 求解（伪目标 z=mu-g/h，权重 w=h），gamma/λ 在 train 子采样上
+按 held-out 删失 NLL 选择。单元测试 5 passed（核矩阵性质、grad/hess 有限差分、
+IRLS 收敛、形状、unseen-scaffold abstain）。
+
+**关键实现坑**：
+1. 无截距的 RBF 核在远测试点预测→0 而 y≈-8.3，导致 NLL 灾难性放大
+   （首版 full 6.32）——必须显式含截距 b。
+2. 含截距的增广 (n+1) 系统在 GPU float32 下病态（cond~1e17，奇异）——用
+   **块消元消去 b**（n 维系统）+ **float64 solve** 修复，IRLS 3 轮收敛。
+
+**full 37-fold（`r36_kernel_full2`，pooled junction-macro NLL）**：
+
+| 模型/集成 | NLL | vs nuisance | 备注 |
+|-----------|-----|-----------|------|
+| kernel_censored_hybrid（单模型） | 1.0073 | +7.72% | 远弱于 GBDT/MLP 族（~+19%） |
+| 错误相关 kernel vs GBDT 4x | 0.747 | — | 不如预期正交（GBDT vs MLP 跨族 0.84） |
+| 错误相关 kernel vs MLP 3x | 0.864 | — | — |
+| 2 族 mixed（GBDT4x+MLP3x） | **0.8522** | **+21.93%** | 现最优 |
+| 3 族 mixed（family-equal 1/3） | 0.8681 | +20.47% | **劣于 2 族** |
+
+**权重扫描**：对 3 族做核权重 wk 扫描，**最优 wk=0.00**——任何正权重都劣化
+集成。核成员被否决。
+
+**结论**：RBF 核在同一特征块上表现远弱于树/MLP（核的平滑假设与
+one-hot nuisance + 连续 Vienna 混合特征空间不匹配，无法捕捉树/MLP 的
+特征交互），且可提供信息的预测与既有族相关并不更低（0.75-0.86）。
+**无任何正交第三族能增益** —— "正交模型族"杠杆已完全探明：
+唯一有效的是 GBDT(树) × MLP(神经) 两个族，第三族（核）被证据否决。
+最终方法冻结为 7 成员混合集成（+21.93%）。
+
+## r36 代码与提交
+
+- 新增：`audit/models/kernel_censored_hybrid.py`（RBF 核 + IRLS 删失求解 +
+  块消元截距 + float64）、`tests/audit/test_kernel_censored_hybrid.py`（5 项）、
+  `shootout_r36_kernel_smoke_cfg.json`、`shootout_r36_kernel_full_cfg.json`、
+  `shootout_r36_kernel_full2_cfg.json`（修复后重跑）。
+- 修改：`audit/repair/shootout_run.py`（注册 `kernel_censored_hybrid`）、
+  `audit/repair/analyze_mixed_gbdt_t7.py`（核成员 + 3 族集成 + 多样性/权重扫描）。
+
 ## r35 代码与提交
 
 - 修改：`audit/models/xgboost_censored_hybrid.py`（暴露

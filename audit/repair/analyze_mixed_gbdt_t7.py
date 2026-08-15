@@ -1,23 +1,22 @@
-"""Mixed-family ensemble: multi-seed GBDT + 3x t7 MLP.
+"""Mixed-family ensemble: GBDT + t7 MLP + kernel members.
 
 Consumes materialized preds from r24 (3x t7 MLP seeds), r33 (Gaussian XGBoost
-seed23 + nuisance), r34_gbdt_seeds_full (seeds s99/s2026), and
-r35_gbdt_hp_full (hp_lr03: lr=0.03, 3000 rounds, the r35 scan winner at 0.8807
-vs default 0.8845) on the same 37 blocked joint folds, restricted to
-optimizer+full-coverage eligible rows (fail-closed).
+seed23 + nuisance), r34_gbdt_seeds_full (seeds s99/s2026), r35_gbdt_hp_full
+(hp_lr03, the r35 scan winner), and r36_kernel_full (kernel RBF member) on the
+same 37 blocked joint folds, restricted to optimizer+full-coverage eligible rows
+(fail-closed).
 
 Headline estimand: pooled junction-macro right-censored Gaussian NLL (sigma=0.7).
 
-Ensembles (mu-average, fixed sigma=0.7):
-  - GBDT family: best-3 {lr03, s99, s2026}; 4x {s23, lr03, s99, s2026}
+Families (mu-average, fixed sigma=0.7):
+  - GBDT family: {s23, lr03, s99, s2026}
   - MLP family:  3x t7 MLP {t7, t7_s99, t7_s2026}
-  - mixed:       GBDT-family ensemble + MLP-family ensemble (2 members)
+  - kernel family: kernel_censored_hybrid (single member)
 
-Also reports the single-model NLL ladder and an edit-cluster bootstrap CI for
-the headline mixed ensemble vs the nuisance baseline.
-
-Note: Student-t (df=7) GBDT was smoke-rejected (r34); hyperparameter scan r35
-confirmed lr03 (lower LR, more rounds) as the best single GBDT.
+Mixed ensembles: family-equal weights (each family 1/3) and the 2-family
+GBDT+MLP optimum for comparison; the kernel's standalone NLL and error
+correlation vs the two other families quantify whether it adds real
+variance reduction (the r36 hypothesis).
 """
 from __future__ import annotations
 
@@ -37,10 +36,12 @@ R = "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z"
 R33 = f"{R}/r33_xgboost_full/Predictions_v3.jsonl"
 R34 = f"{R}/r34_gbdt_seeds_full/Predictions_v3.jsonl"
 R35 = f"{R}/r35_gbdt_hp_full/Predictions_v3.jsonl"
+R36 = f"{R}/r36_kernel_full2/Predictions_v3.jsonl"
 R24 = f"{R}/r24_t7_seed7/combined_r20_r21_r23_r24_preds.jsonl"
 R33_LEDGER = f"{R}/r33_xgboost_full/ConvergenceLedger_v3.parquet"
 R34_LEDGER = f"{R}/r34_gbdt_seeds_full/ConvergenceLedger_v3.parquet"
 R35_LEDGER = f"{R}/r35_gbdt_hp_full/ConvergenceLedger_v3.parquet"
+R36_LEDGER = f"{R}/r36_kernel_full2/ConvergenceLedger_v3.parquet"
 R24_LEDGERS = [
     f"{R}/r20_robust_t_df_sweep/ConvergenceLedger_v3.parquet",
     f"{R}/r21_seed99_replication/ConvergenceLedger_v3.parquet",
@@ -52,14 +53,13 @@ XGB = "xgboost_censored_hybrid"
 XGB_S99 = "xgboost_censored_hybrid_s99"
 XGB_S2026 = "xgboost_censored_hybrid_s2026"
 XGB_LR03 = "xgboost_censored_hybrid_hp_lr03"
+KERNEL = "kernel_censored_hybrid"
 T7 = "nonlinear_mlp_extended_hybrid_reg_deep_t7"
 T7_S99 = "nonlinear_mlp_extended_hybrid_reg_deep_t7_s99"
 T7_S2026 = "nonlinear_mlp_extended_hybrid_reg_deep_t7_s2026"
 NUIS = "motif_topology_hierarchy"
 
-GBDT_ORIG = [XGB, XGB_S99, XGB_S2026]
-GBDT_BEST3 = [XGB_LR03, XGB_S99, XGB_S2026]
-GBDT_ALL4 = [XGB, XGB_LR03, XGB_S99, XGB_S2026]
+GBDT = [XGB, XGB_LR03, XGB_S99, XGB_S2026]
 MLP = [T7, T7_S99, T7_S2026]
 
 
@@ -103,6 +103,13 @@ def _ens(members, keys):
     return out
 
 
+def _error_corr(a, b):
+    shared = sorted(set(a) & set(b))
+    ea = np.asarray([a[r]["y"] - a[r]["mu"] for r in shared], dtype=float)
+    eb = np.asarray([b[r]["y"] - b[r]["mu"] for r in shared], dtype=float)
+    return float(np.corrcoef(ea, eb)[0, 1]), len(shared)
+
+
 def _edit_ci(ens, base):
     jid_edit = {}
     for rid, p in ens.items():
@@ -137,10 +144,12 @@ def main():
     elig33 = _elig([R33_LEDGER])
     elig34 = _elig([R34_LEDGER])
     elig35 = _elig([R35_LEDGER])
+    elig36 = _elig([R36_LEDGER])
     elig24 = _elig(R24_LEDGERS)
     rows33 = _load(R33)
     rows34 = _load(R34)
     rows35 = _load(R35)
+    rows36 = _load(R36)
     rows24 = _load(R24)
 
     members = {}
@@ -148,6 +157,7 @@ def main():
     members[XGB_S99] = _by_rid(rows34, XGB_S99, elig34)
     members[XGB_S2026] = _by_rid(rows34, XGB_S2026, elig34)
     members[XGB_LR03] = _by_rid(rows35, XGB_LR03, elig35)
+    members[KERNEL] = _by_rid(rows36, KERNEL, elig36)
     for m in MLP:
         members[m] = _by_rid(rows24, m, elig24)
     nuis = _by_rid(rows33, NUIS, elig33)
@@ -156,38 +166,39 @@ def main():
     out["single_nll"] = {m: round(_pooled(members[m]), 4) for m in members}
     out["n_rows_single"] = {m: len(members[m]) for m in members}
 
-    ens_g3o = _ens(members, GBDT_ORIG)
-    ens_g3b = _ens(members, GBDT_BEST3)
-    ens_g4 = _ens(members, GBDT_ALL4)
+    # diversity: kernel vs GBDT family avg and MLP family avg
+    ens_g4 = _ens(members, GBDT)
     ens_m3 = _ens(members, MLP)
-    ens_prev4 = _ens(members, [XGB] + MLP)  # r34 headline (xgb + 3x t7)
-    ens_prev6 = _ens(members, GBDT_ORIG + MLP)  # r34 6-member
-    ens_mixed_o = _ens({"g": ens_g3o, "m": ens_m3}, ["g", "m"])
-    ens_mixed_b = _ens({"g": ens_g3b, "m": ens_m3}, ["g", "m"])
-    ens_mixed_4 = _ens({"g": ens_g4, "m": ens_m3}, ["g", "m"])
+    k = members[KERNEL]
+    c_g, n_g = _error_corr(ens_g4, k)
+    c_m, n_m = _error_corr(ens_m3, k)
+    out["kernel_diversity"] = {
+        "corr_kernel_vs_gbdt4x": round(c_g, 4),
+        "corr_kernel_vs_mlp3x": round(c_m, 4),
+        "n_shared": n_g,
+    }
 
+    ens_mixed2 = _ens({"g": ens_g4, "m": ens_m3}, ["g", "m"])          # 2-family
+    ens_mixed3 = _ens({"g": ens_g4, "m": ens_m3, "k": k}, ["g", "m", "k"])  # family-equal 1/3
     out["ensemble_nll"] = {
-        "gbdt_3x_orig": round(_pooled(ens_g3o), 4),
-        "gbdt_3x_best_lr03": round(_pooled(ens_g3b), 4),
         "gbdt_4x": round(_pooled(ens_g4), 4),
         "mlp_t7_3x": round(_pooled(ens_m3), 4),
-        "xgb_plus_3xt7_4member": round(_pooled(ens_prev4), 4),
-        "mixed_orig_3xt7": round(_pooled(ens_mixed_o), 4),
-        "mixed_best3_lr03_3xt7": round(_pooled(ens_mixed_b), 4),
-        "mixed_4xgbdt_3xt7": round(_pooled(ens_mixed_4), 4),
+        "kernel_1x": round(_pooled(k), 4),
+        "mixed_gbdt4x_mlp3x_2fam": round(_pooled(ens_mixed2), 4),
+        "mixed_3fam_family_equal": round(_pooled(ens_mixed3), 4),
     }
     out["ensemble_rel_gain_pct"] = {
-        k: round(100.0 * (out["nuisance_nll"] - v) / out["nuisance_nll"], 2)
-        for k, v in out["ensemble_nll"].items()}
+        kk: round(100.0 * (out["nuisance_nll"] - v) / out["nuisance_nll"], 2)
+        for kk, v in out["ensemble_nll"].items()}
     out["edit_cluster_CI_mixed_vs_nuisance"] = {
-        "mixed_orig_3xt7": _edit_ci(ens_mixed_o, nuis),
-        "mixed_best3_lr03_3xt7": _edit_ci(ens_mixed_b, nuis),
-        "mixed_4xgbdt_3xt7": _edit_ci(ens_mixed_4, nuis),
+        "mixed_gbdt4x_mlp3x_2fam": _edit_ci(ens_mixed2, nuis),
+        "mixed_3fam_family_equal": _edit_ci(ens_mixed3, nuis),
     }
-    out["n_rows"] = len(ens_mixed_b)
-    out["note"] = ("r35 scan winner hp_lr03 (0.8807 vs 0.8845) folded into the "
-                   "GBDT family; equal family-weight mu-mean is optimal (both "
-                   "families matched), so mixed = 6/7-member equal mu-mean.")
+    out["n_rows"] = len(ens_mixed3)
+    out["note"] = ("Kernel RBF member (r36) is the structurally orthogonal 3rd "
+                   "family; family-equal weights assign each family 1/3. The "
+                   "r34/r35 weight sweep validated family-equal as optimal when "
+                   "families are matched in quality.")
 
     Path(f"{R}/mixed_gbdt_t7_ensemble.json").write_text(
         json.dumps(out, indent=2, sort_keys=True) + "\n")
