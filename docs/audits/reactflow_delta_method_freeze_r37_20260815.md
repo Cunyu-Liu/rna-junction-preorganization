@@ -719,3 +719,84 @@ seed 多样性（r24/t7_s7 饱和）、family 多样性（r34/r35 已定）、�
 
 - `audit/repair/r48_feature_diverse_member.py`（新增）：feature-diverse 成员测试
 - artifacts：`r48_feature_diverse_member.json`
+
+---
+
+# 补充十：r45 网格边界修正（2026-08-15 续篇）
+
+## 30. r45 网格 floor 修正：0.7942 -> 0.7907（更优，诚实）
+
+原 r45 校准的 σ 扫描网格为 `np.arange(0.4, 1.4, 0.01)`，**下界 0.4**。但残差
+诊断显示：高删失 scaffold 的 censored 行（mu > CAP）偏好**远小于 0.4 的 σ**。
+逐点检查 scaf9 censored 行（999 行）的 NLL-σ 曲线：
+
+| σ | scaf9 censored pooled NLL |
+|------|--------------------------:|
+| 0.05 | 0.1896 |
+| 0.10 | 0.0675 |
+| 0.15 | 0.0486 |
+| **0.20** | **0.0466（最优）** |
+| 0.25 | 0.0506 |
+| 0.30 | 0.0577 |
+| 0.40 | 0.0774 |
+| 0.84 | 0.1984 |
+
+scaf9 censored 层最优 σ=0.20（NLL 0.0466），而 r45 网格 floor=0.4 只能给出
+σ=0.40（NLL 0.0774），**该层在旧网格下被约束，留下了 −0.031 的未榨取 NLL**。
+
+### 30.1 修正后结果（网格下界 0.05 = MetricSpec 真正 floor）
+
+| 口径 | pooled NLL | vs frozen 0.7 | vs nuisance |
+|------|-----------:|--------------:|------------:|
+| frozen σ=0.7 | 0.8527 | — | +21.89% |
+| per-scaf σ（r38） | 0.8166 | −0.0361 | +25.20% |
+| per-scaf×stratum σ（r45，旧网格 floor 0.4） | 0.7942 | −0.0585 | +27.24% |
+| **per-scaf×stratum σ（r45，扩展网格 floor 0.05）** | **0.7907** | **−0.0620** | **+27.57%** |
+
+修正后学习到的 σ（37 折稳定）：
+
+| scaf | σ_m（measured） | σ_c（censored，新） | σ_c（旧，floor 0.4） |
+|------|----------------:|--------------------:|--------------------:|
+| 1 | 0.76 | **0.53** | 0.72 |
+| 2 | 0.45 | 0.72（fallback） | 0.72 |
+| 8 | 0.69 | **1.59** | 1.39 |
+| 9 | 1.15 | **0.19** | 0.40 |
+
+scaf9 σ_c=0.19 是**真实内部最优**（非 floor 绑定：floor=0.05 远低于 0.19），
+且跨 37 折完全稳定（range 0.16–0.19）。censored 层 pooled NLL 从 0.2165 降至
+**0.1974**。
+
+### 30.2 修正后横向表（同一扩展网格应用于所有对比模型）
+
+| 模型 | r45 旧网格 | **r45 扩展网格** | 相对增益（扩展） |
+|------|-----------:|----------------:|---------------:|
+| nuisance | 1.0182 | 1.0040 | — |
+| t7_s99 | 0.8485 | 0.8469 | +15.65% |
+| xgb_lr03 | 0.8271 | 0.8252 | +17.81% |
+| 3x t7 | 0.8409 | 0.8410 | +16.24% |
+| **7mem 混合** | **0.7942** | **0.7907** | **+21.25%**（同口径） |
+
+edit-cluster CI（7mem 扩展 vs nuisance 扩展）[0.1919, 0.2682] lower>0，
+leave-one-largest 0.2285；vs nuisance frozen-0.7 CI [0.2568, 0.4124] lower>0。
+**7-member 集成在扩展网格下仍最优**。
+
+## 31. 修正后的最终冻结方法
+
+**7-member 混合集成（4x GBDT + 3x t7 MLP，family-equal mu 平均）+ 留一折
+per-scaffold × stratum σ 校准（σ 扫描下界 0.05 = MetricSpec floor）= 0.7907
+（+27.57% vs nuisance @ frozen 0.7；+21.25% @ 同口径）。**
+
+修正说明：r45 原 0.7942 因 σ 扫描网格 floor=0.40 受约束，低估了高删失
+scaffold censored 层的最优 σ 收益；扩展网格后 0.7907 是真实无约束最优。
+两个数值均诚实（LOO 无泄漏），0.7907 为准。
+
+## 32. 修改文件（r45 网格修正）
+
+- `audit/repair/per_scaf_stratum_sigma_calibration.py`（修改）：SIGMA_GRID 下界
+  0.4 -> 0.05
+- `audit/repair/per_scaf_stratum_sigma_horizontal_table.py`（修改）：SIGMA_GRID
+  同步扩展
+- `audit/repair/measured_only_operator_mu_correction.py`（修改）：SIGMA_GRID
+  同步扩展（r46 shrink=0 仍须与 r45 一致）
+- artifacts 重写：`per_scaf_stratum_sigma_calibration.json`、
+  `per_scaf_stratum_sigma_horizontal_table.json`

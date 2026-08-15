@@ -55,6 +55,10 @@ R24_LEDGERS = [
     f"{R}/r24_t7_seed7/ConvergenceLedger_v3.parquet",
 ]
 
+# sigma grid extended down to 0.05 (MetricSpec floor): r45 was grid-constrained
+# at 0.40 which BINDs high-censoring scaffolds (scaf9 sigma_c optimum ~0.19).
+SIGMA_GRID = np.arange(0.05, 1.6, 0.01)
+
 XGB = "xgboost_censored_hybrid"
 XGB_S99 = "xgboost_censored_hybrid_s99"
 XGB_S2026 = "xgboost_censored_hybrid_s2026"
@@ -154,7 +158,7 @@ def _scan_sigma(rows, cens_mask=None, grid=None):
     y, cens, mu, jid = y[sel], cens[sel], mu[sel], jid[sel]
     uniq, jcode = np.unique(jid, return_inverse=True)
     jcounts = np.bincount(jcode, minlength=len(uniq))
-    grid = grid if grid is not None else np.arange(0.4, 1.4, 0.01)
+    grid = grid if grid is not None else SIGMA_GRID
     best_s, best_n = None, np.inf
     for s in grid:
         losses = row_nll(y, cens, mu, np.full(len(y), float(s)))
@@ -179,7 +183,7 @@ def _calibrate_r45_plus_mu(ens, folds, min_rows=15, shrink=1.0):
     by_fold = defaultdict(dict)
     for rid, p in ens.items():
         by_fold[p["fold"]][rid] = p
-    grid = np.arange(0.4, 1.4, 0.01)
+    grid = SIGMA_GRID
     cal = {}
     fit_log = {}
     for f in folds:
@@ -280,7 +284,7 @@ def main():
 
     # r38 reference
     cal_scaf = {}
-    grid = np.arange(0.4, 1.4, 0.01)
+    grid = SIGMA_GRID
     for f in folds:
         other = {}
         for ff in folds:

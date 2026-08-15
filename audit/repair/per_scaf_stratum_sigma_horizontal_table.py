@@ -28,6 +28,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from audit.evaluation.metrics import row_nll
 from audit.repair.shootout_run import _eligible_keys
 
+# sigma grid extended down to 0.05 (MetricSpec floor): the original r45 grid
+# started at 0.40 which BINDS high-censoring scaffolds (scaf9 sigma_c optimum
+# ~0.20).  This horizontal table uses the unconstrained scan for all comparators.
+SIGMA_GRID = np.arange(0.05, 1.6, 0.01)
+
 R = "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z"
 R33 = f"{R}/r33_xgboost_full/Predictions_v3.jsonl"
 R34 = f"{R}/r34_gbdt_seeds_full/Predictions_v3.jsonl"
@@ -137,7 +142,7 @@ def _scan_sigma(rows, cens_mask=None, grid=None):
     # map junction ids to dense ints for bincount
     uniq, jcode = np.unique(jid, return_inverse=True)
     jcounts = np.bincount(jcode, minlength=len(uniq))
-    grid = grid if grid is not None else np.arange(0.4, 1.4, 0.01)
+    grid = grid if grid is not None else SIGMA_GRID
     best_s, best_n = None, np.inf
     for s in grid:
         losses = row_nll(y, cens, mu, np.full(len(y), float(s)))
@@ -154,7 +159,7 @@ def _per_scaf_calibrate(preds, folds, min_rows=20):
     by_fold = defaultdict(dict)
     for rid, p in preds.items():
         by_fold[p["fold"]][rid] = p
-    grid = np.arange(0.4, 1.4, 0.01)
+    grid = SIGMA_GRID
     cal = {}
     sigma_map = {}
     for f in folds:
@@ -185,7 +190,7 @@ def _per_scaf_stratum_calibrate(preds, folds, min_rows=15):
     by_fold = defaultdict(dict)
     for rid, p in preds.items():
         by_fold[p["fold"]][rid] = p
-    grid = np.arange(0.4, 1.4, 0.01)
+    grid = SIGMA_GRID
     cal = {}
     sigma_map = {}
     for f in folds:

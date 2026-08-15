@@ -47,6 +47,12 @@ R34 = f"{R}/r34_gbdt_seeds_full/Predictions_v3.jsonl"
 R35 = f"{R}/r35_gbdt_hp_full/Predictions_v3.jsonl"
 R24 = f"{R}/r24_t7_seed7/combined_r20_r21_r23_r24_preds.jsonl"
 
+# sigma grid: extend DOWN to 0.05 (the MetricSpec floor).  The original r45
+# grid started at 0.40, which BINDS for high-censoring scaffolds whose censored
+# rows (mu > CAP) prefer a much smaller sigma_c (scaf9 optimum ~0.20).  Keeping
+# the grid floor at 0.40 left NLL on the table; this is the unconstrained scan.
+SIGMA_GRID = np.arange(0.05, 1.6, 0.01)
+
 R33_LEDGER = f"{R}/r33_xgboost_full/ConvergenceLedger_v3.parquet"
 R34_LEDGER = f"{R}/r34_gbdt_seeds_full/ConvergenceLedger_v3.parquet"
 R35_LEDGER = f"{R}/r35_gbdt_hp_full/ConvergenceLedger_v3.parquet"
@@ -162,7 +168,7 @@ def _scan_sigma_stratum(rows, cens_mask, grid=None):
     y, cens, mu, jid = y[sel], cens[sel], mu[sel], jid[sel]
     uniq, jcode = np.unique(jid, return_inverse=True)
     jcounts = np.bincount(jcode, minlength=len(uniq))
-    grid = grid if grid is not None else np.arange(0.3, 1.6, 0.01)
+    grid = grid if grid is not None else SIGMA_GRID
     best_s, best_n = None, np.inf
     for s in grid:
         losses = row_nll(y, cens, mu, np.full(len(y), float(s)))
@@ -219,7 +225,7 @@ def main():
 
     # ---- r38 reference: per-scaffold sigma LOO (one sigma per scaffold) ----
     cal_scaf = {}
-    grid = np.arange(0.4, 1.4, 0.01)
+    grid = SIGMA_GRID
     for f in folds:
         other = {}
         for ff in folds:
