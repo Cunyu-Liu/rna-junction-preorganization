@@ -21,6 +21,11 @@ from audit.repair.per_scaf_stratum_sigma_horizontal_table import (
 from audit.repair.measured_only_operator_mu_correction import (
     _calibrate_r45_plus_mu,
 )
+from audit.repair.r47_measured_affine_mu_correction import (
+    _ols,
+    _ridge_ols,
+    _calibrate_r47,
+)
 
 
 def _row(rid, fold, scaf, y, cens, mu, jid=None):
@@ -228,6 +233,96 @@ def test_r46_sigma_stays_positive_and_finite():
         assert np.isfinite(p["mu"])
 
 
+def test_ols_recovers_known_slope():
+    rng = np.random.default_rng(10)
+    x = np.linspace(-8.0, -3.0, 200)
+    y = 0.5 - 0.7 * x + rng.normal(0, 0.1, size=len(x))
+    a, b = _ols(x, y)
+    assert np.isclose(b, -0.7, atol=0.02)
+    assert np.isclose(a, 0.5, atol=0.1)
+
+
+def test_ridge_ols_shrinks_toward_prior():
+    # a b=2.0 slope with strong noise: ridge toward b_prior=1.0 should pull
+    # the estimate below the raw OLS slope.
+    rng = np.random.default_rng(11)
+    x = np.linspace(-6.0, -2.0, 30)
+    y = 0.0 + 2.0 * x + rng.normal(0, 1.5, size=len(x))
+    a_raw, b_raw = _ols(x, y)
+    a_r, b_r = _ridge_ols(x, y, lam=5.0, b_prior=1.0)
+    assert abs(b_r - 1.0) < abs(b_raw - 1.0), \
+        "ridge must pull the slope toward the prior"
+
+
+def test_r47_global_affine_applies_only_to_measured_rows():
+    # r47 core honesty: censored rows keep mu EXACTLY; measured rows get a + b*mu.
+    rng = np.random.default_rng(12)
+    preds = {}
+    orig_censored_mu = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (1, 9):
+            for i in range(30):
+                rid = f"{fold}_{sc}_{i}"
+                cens = (sc == 9) and (i % 2 == 0)
+                mu = -6.0 if sc == 9 else -4.5
+                y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                preds[rid] = _row(rid, fold, sc, y, cens, mu, jid=f"j_{sc}_{i // 3}")
+                if cens:
+                    orig_censored_mu[rid] = mu
+    cal, _ = _calibrate_r47(preds, ["f0", "f1", "f2"], mode="global_affine")
+    for rid, mu0 in orig_censored_mu.items():
+        assert np.isclose(cal[rid]["mu"], mu0), \
+            "r47 must never shift censored mu"
+    # measured rows should differ (global slope ~0.86, not 1.0)
+    changed = [rid for rid, p in cal.items()
+               if not p["cens"] and not np.isclose(p["mu"], preds[rid]["mu"])]
+    assert changed, "r47 should adjust measured mu"
+
+
+def test_r47_per_scaf_affine_changes_measured_mu_per_scaf():
+    rng = np.random.default_rng(13)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 5, 9):
+            for i in range(25):
+                rid = f"{fold}_{sc}_{i}"
+                cens = (sc == 9) and (i % 3 == 0)
+                mu = -6.0 if sc == 9 else -4.0
+                y = -7.1 if cens else mu + rng.normal(0, 0.35)
+                preds[rid] = _row(rid, fold, sc, y, cens, mu, jid=f"j_{sc}_{i // 5}")
+    cal, fit_log = _calibrate_r47(preds, ["f0", "f1", "f2"], mode="per_scaf_affine")
+    for f, l in fit_log.items():
+        assert "9" in l["affine"] and "2" in l["affine"]
+        assert isinstance(l["affine"]["9"]["b"], float)
+    assert len(cal) == len(preds)
+    for rid, p in cal.items():
+        assert np.isfinite(p["mu"]) and p["sigma"] > 0.0
+
+
+def test_r47_global_matches_hand_computed_pooled():
+    # Consistency: pooled NLL of the r47 output equals a hand recompute from
+    # (mu, sigma) using row_nll + junction-macro grouping.
+    rng = np.random.default_rng(14)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (1, 3, 9):
+            for i in range(30):
+                rid = f"{fold}_{sc}_{i}"
+                cens = (sc == 9) and (i % 2 == 0)
+                mu = -6.0 if sc == 9 else -4.5
+                y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                preds[rid] = _row(rid, fold, sc, y, cens, mu, jid=f"j_{sc}_{i // 3}")
+    cal, _ = _calibrate_r47(preds, ["f0", "f1", "f2"], mode="global_affine")
+    from audit.evaluation.metrics import row_nll
+    from collections import defaultdict as _dd
+    jd = _dd(list)
+    for rid, p in cal.items():
+        nll = float(row_nll([p["y"]], [p["cens"]], [p["mu"]], [p["sigma"]])[0])
+        jd[p["jid"]].append(nll)
+    hand = float(np.mean([np.mean(v) for v in jd.values()]))
+    assert np.isclose(_pooled(cal), hand, atol=1e-9)
+
+
 if __name__ == "__main__":
     tests = [test_scan_sigma_picks_minimal_nll,
              test_scan_sigma_vectorized_matches_bruteforce,
@@ -237,7 +332,12 @@ if __name__ == "__main__":
              test_horizontal_per_scaf_and_stratum_consistent,
              test_r46_mu_correction_keeps_censored_mu_untouched,
              test_r46_shrink_zero_equals_r45,
-             test_r46_sigma_stays_positive_and_finite]
+             test_r46_sigma_stays_positive_and_finite,
+             test_ols_recovers_known_slope,
+             test_ridge_ols_shrinks_toward_prior,
+             test_r47_global_affine_applies_only_to_measured_rows,
+             test_r47_per_scaf_affine_changes_measured_mu_per_scaf,
+             test_r47_global_matches_hand_computed_pooled]
     failed = 0
     for t in tests:
         try:

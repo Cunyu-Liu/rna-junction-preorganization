@@ -560,3 +560,86 @@ shrink=0.5/0.75/1.0），censored 行 mu 保持不变（避免 r37/r39 的 censo
 - artifacts：`per_scaf_stratum_sigma_calibration.json`、
   `per_scaf_stratum_sigma_horizontal_table.json`、
   `measured_only_operator_mu_correction.json`
+
+---
+
+# 补充八：r47 结果（2026-08-15 续篇）
+
+## 24. r47：measured-only 仿射（斜率）mu 校准 —— 阴性（边界闭合，含重要诚实发现）
+
+所有此前 mu 杠杆（r37/r39 全行加性 α、r46 measured-only 加性 α）都假设
+mu_cal = mu + alpha（即 b=1 固定）。斜率诊断发现 measured 残差存在真实的
+**全局回归均值**（OLS b=0.8584，corr(mu,resid)=-0.248），且 per-scaf 斜率
+极度异质（scaf4 b=1.27、scaf8 b=-0.09、scaf9 b=0.12）。r47 首次允许
+measured-only **仿射** mu_cal = a + b*mu（LOO 诚实拟合），组合 r45 stratum σ：
+
+### 24.1 结果（7-member 集成）
+
+| 口径 | pooled NLL | vs r45 |
+|------|-----------:|-------:|
+| r45（stratum σ only，冻结） | 0.7942 | — |
+| **r47 global_affine（全局 b≈0.86）** | **0.7930** | **-0.0012** |
+| r47 per_scaf_affine | 0.8008 | +0.0066（更差） |
+| r47 per_scaf_ridge（向 b=1） | 0.8008-0.8009 | 更差 |
+| r47 per_scaf_eb（向全局 b 收缩，κ=5-50） | 0.7999-0.8007 | 更差 |
+
+全局斜率 b 跨 37 折高度稳定（mean 0.8587，std 0.0038）。per-scaf 仿射全部
+过度拟合（scaf9 仅 274 个 measured 行，斜率估计噪声大）；EB 收缩也救不回。
+
+### 24.2 重要诚实发现：r47 削弱集成相对增益
+
+r47 横向表（同一校准应用于所有对比模型）：
+
+| 模型 | r45 | **r47 global_affine** | 相对增益（r47） |
+|------|-----:|----------------------:|---------------:|
+| nuisance | 1.0182 | 1.0017 | — |
+| 7mem | 0.7942 | 0.7930 | +20.83% |
+| （r45 同口径） | 0.7942 | — | +22.00% |
+
+**r47 对 nuisance 的改善（-0.0165）远大于对 7-member 集成的改善（-0.0012）**：
+全局仿射是"通用校准"，救的是校准差的模型（nuisance mu 更不校准），而 7-member
+集成 mu 已足够好，被仿射的边际收益小。因此同口径相对增益从 +22.00% 降至
++20.83% —— **采用 r47 会削弱集成相对基线的可发表主张**。
+
+### 24.3 结论：NEGATIVE（不冻结），mu 结构完全闭合
+
+- 绝对 NLL 0.7930 略优于 r45（-0.0012），但这是通用校准的"水涨船高"，不是
+  集成特有增益；nuisance 获益更大，相对主张反而受损。
+- per-scaf 仿射/ridge/EB 全部过度拟合 —— per-scaf 斜率异质基本是噪声。
+- **mu 校准边界完全闭合**：加性（全行 r37/r39、measured-only r46）、仿射
+  （全局/每算子/ridge/EB）全部测尽。唯一稳健的 mu 形态是 equal-weight
+  集成本身；任何事后 mu 重校准要么无增益要么过度拟合要么削弱相对主张。
+
+## 25. 方法级边界最终闭合（r37-r47，17 条路线）
+
+| # | 方向 | 形态 | 结果 |
+|---|------|------|------|
+| 1 | kernel RBF 成员 | r36 | NEGATIVE |
+| 2 | 学习式 stacking 权重 | r37 | NEGATIVE |
+| 3 | per-row 校准 σ | r37 | NEGATIVE |
+| 4 | 算子加性截距 α（全行） | r37 | NEGATIVE |
+| 5 | Student-t GBDT 族 | r34 | DEAD END |
+| 6 | global σ-only 校准 | r37 | POSITIVE（0.8460） |
+| 7 | **per-scaf σ 事后校准** | **r38** | **POSITIVE（0.8166）** |
+| 8 | censoring-aware 算子截距 | r39 | NEGATIVE |
+| 9 | per-scaf σ 训练期联合 | r40 | NEGATIVE |
+| 10 | mixture-of-predictives | r41 | 排序稳健 |
+| 11 | per-scaf mu 输出头 | r42 | NEGATIVE |
+| 12 | per-context σ | r43 | NEGATIVE |
+| 13 | 固定 σ=0.62 训练 | r44 | NEGATIVE |
+| 14 | **per-scaf x stratum σ** | **r45** | **POSITIVE（0.7942）** |
+| 15 | measured-only 加性 mu 修正 | r46 | NEGATIVE |
+| 16 | measured-only 仿射 mu（全局/每算子/ridge/EB） | r47 | NEGATIVE（绝对略优但削弱相对主张；per-scaf 过拟合） |
+| 17 | nonlinear latent-operator head（§9.1） | r27 确认 | DEAD（1.1200 vs t7 0.8242） |
+
+**最终冻结方法保持**：7-member 混合集成 + 留一折 per-scaf x stratum σ 校准
+= **0.7942（+27.24% vs nuisance @ frozen 0.7；+22.00% @ 同口径）**。
+μ 侧（加性/仿射/EB/per-scaf 头）与 σ 侧（global/scaf/ctx/stratum）均已完全闭合。
+
+## 26. 新增文件（r47）
+
+- `audit/repair/measured_affine_slope_diagnostic.py`（新增）：斜率结构诊断
+- `audit/repair/r47_measured_affine_mu_correction.py`（新增）：r47 仿射变体
+- `audit/repair/r47_global_affine_horizontal_table.py`（新增）：r47 横向表
+- `tests/audit/test_per_scaf_stratum_sigma_calibration.py`（扩充）：+5 单测（OLS/ridge/仿射 honesty/一致性），共 14 全过
+- artifacts：`measured_affine_slope_diagnostic.json`、`r47_measured_affine_mu_correction.json`、`r47_global_affine_horizontal_table.json`
