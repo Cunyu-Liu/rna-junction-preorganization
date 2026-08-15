@@ -643,3 +643,79 @@ r47 横向表（同一校准应用于所有对比模型）：
 - `audit/repair/r47_global_affine_horizontal_table.py`（新增）：r47 横向表
 - `tests/audit/test_per_scaf_stratum_sigma_calibration.py`（扩充）：+5 单测（OLS/ridge/仿射 honesty/一致性），共 14 全过
 - artifacts：`measured_affine_slope_diagnostic.json`、`r47_measured_affine_mu_correction.json`、`r47_global_affine_horizontal_table.json`
+
+---
+
+# 补充九：r48 结果（2026-08-15 续篇）
+
+## 27. r48：feature-diverse 集成成员 —— 阴性（集成组成边界闭合）
+
+7 个冻结成员全部使用同一特征块（nuisance + 21-D extended-ViennaRNA），仅族
+（GBDT vs MLP）与 seed 不同，误差相关 0.84–0.95。r31 已物化全 37 折的
+`nonlinear_mlp_nuisance_only_t7` 成员（仅 motif+scaffold+topology，无折叠/序列
+特征），其误差结构理论上应与 Vienna 成员不同。r48 测试加入/替换它对集成的影响
+（等权，r45 校准，LOO 诚实）：
+
+### 27.1 误差相关（多样性）
+
+| 对比 | 相关 |
+|------|-----:|
+| nuisance-only vs MLP t7 成员 | 0.889–0.906 |
+| nuisance-only vs GBDT 成员 | 0.865–0.879 |
+| nuisance-only 平均 | 0.882 |
+| within-MLP t7（对照） | 0.940 |
+
+nuisance-only 成员误差相关 0.88 并未比同族 0.94 低多少 —— 因为
+nuisance+scaffold+motif 基础已经解释了大量方差，去掉 ViennaRNA 并没有创造
+真正独立的误差结构。
+
+### 27.2 集成结果（等权，r45 per-scaf×stratum σ 校准）
+
+| 变体 | frozen 0.7 | r45 校准 |
+|------|-----------:|--------:|
+| 7mem（冻结） | 0.8527 | 0.7942 |
+| **8mem + nuisance-only** | 0.8519 | **0.7933**（−0.0009，噪声内） |
+| 7mem 替换最弱 MLP（t7_s99） | 0.8554 | 0.7967（更差） |
+
+nuisance-only 成员自身质量差（frozen 0.9012 vs 最优成员 0.8839；r45 0.8465），
+误差相关又不够低，加入集成只带来 −0.0009（远在 pooled NLL 噪声内）。
+edit-cluster CI（8mem r45 vs nuisance r45）[0.2032, 0.2864]，与 7mem 的
+[0.2036, 0.2805] 基本一致 —— 无实质增益。
+
+### 27.3 结论：NEGATIVE（不采纳）
+
+7-member Vienna 集成已是该数据上的局部最优。加特征异构成员不能减方差
+（误差相关仍高且成员质量不足）；换更弱成员更差。**集成组成边界闭合**：
+seed 多样性（r24/t7_s7 饱和）、family 多样性（r34/r35 已定）、特征多样性
+（r48）全部测尽。
+
+## 28. 方法级边界最终闭合（r37-r48，18 条路线）
+
+| # | 方向 | 形态 | 结果 |
+|---|------|------|------|
+| 1 | kernel RBF 成员 | r36 | NEGATIVE |
+| 2 | 学习式 stacking 权重 | r37 | NEGATIVE |
+| 3 | per-row 校准 σ | r37 | NEGATIVE |
+| 4 | 算子加性截距 α（全行） | r37 | NEGATIVE |
+| 5 | Student-t GBDT 族 | r34 | DEAD END |
+| 6 | global σ-only 校准 | r37 | POSITIVE（0.8460） |
+| 7 | **per-scaf σ 事后校准** | **r38** | **POSITIVE（0.8166）** |
+| 8 | censoring-aware 算子截距 | r39 | NEGATIVE |
+| 9 | per-scaf σ 训练期联合 | r40 | NEGATIVE |
+| 10 | mixture-of-predictives | r41 | 排序稳健 |
+| 11 | per-scaf mu 输出头 | r42 | NEGATIVE |
+| 12 | per-context σ | r43 | NEGATIVE |
+| 13 | 固定 σ=0.62 训练 | r44 | NEGATIVE |
+| 14 | **per-scaf x stratum σ** | **r45** | **POSITIVE（0.7942）** |
+| 15 | measured-only 加性 mu 修正 | r46 | NEGATIVE |
+| 16 | measured-only 仿射 mu（全局/每算子/ridge/EB） | r47 | NEGATIVE（绝对略优但削弱相对主张；per-scaf 过拟合） |
+| 17 | nonlinear latent-operator head（§9.1） | r27 确认 | DEAD（1.12 vs 0.82） |
+| 18 | feature-diverse 集成成员（nuisance-only） | r48 | NEGATIVE（误差相关 0.88 仍高、质量不足，增益在噪声内） |
+
+**最终冻结方法保持**：7-member 混合集成 + 留一折 per-scaf x stratum σ 校准
+= **0.7942（+27.24% vs nuisance @ frozen 0.7；+22.00% @ 同口径）**。
+
+## 29. 新增文件（r48）
+
+- `audit/repair/r48_feature_diverse_member.py`（新增）：feature-diverse 成员测试
+- artifacts：`r48_feature_diverse_member.json`
