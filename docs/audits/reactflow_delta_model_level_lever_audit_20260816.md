@@ -189,6 +189,7 @@ mu 上失败）在 **r56b mu** 上有微弱正增益。更关键的是 r62 揭�
 | measured 残差 vs err10（label 测量误差）| r68 | 残差 sd 0.548 = 2.2× err10 rms 0.248 | 表观"headroom"存在，但见 r69/r70 解读 |
 | 残差按 context 可见性分解 | r69 | OOD context 残差 sd 0.694 vs train-visible 0.525 | 差距是 context 随机效应，r56b EB 只能救 train-visible |
 | err10 驱动 per-row σ（quadrature）| r70/r72 | 0.7195（−0.0048，split-half −0.0029）| **数据侧杠杆，非合法模型改进**（见下）|
+| row-level σ 用 train-legal Vienna+nuisance 特征回归 | r73 | 0.8194–0.8271（GBDT/Ridge，全部 > 0.7243）| NEGATIVE：合法特征无法预测逐行残差幅度，r70 增益只能来自 label-derived err10 |
 
 关键解读（必须诚实记录）：
 
