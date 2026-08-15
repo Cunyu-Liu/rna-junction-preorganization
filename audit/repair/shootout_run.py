@@ -139,6 +139,17 @@ def _universe(rnafm_cache=None):
     # independent seeds of the GBDT family (parity with the 3x t7 MLP side)
     U["xgboost_censored_hybrid_s99"] = make_xgboost_censored_hybrid(seed=99)
     U["xgboost_censored_hybrid_s2026"] = make_xgboost_censored_hybrid(seed=2026)
+    # r35 hyperparameter scan variants (one axis perturbed at a time, seed 23)
+    U["xgboost_censored_hybrid_hp_d6"] = make_xgboost_censored_hybrid(max_depth=6)
+    U["xgboost_censored_hybrid_hp_d3"] = make_xgboost_censored_hybrid(max_depth=3)
+    U["xgboost_censored_hybrid_hp_lr03"] = make_xgboost_censored_hybrid(
+        learning_rate=0.03, n_estimators=3000)
+    U["xgboost_censored_hybrid_hp_mcw1"] = make_xgboost_censored_hybrid(
+        min_child_weight=1)
+    U["xgboost_censored_hybrid_hp_cs1"] = make_xgboost_censored_hybrid(
+        colsample_bytree=1.0)
+    U["xgboost_censored_hybrid_hp_ss08"] = make_xgboost_censored_hybrid(
+        subsample=0.8)
     # robust Student-t objective for the GBDT family (matches the winning t7 MLP
     # head; the df->inf limit is the Gaussian objective above)
     U["xgboost_censored_hybrid_t7"] = make_xgboost_censored_hybrid(df=7.0)

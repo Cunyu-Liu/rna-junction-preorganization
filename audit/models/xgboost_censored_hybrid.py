@@ -141,7 +141,9 @@ def make_xgboost_censored_hybrid(hidden=None, dropout=None, weight_decay=None,
                                  seed=SEED, n_estimators=_DEFAULT_N_EST,
                                  learning_rate=_DEFAULT_LR,
                                  max_depth=_DEFAULT_MAX_DEPTH,
-                                 n_jobs=8, df=None):
+                                 n_jobs=8, df=None,
+                                 min_child_weight=5, colsample_bytree=0.9,
+                                 subsample=0.9):
     """Return (fit, predict) for the XGBoost right-censored hybrid.
 
     Feature block matches the winning MLP: [nuisance(motif+scaffold+topology) +
@@ -153,6 +155,9 @@ def make_xgboost_censored_hybrid(hidden=None, dropout=None, weight_decay=None,
     Student-t NLL (df degrees of freedom, robust head matching the winning t7
     MLP) instead of the Gaussian NLL; the model still predicts fixed sigma=0.7
     so it is scored by the same Gaussian evaluation NLL as every other family.
+
+    min_child_weight / colsample_bytree / subsample are exposed for the r35
+    hyperparameter scan; the defaults reproduce the r33/r34 GBDT exactly.
     """
     kind = "xgboost_censored_hybrid_t" if df is not None else "xgboost_censored_hybrid"
 
@@ -188,9 +193,9 @@ def make_xgboost_censored_hybrid(hidden=None, dropout=None, weight_decay=None,
             "seed": seed,
             "eta": learning_rate,
             "max_depth": max_depth,
-            "min_child_weight": 5,
-            "subsample": 0.9,
-            "colsample_bytree": 0.9,
+            "min_child_weight": min_child_weight,
+            "subsample": subsample,
+            "colsample_bytree": colsample_bytree,
             "nthread": n_jobs,
         }
         if df is not None:

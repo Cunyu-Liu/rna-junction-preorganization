@@ -432,6 +432,59 @@ w=0.5（等权），因为两族单模型质量几乎相同（GBDT 3x 0.8817 vs 
 4→6 成员只 +0.0075。跨族正交（GBDT vs MLP）才是主要方差缩减来源，
 族内扩种子的边际收益已近饱和。
 
+## r35 GBDT 超参数扫描（smoke → full）
+
+方向：r34 后集成杠杆近饱和，转做基础 GBDT 超参优化（用户选定）。对
+`make_xgboost_censored_hybrid` 暴露 `min_child_weight`/`colsample_bytree`/
+`subsample`（默认值精确复现 r33/r34），注册 6 个单轴扰动变体（depth、lr、
+min_child_weight、colsample、subsample），2-fold smoke：
+
+| 变体 | NLL | Δ vs default |
+|------|-----|-------------|
+| default（d4/lr.05/mcw5/cs.9/ss.9） | 0.8314 | — |
+| **d3（depth 3）** | **0.8290** | **-0.0024** |
+| **lr03（lr .03, 3000 轮）** | **0.8311** | **-0.0003** |
+| mcw1 | 0.8326 | +0.0012 |
+| cs1 | 0.8353 | +0.0039 |
+| ss08 | 0.8358 | +0.0044 |
+| d6 | 0.8394 | +0.0080 |
+
+smoke 结论：默认超参已近最优；仅 d3 与 lr03 微优（差值在 2-fold 噪声内）。
+两个最优变体进入 full 37-fold 确认（`r35_gbdt_hp_full`）。
+
+**full 37-fold（`r35_gbdt_hp_full`，pooled junction-macro NLL）**：
+
+| 模型 | NLL | Δ vs default |
+|------|-----|-------------|
+| xgb default（d4/lr.05/2000） | 0.8845 | — |
+| hp_d3（depth 3） | 0.8837 | -0.0009 |
+| **hp_lr03（lr .03, 3000 轮）** | **0.8807** | **-0.0038** |
+
+**hp_lr03 是确认的最优单 GBDT**（-0.43%）：低学习率 + 更多 boosting rounds 是
+经典 GBDT 增益，smoke 因 2-fold 噪声未分辨，full 数据确认。
+
+**折入集成（`analyze_mixed_gbdt_t7.py`）**：
+
+| 集成 | NLL | vs nuisance |
+|------|-----|-----------|
+| GBDT 3x orig（s23/s99/s2026） | 0.8817 | +19.23% |
+| GBDT 3x best（lr03/s99/s2026） | 0.8805 | +19.34% |
+| GBDT 4x（s23/lr03/s99/s2026） | 0.8801 | +19.38% |
+| 6 成员 mixed（best3 + 3x t7） | 0.8524 | +21.91% |
+| **7 成员 mixed（4x GBDT + 3x t7）** | **0.8522** | **+21.93%** |
+
+r35 结论：lr03 提升单模型（0.8845→0.8807），但折入集成后仅 +0.0002
+（0.8524→0.8522）——集成在 GBDT 侧已饱和，族平均吞掉基础模型增益。
+**最终最优方法 = 7 成员混合集成（4x GBDT + 3x t7 MLP），NLL 0.8522，
+vs nuisance +21.93%，edit-cluster CI [0.186, 0.363]**。
+
+## r35 代码与提交
+
+- 修改：`audit/models/xgboost_censored_hybrid.py`（暴露
+  `min_child_weight`/`colsample_bytree`/`subsample`）、
+  `audit/repair/shootout_run.py`（注册 `_hp_d6/_hp_d3/_hp_lr03/_hp_mcw1/_hp_cs1/_hp_ss08`）。
+- 新增：`shootout_r35_gbdt_hp_smoke_cfg.json`、`shootout_r35_gbdt_hp_full_cfg.json`。
+
 ## r34 代码与提交
 
 - 修改：`audit/models/xgboost_censored_hybrid.py`（Student-t 删失目标

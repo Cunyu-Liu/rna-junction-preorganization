@@ -61,6 +61,7 @@ MODEL_RUNS = {
     "xgboost_censored_hybrid": ("r33_xgboost_full", "r33_xgboost_full"),
     "xgboost_censored_hybrid_s99": ("r34_gbdt_seeds_full", "r34_gbdt_seeds_full"),
     "xgboost_censored_hybrid_s2026": ("r34_gbdt_seeds_full", "r34_gbdt_seeds_full"),
+    "xgboost_censored_hybrid_hp_lr03": ("r35_gbdt_hp_full", "r35_gbdt_hp_full"),
 }
 T7_MEMBERS = [
     "nonlinear_mlp_extended_hybrid_reg_deep_t7",
@@ -71,6 +72,7 @@ GBDT_MEMBERS = [
     "xgboost_censored_hybrid",
     "xgboost_censored_hybrid_s99",
     "xgboost_censored_hybrid_s2026",
+    "xgboost_censored_hybrid_hp_lr03",
 ]
 NUIS = "motif_topology_hierarchy"
 
@@ -84,6 +86,7 @@ LEDGER_PATHS = [
     f"{R}/r24_t7_seed7/ConvergenceLedger_v3.parquet",
     f"{R}/r33_xgboost_full/ConvergenceLedger_v3.parquet",
     f"{R}/r34_gbdt_seeds_full/ConvergenceLedger_v3.parquet",
+    f"{R}/r35_gbdt_hp_full/ConvergenceLedger_v3.parquet",
 ]
 
 
@@ -275,25 +278,36 @@ def main():
           f"{scaf_e[0] if scaf_e else float('nan'):7.4f} "
           f"{100*float(np.mean(cens)):5.1f} {rel_e:+7.2f}")
 
-    # 6-member mixed ensemble: GBDT 3x + t7 MLP 3x (equal mu-mean).
-    # The weight sweep on the family ensembles showed w=0.5 is optimal (the two
-    # families have matched quality), so equal weighting is the honest optimum.
-    MIXED_MEMBERS = T7_MEMBERS + GBDT_MEMBERS
-    mix_by_rid = defaultdict(dict)
-    for m in MIXED_MEMBERS:
+    # 7-member mixed ensemble: GBDT 4x family + t7 MLP 3x family, combined at
+    # equal FAMILY weight (GBDT 50% / MLP 50%).  The r34 weight sweep showed
+    # equal family weighting is optimal (the two families are matched in
+    # quality); member-equal averaging would over-weight the larger GBDT family
+    # (0.8527 vs 0.8522) and is not the honest optimum.
+    MIXED_GBDT = GBDT_MEMBERS
+    MIXED_T7 = T7_MEMBERS
+    gbdt_by_rid = defaultdict(dict)
+    t7_by_rid = defaultdict(dict)
+    for m in MIXED_GBDT:
         for p in load_model(m, eligible):
             if p["support"] and not p["abstain"]:
-                mix_by_rid[p["source_row_id"]][m] = p
+                gbdt_by_rid[p["source_row_id"]][m] = p
+    for m in MIXED_T7:
+        for p in load_model(m, eligible):
+            if p["support"] and not p["abstain"]:
+                t7_by_rid[p["source_row_id"]][m] = p
     mix_rows = []
-    for rid, d in mix_by_rid.items():
-        if not all(m in d for m in MIXED_MEMBERS):
+    for rid in set(gbdt_by_rid) & set(t7_by_rid):
+        gd, td = gbdt_by_rid[rid], t7_by_rid[rid]
+        if not (all(m in gd for m in MIXED_GBDT) and all(m in td for m in MIXED_T7)):
             continue
-        ref = d[MIXED_MEMBERS[0]]
+        ref = td[MIXED_T7[0]]
+        mu_g = float(np.mean([gd[m]["mu"] for m in MIXED_GBDT]))
+        mu_m = float(np.mean([td[m]["mu"] for m in MIXED_T7]))
         mix_rows.append({
             "source_row_id": rid, "jid": ref["jid"], "fold": ref["fold"],
             "scaf": int(ref["scaf"]), "context": str(ref.get("context") or ref.get("helix_seq", "")),
             "y": ref["y"], "cens": ref["cens"],
-            "mu": float(np.mean([d[m]["mu"] for m in MIXED_MEMBERS])),
+            "mu": float(0.5 * mu_g + 0.5 * mu_m),
             "sigma": 0.7, "support": True, "abstain": False,
         })
     mu = np.array([p["mu"] for p in mix_rows])
@@ -315,7 +329,7 @@ def main():
         "censored_frac": round(float(np.mean(cens)), 4),
         "rel_gain_pct_vs_nuisance": round(rel_x, 2),
     }
-    print(f"{'ENSEMBLE_MIXED_6 (3x GBDT + 3x t7)':52s} {len(mix_rows):6d} {pooled_x:7.4f} "
+    print(f"{'ENSEMBLE_MIXED_7 (4x GBDT + 3x t7)':52s} {len(mix_rows):6d} {pooled_x:7.4f} "
           f"{ctx_x[0] if ctx_x else float('nan'):7.4f} "
           f"{scaf_x[0] if scaf_x else float('nan'):7.4f} "
           f"{100*float(np.mean(cens)):5.1f} {rel_x:+7.2f}")
@@ -330,7 +344,7 @@ def main():
         "ensemble_vs_nuisance": ens_vs_nuis,
         "ensemble_vs_t7_s99": ens_vs_s99,
         "nuisance_vs_t7_s99": nuis_vs_s99,
-        "mixed6_vs_nuisance": mix_vs_nuis,
+        "mixed7_vs_nuisance": mix_vs_nuis,
         "note": ("delta = (b - a); positive means the first (a) model is better. "
                  "Bootstrap unit = edit component (37)."),
     }
@@ -338,7 +352,7 @@ def main():
     for name, d in (("ensemble_vs_nuisance", ens_vs_nuis),
                     ("ensemble_vs_t7_s99", ens_vs_s99),
                     ("nuisance_vs_t7_s99", nuis_vs_s99),
-                    ("mixed6_vs_nuisance", mix_vs_nuis)):
+                    ("mixed7_vs_nuisance", mix_vs_nuis)):
         print(f"  {name:24s} CI={d['ci']} lower_gt_0={d['ci_lower_gt_0']} "
               f"n_edit={d['n_edit']} leave1={d['leave_one_largest']}")
 
