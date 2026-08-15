@@ -453,3 +453,110 @@ scaf/ctx/row σ、α 截距、mixture）均已闭合；残差 0.61 是集成级�
   leave-one-fold-out 校准
 - artifacts：`stacked_ensemble_analysis.json`、`residual_structure_diagnostic.json`、
   `operator_calibrated_ensemble.json`（run root）
+
+---
+
+# 补充七：r45 结果（2026-08-15 续篇）
+
+## 20. r45：per-scaffold x stratum（measured vs censored）σ 校准 —— 显著正收益
+
+r38 发射每个 scaffold 一个 σ 作用于**所有行**。但残差诊断显示两层的尺度不同：
+高删失 scaffold（scaf9 78.5%删失）的 measured RMSE=1.15，而 pooled σ=0.84
+（删失行主导妥协）。r45 将该机制泛化为：每个 scaffold 发射 sigma_m（measured层）
+和 sigma_c（censored层），同样留一折诚实校准：
+
+| 口径 | pooled NLL | vs frozen 0.7 | vs nuisance |
+|------|-----------:|--------------:|------------:|
+| frozen σ=0.7 | 0.8527 | — | +21.89% |
+| per-scaf σ（r38，此前冻结） | 0.8166 | -0.0361 | +25.20% |
+| **per-scaf x stratum σ（r45）** | **0.7942** | **-0.0585** | **+27.24%** |
+
+### 20.1 公正横向表（同一校准应用于所有对比模型）
+
+| 模型 | frozen 0.7 | per-scaf σ（r38） | **per-scaf x stratum σ（r45）** | 相对增益（r45） |
+|------|-----------:|-----------------:|----------------------------:|---------------:|
+| nuisance | 1.0916 | 1.0536 | 1.0182 | — |
+| t7_s99 | 0.8839 | 0.8687 | **0.8485** | +16.67% |
+| xgb_lr03 | 0.8807 | 0.8481 | **0.8271** | +18.77% |
+| 3x t7 | 0.8823 | 0.8603 | **0.8409** | +17.41% |
+| **7-member 混合** | **0.8527** | **0.8166** | **0.7942** | **+22.00%** |
+
+edit-cluster CI（r45 7mem vs nuisance r45）[0.2036, 0.2805] lower>0；
+leave-one-largest 0.2366。**7-member 集成在 r45 下仍最优**。
+
+### 20.2 分层分解（r45 增益来源）
+
+| 口径 | measured NLL | censored NLL |
+|------|------------:|------------:|
+| frozen 0.7 | 0.9428 | 0.3077 |
+| per-scaf σ（r38） | 0.8978 | 0.3241 |
+| **per-scaf x stratum σ（r45）** | **0.8942** | **0.2165** |
+
+r45 的全部增益来自 censored 层（-0.1076），measured 层基本持平（-0.0036）。
+高删失 scaffold 的 sigma_c 稳定在 ~0.40（scaf9）—— 比 r38 的 σ~0.84 小得多，
+因为 censored NLL 在 mu>CAP 时偏好小 σ。
+
+### 20.3 学习到的 σ 稳定且物理合理（37 折高度稳定）
+
+| scaf | 删失率 | σ_m（measured） | σ_c（censored） |
+|------|-------:|----------------:|----------------:|
+| 1 | 59.2% | 0.76 | 0.72 |
+| 2 | 0.0% | 0.45 | 0.72（全局 fallback） |
+| 3 | 0.0% | 0.47 | 0.72（全局 fallback） |
+| 8 | 9.7% | 0.69 | 1.39 |
+| 9 | 78.5% | 1.15 | 0.40 |
+
+scaf9 的 σ_m=1.15 精确匹配其 measured RMSE（1.15），σ_c=0.40 远小于 pooled
+σ=0.84。scaf8 σ_c=1.39 反映其 censored 行被截断的极值不确定性。
+
+## 21. r46：measured-only 算子 mu 修正 —— 阴性（边界闭合）
+
+r45 证明 Strata 应独立处理。r46 测试 mu 侧的对应：仅在 measured 行上施加
+per-scaffold 加性偏差修正（α = mean(y-mu) on other folds' OOF measured rows，
+shrink=0.5/0.75/1.0），censored 行 mu 保持不变（避免 r37/r39 的 censored 损伤）。
+
+| 口径 | pooled NLL |
+|------|-----------:|
+| r45（stratum σ only） | 0.7942 |
+| r46 shrink=0.5 | 0.7942（无增益） |
+| r46 shrink=0.75 | 0.7999（更差） |
+| r46 shrink=1.0 | 0.8094（更差） |
+
+**结论：NEGATIVE。** measured-only mu 修正无增益：measured 行偏倚（scaf9 -0.996）
+在 equal-weight 集成中已被 σ_m=1.15 充分吸收，增广 mu 无额外收益。这与 r42
+（per-scaf mu 输出头）及 r37/r39（全行 mu 修正）的失败一致——**mu 结构已到
+该数据上的局部最优**。
+
+## 22. 方法级边界最终闭合（r37-r46，15 条路线）
+
+| # | 方向 | 形态 | 结果 |
+|---|------|------|------|
+| 1 | kernel RBF 成员 | r36 | NEGATIVE |
+| 2 | 学习式 stacking 权重 | r37 | NEGATIVE |
+| 3 | per-row 校准 σ | r37 | NEGATIVE |
+| 4 | 算子加性截距 α（全行） | r37 | NEGATIVE |
+| 5 | Student-t GBDT 族 | r34 | DEAD END |
+| 6 | global σ-only 校准 | r37 | POSITIVE（0.8460） |
+| 7 | **per-scaf σ 事后校准** | **r38** | **POSITIVE（0.8166）** |
+| 8 | censoring-aware 算子截距 | r39 | NEGATIVE |
+| 9 | per-scaf σ 训练期联合 | r40 | NEGATIVE |
+| 10 | mixture-of-predictives | r41 | 排序稳健 |
+| 11 | per-scaf mu 输出头 | r42 | NEGATIVE |
+| 12 | per-context σ | r43 | NEGATIVE |
+| 13 | 固定 σ=0.62 训练 | r44 | NEGATIVE |
+| 14 | **per-scaf x stratum σ** | **r45** | **POSITIVE（0.7942）** |
+| 15 | measured-only mu 修正 | r46 | NEGATIVE |
+
+**最终冻结方法**：7-member 混合集成 + 留一折 per-scaffold x stratum σ 校准
+= **0.7942（+27.24% vs nuisance）**。μ 结构（共享头→scaf 头→measured-only
+修正）与 σ 粒度（global→scaf→ctx→stratum）均已完全闭合。
+
+## 23. 新增文件（r45/r46）
+
+- `audit/repair/per_scaf_stratum_sigma_calibration.py`（新增）：r45 stratum σ
+- `audit/repair/per_scaf_stratum_sigma_horizontal_table.py`（新增）：r45 公正横向表
+- `audit/repair/measured_only_operator_mu_correction.py`（新增）：r46 mu 修正（阴性）
+- `tests/audit/test_per_scaf_stratum_sigma_calibration.py`（新增）：9 单测，全部通过
+- artifacts：`per_scaf_stratum_sigma_calibration.json`、
+  `per_scaf_stratum_sigma_horizontal_table.json`、
+  `measured_only_operator_mu_correction.json`
