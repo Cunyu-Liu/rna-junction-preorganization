@@ -74,3 +74,48 @@ per-scaffold × stratum σ 校准（σ 扫描下界 0.05 = MetricSpec floor）�
 - 生成 Figure 2（横向 NLL 柱状图 + CI 误差条）；
 - 生成 Figure 3（censored/measured 分层分解）；
 - 生成稿件 Table 2（消融阶梯：单成员→3x t7→7mem→+r45）。
+
+## 8. Table 2（消融阶梯：方法贡献链）
+
+| 步骤 | frozen 0.7 | r45 校准 |
+|------|-----------:|---------:|
+| nuisance（基线） | 1.0916 | 1.0040 |
+| 最优单成员（GBDT lr03） | 0.8807 | 0.8252 |
+| 3x t7 集成 | 0.8823 | 0.8410 |
+| 7-member 混合集成 | 0.8527 | 0.7907 |
+| **冻结方法（7mem + r45 σ 校准）** | 0.8527 | **0.7907（+27.57%）** |
+
+方法贡献链：非线性鲁棒头（+17.45%）→ 跨族集成（+21.94%）→ per-operator
+stratum σ 校准（+27.57%）。
+
+## 9. Figure 2（横向对比）
+
+见 `horizontal_nll_figure.svg/.png`：全模型族 frozen 0.7 vs r45 校准双柱图，
+r45 排序，冻结方法高亮。视觉信息：r45 校准系统性降低所有模型 NLL（含
+nuisance），7-member 集成在两口径下均最优。
+
+## 10. 更新后的材料清单
+
+| 材料 | 状态 | 来源 |
+|------|------|------|
+| 最终横向表 | 已生成 | `submission_horizontal_table.json` |
+| Figure 1（per-operator σ） | 已生成 | `per_scaf_stratum_sigma_figure.*` |
+| Figure 2（横向对比） | 已生成 | `horizontal_nll_figure.*` |
+| Table 2（消融阶梯） | 已生成 | `fig2_and_ablation_ladder.json` + 本节 |
+| 残差/分层诊断 | 已生成 | `residual_structure_diagnostic.json` |
+| 方法冻结记录 | 已更新 | `reactflow_delta_method_freeze_r37_20260815.md` |
+| Claim 矩阵 | 已更新 | `audit/release/SubmissionClaimMatrix.csv` |
+| Task equivalence | 待生成 | 需 owner 确认 comparator 清单 |
+| 稿件 draft | 待生成 | 需 owner 选择故事线 |
+
+## 11. 生成命令（可复现）
+
+```bash
+cd /home/cunyuliu/rna_junction_repair_20260811
+# 最终横向表（已生成）
+python -c "from audit.repair.submission_horizontal_table import main; main()"
+# Figure 1（per-operator sigma，已生成）
+python -c "from audit.repair.per_scaf_stratum_sigma_figure import main; main()"
+# Figure 2 + Table 2（已生成）
+python -c "from audit.repair.horizontal_nll_figure import main; main()"
+```
