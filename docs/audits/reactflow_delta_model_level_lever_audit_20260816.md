@@ -177,6 +177,38 @@ mu 上失败）在 **r56b mu** 上有微弱正增益。更关键的是 r62 揭�
 这些方向的预期收益全部在 edit-cluster CI 宽度（±0.05-0.1）以内，无法
 产生统计上可检测的改善。
 
+### 4.aa r65–r72（2026-08-16）：σ 粒度/噪声底诊断 —— 模型级边界彻底闭合
+
+在 r62（0.7243）冻结后继续系统性收尾，全部 NEGATIVE 或"非合法杠杆"：
+
+| 实验 | run | 结果 | 判定 |
+|------|-----|------|------|
+| 解耦 censored σ_c | r65 | 0.7243 = 0.7243（逐 scaf σ_c 完全相同）| censored 层本就干净，NEGATIVE |
+| r62 + per-context EB σ（r60 修复版，向解耦 σ 收缩）| r66 | 全网格 ≥0.7275 > 0.7243 | NEGATIVE：解耦 scaf×stratum σ 已吸收全部异方差 |
+| context bias 是否可由特征预测（OOD 推广）| r67 | OOD R2 = −0.31 ~ −0.42（Ridge/GBDT 全部负）| NEGATIVE：context bias 是不可约 per-context 随机效应 |
+| measured 残差 vs err10（label 测量误差）| r68 | 残差 sd 0.548 = 2.2× err10 rms 0.248 | 表观"headroom"存在，但见 r69/r70 解读 |
+| 残差按 context 可见性分解 | r69 | OOD context 残差 sd 0.694 vs train-visible 0.525 | 差距是 context 随机效应，r56b EB 只能救 train-visible |
+| err10 驱动 per-row σ（quadrature）| r70/r72 | 0.7195（−0.0048，split-half −0.0029）| **数据侧杠杆，非合法模型改进**（见下）|
+
+关键解读（必须诚实记录）：
+
+1. **r68 的"2.2× headroom"不是可学信号**。err10 rms 0.248 vs 残差 sd 0.548 的
+   表观差距，由 r67 证明**不可特征预测**（context bias OOD R2 < 0），由 r69
+   证明主要落在 OOD context（0.694 vs 0.525）——即 held-out 折自身 context
+   的不可约随机效应，r56b 的 EB 只能对 train-visible context 生效。
+2. **r70/r72 的"−0.0048 增益"是 label-derived 泄漏，合同禁止**。err10 在
+   `audit/evaluation/feature_provenance.py` 明确标记 `derived_from_target:
+   True, train_legal: False`（"target-derived measurement error; must NOT
+   enter sequence model"）。err10 是 dg10 测量的 SE，只有在拿到该行测量值
+   之后才存在 —— 用它校准 σ 等价于把 label 噪声注入预测，不是模型能力提升，
+   正是用户明确要求避免的"数据层面"手法。故 **r70 不作为冻结方法**，
+   仅记录为"机械可行但非法/不诚实"的对照。
+3. **结论：measured 层已在 train-legal 数据极限**。残余 sd 0.548 中，
+   err10（0.248）是不可约测量噪声；余下的 context 随机效应在 joint-blocked
+   split 下对 held-out 折不可见（r67/r69），唯一可救部分（train-visible
+   context）已被 r56b EB 全部提取（r56b→r62 累计 −0.0568）。任何进一步
+   的模型级杠杆要么撞 context 随机效应墙，要么用 label-derived 特征。
+
 ## 5. 最终判断与建议
 
 - **冻结方法**：7-member 混合集成（equal-family wg=0.5）+ **r62（r56b
