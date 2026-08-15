@@ -140,6 +140,12 @@ def _universe(rnafm_cache=None):
     # 0.7 -- unlike r40 where the sigma table was the free parameter, this one
     # varies mu only, which is the genuine bottleneck.
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_scafmu"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_scafmu(df=7.0)
+    # r44: FIXED sigma=0.62 in the training objective (the ensemble's measured
+    # residual scale).  Unlike r40 (learned sigma) this is a constant, so it
+    # only reweights measured vs censored rows in training and cannot absorb
+    # residual.  If the frozen 0.7 is over-dispersed for the mu fit, a fixed
+    # smaller sigma should sharpen mu and lower the evaluation NLL.
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_sig062"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, sigma=0.62)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, swa_n=10)
     # NONLINEAR LATENT-OPERATOR head (contract 9.1): MLP junction map -> latent q_j,
     # operator-aware head a_s + b_s q_j, GH-marginal right-censored training.

@@ -817,7 +817,7 @@ def _train_mlp_t_scaf(Xtr, ytr, cens_tr, scaf_tr, device, in_dim,
 
 def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
                  dropout=0.1, weight_decay=1e-2, df=_DEFAULT_DF,
-                 seed=_T_SEED, swa_n=0,
+                 seed=_T_SEED, swa_n=0, sigma=0.7,
                  lr=LR, max_epochs=MAX_EPOCHS, patience=PATIENCE,
                  loss_tol=LOSS_TOL, plateau_window=PLATEAU_WINDOW,
                  plateau_rel_tol=PLATEAU_REL_TOL):
@@ -825,8 +825,12 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
 
     Mirrors _train_mlp (same architecture, Adam + weight decay, plateau-based
     early stopping, eligibility gate) but swaps the Gaussian NLL for the
-    Student-t NLL with `df` degrees of freedom.  Fixed sigma=0.7 and cap=-7.1
-    match the evaluation metric; only the training objective differs.
+    Student-t NLL with `df` degrees of freedom.  `sigma` is the FIXED noise
+    scale in the training objective (default 0.7 matches the frozen evaluation
+    metric); setting a different FIXED sigma (e.g. 0.62, the measured residual
+    scale) reweights measured vs censored rows in training WITHOUT letting the
+    model absorb residual into a learned sigma (unlike the r40 per-scaffold
+    sigma table).  cap=-7.1 matches the evaluation metric.
     """
     import torch
     from audit.models.nonlinear_mlp_hybrid import (
@@ -860,7 +864,7 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
             idx = perm[start:start + BATCH]
             opt.zero_grad()
             mu = net(Xt[idx]).squeeze(-1)
-            loss = _t_right_censored_nll(mu, yt[idx], ct[idx], df=df)
+            loss = _t_right_censored_nll(mu, yt[idx], ct[idx], df=df, sigma=sigma)
             loss.backward()
             opt.step()
             epoch_losses.append(float(loss.detach().cpu()))
@@ -908,7 +912,7 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
 
     net.zero_grad()
     mu_all = net(Xt).squeeze(-1)
-    lossg = _t_right_censored_nll(mu_all, yt, ct, df=df)
+    lossg = _t_right_censored_nll(mu_all, yt, ct, df=df, sigma=sigma)
     lossg.backward()
     gn = 0.0
     for p in net.parameters():
@@ -927,6 +931,7 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
         "final_train_nll": final_loss, "best_train_nll": best_loss,
         "plateau_reached": plateau_reached, "success": converged,
         "n_nan_inf_params": int(not params_finite), "df": float(df),
+        "train_sigma": float(sigma),
     }
     return net, gate
 
@@ -1067,7 +1072,8 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
                                                   dropout=0.1,
                                                   weight_decay=1e-2,
                                                   seed=_T_SEED,
-                                                  swa_n=0):
+                                                  swa_n=0,
+                                                  sigma=0.7):
     """reg_deep MLP trained with a robust right-censored Student-t objective.
 
     Same winning feature block (nuisance + 21-D extended-Vienna, reg_deep arch)
@@ -1075,6 +1081,9 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
     Student-t NLL with `df` degrees of freedom instead of the Gaussian NLL.
     Heavy tails down-weight extreme / outlier rows, so a few catastrophic folds
     (which drag the mean evaluation NLL) should exert far less pull on mu.
+    `sigma` is the FIXED noise scale in the training objective (default 0.7);
+    a different fixed sigma (e.g. 0.62) reweights measured vs censored rows in
+    training without a learned-sigma degradation (the r44 lever).
     Prediction still returns mu with the fixed sigma=0.7 and the Gaussian
     evaluation NLL is unchanged -- only the training objective differs.
     """
@@ -1095,13 +1104,13 @@ def make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=_DEFAULT_DF,
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
         net, gate = _train_mlp_t(X, y, cens, device, X.shape[1], hidden=hidden,
                                  dropout=dropout, weight_decay=weight_decay,
-                                 df=df, seed=seed, swa_n=swa_n)
+                                 df=df, seed=seed, swa_n=swa_n, sigma=sigma)
         return {"kind": "nonlinear_mlp_extended_hybrid_reg_deep_t", "net": net,
                 "gate": gate, "motifs": motifs, "scafs": scafs, "mean": mean,
                 "sd": sd, "by_jid": by_jid, "n_nuisance": Xn.shape[1],
                 "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
                 "dropout": dropout, "weight_decay": weight_decay, "df": float(df),
-                "seed": int(seed), "swa_n": int(swa_n)}
+                "seed": int(seed), "swa_n": int(swa_n), "train_sigma": float(sigma)}
 
     def predict(model, test_rows):
         import torch
