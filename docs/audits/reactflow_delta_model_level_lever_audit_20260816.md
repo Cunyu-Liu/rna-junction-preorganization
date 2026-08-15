@@ -190,6 +190,13 @@ mu 上失败）在 **r56b mu** 上有微弱正增益。更关键的是 r62 揭�
 | 残差按 context 可见性分解 | r69 | OOD context 残差 sd 0.694 vs train-visible 0.525 | 差距是 context 随机效应，r56b EB 只能救 train-visible |
 | err10 驱动 per-row σ（quadrature）| r70/r72 | 0.7195（−0.0048，split-half −0.0029）| **数据侧杠杆，非合法模型改进**（见下）|
 | row-level σ 用 train-legal Vienna+nuisance 特征回归 | r73 | 0.8194–0.8271（GBDT/Ridge，全部 > 0.7243）| NEGATIVE：合法特征无法预测逐行残差幅度，r70 增益只能来自 label-derived err10 |
+| 联合 per-context (mu,σ) 2-参数 EB | r74 | mm3 0.8520 / mm5 0.8181（edit CI [-0.1599,-0.0695] 穿 0）| NEGATIVE：逐 context 联合 σ 严重过拟合，证实 r56b mu→r62 σ 的顺序结构是正确解 |
+| ensemble family 权重在 r62 下重扫 | r75 | wg=0.5 → 0.7243（最优；wg0/0.25/0.75/1 = 0.757/0.729/0.743/0.777）| 确认 equal-family 在 r62 下仍最优，冻结不动 |
+
+**Gaussian 信息底（measured 层，决定性证据）**：r62 measured NLL = 0.8182，而其发射 σ_m
+（0.42–0.68）对应的 Gaussian 信息下界 0.5·log(2π)+log σ+0.5 = 0.55–1.03（σ=0.54 时为 0.803）。
+measured 层已贴在该信息底上 —— 唯一能再降 NLL 的途径是降低残差 sd（更好 mu），而 mu 侧
+全部杠杆（r67 context 不可特征预测、r56b/r62 已提取可救部分）已闭合。
 
 关键解读（必须诚实记录）：
 
