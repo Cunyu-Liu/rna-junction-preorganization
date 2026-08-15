@@ -800,3 +800,79 @@ scaffold censored 层的最优 σ 收益；扩展网格后 0.7907 是真实无�
   同步扩展（r46 shrink=0 仍须与 r45 一致）
 - artifacts 重写：`per_scaf_stratum_sigma_calibration.json`、
   `per_scaf_stratum_sigma_horizontal_table.json`
+
+---
+
+# 补充十一：r49 结果（2026-08-15 续篇）
+
+## 33. r49：censoring-aware 训练重加权 —— 阴性（训练侧 mu 杠杆最后闭合）
+
+残差诊断显示高删失 scaffold 带系统性 mu 偏差（scaf9 -0.996，78.5%删失）：
+删失多数把 mu 拉向 CAP，而鲁棒 Student-t 损失把少量 measured 行当作离群点
+降权，模型从未学好这些算子的 measured 水平。r46/r47 事后修正无法解决——
+因为 mu 在训练时就没拟合到那些行。
+
+r49 在**训练目标**中按删失率对 measured 行加权：scaffold s 的 measured 行
+权重 w = 1 + cw_strength * c_s/(1-c_s)（删失行权重 1，权重归一化到单位均值），
+直接针对高删失算子的 mu 拟合。权重只用 TRAIN 行的删失率（无泄漏）。
+
+### 33.1 smoke 结果（2 折，GPU6）
+
+| 模型 | pooled NLL（2 折） |
+|------|------------------:|
+| t7 冻结（对照） | 0.7886 |
+| cw_strength=0.5 | 0.8120（+0.023） |
+| cw_strength=1.0 | 0.7965（+0.008） |
+| cw_strength=2.0 | 0.8259（+0.037） |
+
+**结论：NEGATIVE。** 所有 cw 变体均劣于冻结 t7。机理：删失行携带主要信息
+（高删失算子的 censored 行告诉模型这些 junction 的 ΔG 分布右尾），稀释
+删失行权重会全局破坏 mu 拟合；measured 行被加权的收益远小于删失信息损失。
+这与 r40（训练期 σ 退化）、r42（per-scaf mu 头过拟合）一致——**mu 的
+系统性偏差在该单 study 数据上不可通过训练侧重加权修复**，只能靠 prospective
+数据或新测量。
+
+### 33.2 训练侧 mu 杠杆最终闭合
+
+至此训练侧 mu 全部测尽：r40 训练期 σ（退化）、r42 per-scaf mu 头（过拟合）、
+r44 固定 σ=0.62（阴性）、r46/r47 事后 mu 修正（阴性）、r49 censor-aware
+重加权（阴性）。**mu 结构在训练与校准两侧均已到局部最优**。
+
+## 34. 方法级边界最终闭合（r37-r49，19 条路线）
+
+| # | 方向 | 形态 | 结果 |
+|---|------|------|------|
+| 1 | kernel RBF 成员 | r36 | NEGATIVE |
+| 2 | 学习式 stacking 权重 | r37 | NEGATIVE |
+| 3 | per-row 校准 σ | r37 | NEGATIVE |
+| 4 | 算子加性截距 α（全行） | r37 | NEGATIVE |
+| 5 | Student-t GBDT 族 | r34 | DEAD END |
+| 6 | global σ-only 校准 | r37 | POSITIVE（0.8460） |
+| 7 | **per-scaf σ 事后校准** | **r38** | **POSITIVE（0.8166）** |
+| 8 | censoring-aware 算子截距 | r39 | NEGATIVE |
+| 9 | per-scaf σ 训练期联合 | r40 | NEGATIVE |
+| 10 | mixture-of-predictives | r41 | 排序稳健 |
+| 11 | per-scaf mu 输出头 | r42 | NEGATIVE |
+| 12 | per-context σ | r43 | NEGATIVE |
+| 13 | 固定 σ=0.62 训练 | r44 | NEGATIVE |
+| 14 | **per-scaf x stratum σ** | **r45（网格修正后）** | **POSITIVE（0.7907）** |
+| 15 | measured-only 加性 mu 修正 | r46 | NEGATIVE |
+| 16 | measured-only 仿射 mu（全局/每算子/ridge/EB） | r47 | NEGATIVE |
+| 17 | nonlinear latent-operator head（§9.1） | r27 确认 | DEAD（1.12 vs 0.82） |
+| 18 | feature-diverse 集成成员（nuisance-only） | r48 | NEGATIVE |
+| 19 | censor-aware 训练重加权 | r49 | NEGATIVE |
+
+**最终冻结方法保持**：7-member 混合集成 + 留一折 per-scaf x stratum σ 校准
+（网格下界 0.05）= **0.7907（+27.57% vs nuisance @ frozen 0.7；+21.25%
+@ 同口径）**。mu 侧（训练+校准）与 σ 侧（global/scaf/ctx/stratum）均已完全闭合。
+
+## 35. 新增/修改文件（r49）
+
+- `audit/models/nonlinear_mlp_rich_hybrid.py`（修改）：`_t_right_censored_nll`
+  加 `sample_weight`；`_train_mlp_t` 加 `sample_weight` 线程；
+  新增 `make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw`
+- `audit/repair/shootout_run.py`（修改）：注册 r49 cw 变体（cw0.5/1/2）
+- `audit/repair/shootout_r49_censor_weight_smoke_cfg.json`（新增）
+- `tests/audit/test_nonlinear_mlp_rich_hybrid.py`（扩充）：+3 单测
+  （shapes/gate、高删失权重优先级、seed 线程），全部通过
+- artifacts：`r49_censor_weight_smoke/`（run root）

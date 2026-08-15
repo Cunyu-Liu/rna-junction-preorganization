@@ -67,6 +67,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_scafmu,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw,
     make_nonlinear_mlp_rnafm_pca_hybrid,
     make_nonlinear_mlp_rnafm_only_pca_hybrid,
     make_nonlinear_mlp_rnafm_extended_reg_deep,
@@ -146,6 +147,14 @@ def _universe(rnafm_cache=None):
     # residual.  If the frozen 0.7 is over-dispersed for the mu fit, a fixed
     # smaller sigma should sharpen mu and lower the evaluation NLL.
     U["nonlinear_mlp_extended_hybrid_reg_deep_t7_sig062"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=7.0, sigma=0.62)
+    # r49: censor-aware training reweighting -- upweight MEASURED rows on
+    # high-censoring scaffolds in the training loss (w = 1 + cw_strength*c_s/
+    # (1-c_s)).  Directly targets the scaf9 (-0.996) / scaf1 (-0.44) measured
+    # bias that the censored majority pulls into mu and that post-hoc mu
+    # corrections (r46/r47) cannot fix.  cw_strength sweep for the smoke.
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_cw05"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(df=7.0, cw_strength=0.5)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_cw1"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(df=7.0, cw_strength=1.0)
+    U["nonlinear_mlp_extended_hybrid_reg_deep_t7_cw2"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(df=7.0, cw_strength=2.0)
     U["nonlinear_mlp_extended_hybrid_reg_deep_t10_swa"] = make_nonlinear_mlp_extended_hybrid_reg_deep_t(df=10.0, swa_n=10)
     # NONLINEAR LATENT-OPERATOR head (contract 9.1): MLP junction map -> latent q_j,
     # operator-aware head a_s + b_s q_j, GH-marginal right-censored training.

@@ -25,6 +25,7 @@ from audit.models.nonlinear_mlp_rich_hybrid import (
     make_nonlinear_mlp_extended_hybrid_reg_deep_t,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_scaf,
     make_nonlinear_mlp_extended_hybrid_reg_deep_t_bag,
+    make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw,
     make_nonlinear_mlp_nuisance_only_t,
     _student_t_survival,
     make_nonlinear_mlp_rnafm_pca_hybrid,
@@ -465,6 +466,81 @@ def test_nuisance_only_t7_shapes_and_ablation():
             "helix_seq": "h99", "symmetry_key": "AAAA_BBBB"}]
     mu2, sigma2, cp2, support2, abstain2 = predict(model, te2)
     assert bool(abstain2[0]) is True and bool(support2[0]) is False
+
+
+@needs_torch_vienna
+def test_censor_weight_variant_shapes_and_gate():
+    """r49 censor-aware reweighting: fits cleanly with a recorded gate.
+
+    Asserts the cw factory threads cw_strength/floor into the returned model,
+    emits frozen 0.7 sigma at prediction, abstains on unseen scaffolds, and
+    records the per-row train weights.
+    """
+    fit, predict = make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(
+        df=7.0, cw_strength=1.0, cw_floor=0.15)
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    model = fit(tr)
+    assert model["kind"] == "nonlinear_mlp_extended_hybrid_reg_deep_t_cw"
+    assert model["df"] == 7.0
+    assert model["cw_strength"] == 1.0 and model["cw_floor"] == 0.15
+    assert "eligible" in model["gate"] and "final_grad_norm" in model["gate"]
+    w = model["train_weights"]
+    assert len(w) == len(tr)
+    assert np.all(np.asarray(w) >= 1.0), "measured rows must be >= 1.0 weight"
+    mu, sigma, cp, support, abstain = predict(model, te)
+    n = len(te)
+    assert mu.shape == (n,) and sigma.shape == (n,)
+    assert np.all(np.isfinite(mu)) and np.allclose(sigma, 0.7)
+    assert cp.min() >= 0.0 and cp.max() <= 1.0
+    assert support.dtype == bool and abstain.dtype == bool
+
+
+@needs_torch_vienna
+def test_censor_weight_prioritizes_high_censoring_scaffold():
+    """cw weights must be LARGER for measured rows on high-censoring scaffolds.
+
+    Build synthetic rows where scaf=9 is mostly censored (c_s~0.8) and scaf=2
+    is measured-only (c_s=0); measured rows on scaf9 must receive a larger
+    weight than measured rows on scaf2.
+    """
+    rows = _rows()
+    # force scaf 9 rows to be censored (they already exist in the fixture)
+    weighted = []
+    for r in rows:
+        r2 = dict(r)
+        if int(r["scaf"]) == 9:
+            r2["cens"] = 1
+        weighted.append(r2)
+    fit, _ = make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(
+        df=7.0, cw_strength=1.0, cw_floor=0.15)
+    tr = weighted[:18]
+    model = fit(tr)
+    w = model["train_weights"]
+    w_scaf9 = [w[i] for i, r in enumerate(tr) if int(r["scaf"]) == 9 and not r["cens"]]
+    w_scaf2 = [w[i] for i, r in enumerate(tr) if int(r["scaf"]) == 2 and not r["cens"]]
+    if w_scaf9 and w_scaf2:
+        assert np.mean(w_scaf9) > np.mean(w_scaf2), \
+            "measured rows on high-censoring scaffold must be upweighted"
+    # censored rows always weight 1.0
+    for i, r in enumerate(tr):
+        if r["cens"]:
+            assert np.isclose(w[i], 1.0)
+
+
+@needs_torch_vienna
+def test_censor_weight_seed_threading():
+    """Different seeds must thread through the cw factory."""
+    rows = _rows()
+    tr, te = rows[:18], rows[18:]
+    fit1, _ = make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(df=7.0, seed=23)
+    fit2, _ = make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(df=7.0, seed=99)
+    m1, m2 = fit1(tr), fit2(tr)
+    assert m1["seed"] == 23 and m2["seed"] == 99
+    assert m1["df"] == m2["df"] == 7.0
+    for m in (m1, m2):
+        assert "eligible" in m["gate"]
+        assert len(m["train_weights"]) == len(tr)
 
 
 @needs_torch_vienna

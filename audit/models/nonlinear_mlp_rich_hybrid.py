@@ -27,6 +27,7 @@ CUDA is available, CPU otherwise (unit tests).
 from __future__ import annotations
 
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
@@ -453,7 +454,8 @@ def _student_t_survival(a, nu):
         a, torch.as_tensor(float(nu), device=a.device, dtype=a.dtype))
 
 
-def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1):
+def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1,
+                          sample_weight=None):
     """Right-censored Student-t NLL (mean over batch), heavier-tailed than Gaussian.
 
     measured rows : nll_m = -log f_t(y; mu, sigma, df)
@@ -463,6 +465,12 @@ def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1):
     The measured term grows only logarithmically in |z| (vs quadratically for the
     Gaussian), so a few extreme / outlier rows (the catastrophic folds that drag
     mean evaluation NLL) exert far less pull on mu.
+
+    `sample_weight` (optional, shape == mu) reweights each row's NLL contribution
+    before the batch mean.  This is the r49 lever: upweighting measured rows on
+    high-censoring scaffolds counteracts the censored-majority pull that biases
+    mu for those operators (scaf9 -0.996).  Weights are normalized to unit mean
+    so the objective scale is unchanged.
     """
     import torch
     dist = torch.distributions.StudentT(
@@ -470,7 +478,12 @@ def _t_right_censored_nll(mu, y, cens, df, sigma=0.7, cap=-7.1):
     nll_m = -dist.log_prob(y)
     a = (cap - mu) / sigma
     nll_c = -torch.log(_student_t_survival(a, float(df)))
-    return torch.where(cens, nll_c, nll_m).mean()
+    nll = torch.where(cens, nll_c, nll_m)
+    if sample_weight is not None:
+        w = torch.as_tensor(sample_weight, dtype=nll.dtype, device=nll.device)
+        w = w / w.mean()
+        nll = nll * w
+    return nll.mean()
 
 
 class _MLPScafHeads(nn.Module):
@@ -817,7 +830,7 @@ def _train_mlp_t_scaf(Xtr, ytr, cens_tr, scaf_tr, device, in_dim,
 
 def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
                  dropout=0.1, weight_decay=1e-2, df=_DEFAULT_DF,
-                 seed=_T_SEED, swa_n=0, sigma=0.7,
+                 seed=_T_SEED, swa_n=0, sigma=0.7, sample_weight=None,
                  lr=LR, max_epochs=MAX_EPOCHS, patience=PATIENCE,
                  loss_tol=LOSS_TOL, plateau_window=PLATEAU_WINDOW,
                  plateau_rel_tol=PLATEAU_REL_TOL):
@@ -831,6 +844,10 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
     scale) reweights measured vs censored rows in training WITHOUT letting the
     model absorb residual into a learned sigma (unlike the r40 per-scaffold
     sigma table).  cap=-7.1 matches the evaluation metric.
+
+    `sample_weight` (optional, length == n) is a per-row weight threaded into
+    the Student-t NLL (r49 lever): upweight measured rows on high-censoring
+    scaffolds to counteract the censored-majority mu pull.
     """
     import torch
     from audit.models.nonlinear_mlp_hybrid import (
@@ -845,6 +862,8 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
     yt = torch.tensor(ytr, dtype=torch.float32, device=device)
     ct = torch.tensor(cens_tr, dtype=torch.bool, device=device)
     n = Xt.shape[0]
+    wt = torch.as_tensor(sample_weight, dtype=torch.float32, device=device) \
+        if sample_weight is not None else None
 
     best_loss = float("inf")
     best_state = None
@@ -864,7 +883,8 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
             idx = perm[start:start + BATCH]
             opt.zero_grad()
             mu = net(Xt[idx]).squeeze(-1)
-            loss = _t_right_censored_nll(mu, yt[idx], ct[idx], df=df, sigma=sigma)
+            loss = _t_right_censored_nll(mu, yt[idx], ct[idx], df=df, sigma=sigma,
+                                         sample_weight=wt[idx] if wt is not None else None)
             loss.backward()
             opt.step()
             epoch_losses.append(float(loss.detach().cpu()))
@@ -912,7 +932,8 @@ def _train_mlp_t(Xtr, ytr, cens_tr, device, in_dim, hidden=(96, 64, 32),
 
     net.zero_grad()
     mu_all = net(Xt).squeeze(-1)
-    lossg = _t_right_censored_nll(mu_all, yt, ct, df=df, sigma=sigma)
+    lossg = _t_right_censored_nll(mu_all, yt, ct, df=df, sigma=sigma,
+                                  sample_weight=wt if wt is not None else None)
     lossg.backward()
     gn = 0.0
     for p in net.parameters():
@@ -1050,6 +1071,108 @@ def make_nonlinear_mlp_extended_hybrid_localctx(hidden=(96, 64, 32), dropout=0.1
             Xv[i] = vienna_ext_transform([j], v_by_jid, model["v_mean"], model["v_sd"])[0]
             Xl[i] = lctx_transform([j], l_by_jid, model["l_mean"], model["l_sd"])[0]
         X = np.hstack([Xn, Xv, Xl])
+        model["net"].eval()
+        with torch.no_grad():
+            Xt = torch.tensor(X, dtype=torch.float32, device=model["device"])
+            mu = model["net"](Xt).squeeze(-1).cpu().numpy()
+        sigma = np.full(len(mu), 0.7)
+        from scipy.special import log_ndtr
+        a = (mu + 7.1) / 0.7
+        cp = np.exp(np.clip(log_ndtr(a), -50.0, 0.0))
+        seen_scaf = np.zeros(len(mu), dtype=bool)
+        for i, r in enumerate(test_rows):
+            if int(r["scaf"]) in model["scafs"]:
+                seen_scaf[i] = True
+        return mu, sigma, cp, seen_scaf, ~seen_scaf
+
+    return fit, predict
+
+
+def make_nonlinear_mlp_extended_hybrid_reg_deep_t_cw(df=_DEFAULT_DF,
+                                                      hidden=(96, 64, 32),
+                                                      dropout=0.1,
+                                                      weight_decay=1e-2,
+                                                      seed=_T_SEED,
+                                                      swa_n=0,
+                                                      sigma=0.7,
+                                                      cw_strength=1.0,
+                                                      cw_floor=0.15):
+    """reg_deep t7 MLP with censor-aware training reweighting (r49 lever).
+
+    The residual diagnostic found high-censoring scaffolds carry a systematic
+    mu bias (scaf9 -0.996, 78.5% censored): the censored majority pulls mu up
+    toward CAP and the robust Student-t loss down-weights the few measured rows
+    (they are outliers relative to the censored cluster), so the model never
+    learns the true measured level of those operators.  Post-hoc corrections
+    (r46 additive, r47 affine) cannot fix this because the mu was never fit to
+    those rows.
+
+    This variant computes, from TRAIN rows only, each scaffold's censoring rate
+    c_s, and upweights MEASURED rows on scaffold s by
+        w = 1 + cw_strength * c_s / (1 - c_s)
+    (censored rows weight 1).  For scaf9 (c=0.785) with cw_strength=1 that is
+    w = 1 + 3.66 = 4.66 -- measured rows of the most-censored operator get ~4.7x
+    the loss weight, rebalancing the mu fit without any test-label leakage.
+    `cw_floor` clamps the denominator (1 - c_s) to avoid infinite weight for a
+    fully-censored scaffold.  Sigma stays frozen (r40/r44 lesson); prediction
+    emits the frozen 0.7 (the r45 stratum calibration is applied post-hoc by
+    the analysis layer).
+    """
+    def _weights(train_rows):
+        n = len(train_rows)
+        w = np.ones(n, dtype=float)
+        cens_by_scaf = defaultdict(int)
+        tot_by_scaf = defaultdict(int)
+        for r in train_rows:
+            s = int(r["scaf"])
+            tot_by_scaf[s] += 1
+            if r["cens"]:
+                cens_by_scaf[s] += 1
+        for i, r in enumerate(train_rows):
+            s = int(r["scaf"])
+            if not r["cens"] and tot_by_scaf.get(s, 0) > 0:
+                c_s = cens_by_scaf[s] / tot_by_scaf[s]
+                denom = max(1.0 - c_s, cw_floor)
+                w[i] = 1.0 + cw_strength * c_s / denom
+        return w
+
+    def fit(train_rows):
+        motifs = sorted({str(r["motif"]) for r in train_rows})
+        scafs = sorted({int(r["scaf"]) for r in train_rows})
+        Xn = _nuisance_basis(train_rows, motifs, scafs)
+        tr_jids = sorted({str(r["jid"]) for r in train_rows})
+        by_jid = vienna_ext_build_raw(train_rows)
+        mean, sd = vienna_ext_fit_scaler(tr_jids, by_jid)
+        Xv = np.zeros((len(train_rows), len(mean)))
+        for i, r in enumerate(train_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, mean, sd)[0]
+        X = np.hstack([Xn, Xv])
+        y = np.asarray([r["y"] for r in train_rows], dtype=float)
+        cens = np.asarray([r["cens"] for r in train_rows], dtype=bool)
+        w = _weights(train_rows)
+        import torch
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        net, gate = _train_mlp_t(X, y, cens, device, X.shape[1], hidden=hidden,
+                                 dropout=dropout, weight_decay=weight_decay,
+                                 df=df, seed=seed, swa_n=swa_n, sigma=sigma,
+                                 sample_weight=w)
+        return {"kind": "nonlinear_mlp_extended_hybrid_reg_deep_t_cw", "net": net,
+                "gate": gate, "motifs": motifs, "scafs": scafs, "mean": mean,
+                "sd": sd, "by_jid": by_jid, "n_nuisance": Xn.shape[1],
+                "n_vienna": Xv.shape[1], "device": device, "hidden": list(hidden),
+                "dropout": dropout, "weight_decay": weight_decay, "df": float(df),
+                "seed": int(seed), "swa_n": int(swa_n), "train_sigma": float(sigma),
+                "cw_strength": float(cw_strength), "cw_floor": float(cw_floor),
+                "train_weights": w.tolist()}
+
+    def predict(model, test_rows):
+        import torch
+        Xn = _nuisance_basis(test_rows, model["motifs"], model["scafs"])
+        by_jid = vienna_ext_build_raw(test_rows)
+        Xv = np.zeros((len(test_rows), model["n_vienna"]))
+        for i, r in enumerate(test_rows):
+            Xv[i] = vienna_ext_transform([str(r["jid"])], by_jid, model["mean"], model["sd"])[0]
+        X = np.hstack([Xn, Xv])
         model["net"].eval()
         with torch.no_grad():
             Xt = torch.tensor(X, dtype=torch.float32, device=model["device"])
