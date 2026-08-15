@@ -194,6 +194,17 @@ mu 上失败）在 **r56b mu** 上有微弱正增益。更关键的是 r62 揭�
 | ensemble family 权重在 r62 下重扫 | r75 | wg=0.5 → 0.7243（最优；wg0/0.25/0.75/1 = 0.757/0.729/0.743/0.777）| 确认 equal-family 在 r62 下仍最优，冻结不动 |
 | 非线性单调 mu 校准（isotonic / poly2-3）| r76 | 0.7386–0.7454（全部 > 0.7243，edit CI [-0.0283,-0.0081] 穿 0）| NEGATIVE：residual-vs-mu 表观非线性是 context 结构/噪声，不是可学单调变换 |
 | per-context y~mu 斜率稳定性 | r77 (diag) | split-half slope corr = 0.527（n=18，不稳定）vs intercept corr = 0.993 | 斜率是噪声；intercept 仍是唯一稳定 context 结构（r56b 已用）|
+| σ_c 网格 ceiling 扩展（1.6→5/7.5/10）| r78/r79 | 0.7199/0.7193/0.7190（censored 0.199→0.175，edit CI [0.002,0.0079] lower>0）| **UNBOUNDED 弃权对冲，不采用**（见下）|
+| context EB mu 应用于 censored 行 | r80 | 0.7299（+0.0056 vs r62）| NEGATIVE：censored 行 mu 修正伤 measured 层 |
+
+**r78/r79 诚实裁定（重要）**：σ_c ceiling 扩展确实降低 pooled NLL 且 edit CI 下界 >0，
+但机制是 **无界单调向 log(2)=0.693 的对冲** —— 对任何 mu<CAP 的 censored 行，
+NLL = −log Φ((mu−CAP)/σ) 随 σ→∞ 单调递减至 0.693（即 P(censored)=0.5 的完全弃权），
+不存在有限最优。frozen 网格 ceiling 1.6 是防退化的有原则选择（非 MetricSpec 约束，
+MetricSpec 仅 floor σ≥0.05），任意提高 ceiling 只是把 scaf8 censored 行的"模型认为
+这些 junction 应被测量（mu 远低于 CAP）但数据记录为 censored"的分歧用无限 σ 掩盖。
+**这不是可辩护的模型改进**，保留 r62=0.7243。r80 证明把 r56b context alpha 应用到
+censored 行反而伤 measured 层（alpha 是 measured 残差估计的，不迁移到 censored）。
 
 **Gaussian 信息底（measured 层，决定性证据）**：r62 measured NLL = 0.8182，而其发射 σ_m
 （0.42–0.68）对应的 Gaussian 信息下界 0.5·log(2π)+log σ+0.5 = 0.55–1.03（σ=0.54 时为 0.803）。
