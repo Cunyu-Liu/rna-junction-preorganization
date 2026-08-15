@@ -402,6 +402,49 @@ mu-集成 + **留一折 per-operator 异方差 σ 校准**（σ 随算子删失�
 13 独立模型族公平比较等；63-D sequence-map 路线关闭；提交/release 仍不授权
 （需 owner 明确指示 + P0.6 重裁定 + release seal）。
 
+---
+
+# 补充六：r44 结果（同日续篇）
+
+## 18. r44：固定 σ=0.62 训练 —— 阴性（残差尺度边界闭合）
+
+残差诊断发现 7-member 集成 measured RMSE = 0.61 < 冻结 σ=0.7。r40 失败的是
+"学习 σ"（σ 吸收残差）；r44 测试**固定 σ=0.62** 作为训练目标中的常数（只重新
+加权 measured vs censored 行，不增加自由度）：
+
+| 模型（2 折 smoke） | pooled NLL |
+|--------------------|-----------:|
+| t7 冻结 σ=0.7（现有成员） | 0.7886 |
+| **t7 固定 σ=0.62 训练** | **0.8007** |
+
+**结论：NEGATIVE。** 单成员用 σ=0.62 训练略差（+0.0121）。机理：**0.61 的残差
+尺度是集成 mu-平均后的水平，单成员自身残差仍接近 0.7**；σ 只改变训练加权，
+不改变 mu 的结构上限，且过小的 σ 提高 measured 行相对权重，可能加剧少量
+灾难性折叠的 pull（Student-t 已缓解但未消除）。
+
+## 19. 方法级边界最终闭合（r37–r44，13 条路线）
+
+| # | 方向 | 形态 | 结果 |
+|---|------|------|------|
+| 1 | kernel RBF 成员 | r36 | NEGATIVE |
+| 2 | 学习式 stacking 权重 | r37 | NEGATIVE |
+| 3 | per-row 校准 σ | r37 | NEGATIVE |
+| 4 | 算子加性截距 α | r37 | NEGATIVE |
+| 5 | Student-t GBDT 族 | r34 | DEAD END |
+| 6 | global σ-only 校准 | r37 | **POSITIVE（0.8460）** |
+| 7 | **per-scaf σ 事后校准** | **r38** | **POSITIVE（0.8166, +25.20%）** |
+| 8 | censoring-aware 算子截距 | r39 | NEGATIVE |
+| 9 | per-scaf σ 训练期联合 | r40 | NEGATIVE |
+| 10 | mixture-of-predictives | r41 | 排序稳健 |
+| 11 | per-scaf mu 输出头 | r42 | NEGATIVE |
+| 12 | per-context σ | r43 | NEGATIVE |
+| 13 | 固定 σ=0.62 训练 | r44 | NEGATIVE |
+
+**最终冻结方法保持**：7-member 混合集成 + 留一折 per-scaf σ 校准 = **0.8166
+（+25.20%）**。训练侧（σ=0.62/0.7、学习 σ、per-scaf mu 头）与校准侧（global/
+scaf/ctx/row σ、α 截距、mixture）均已闭合；残差 0.61 是集成级尺度，非单成员
+训练可再压缩。剩余不可约残差需 prospective 数据或新测量。
+
 ## 4. 新增/修改文件（r37）
 
 - `audit/repair/analyze_stacked_ensemble.py`（新增）：censoring-aware LOO stacking
