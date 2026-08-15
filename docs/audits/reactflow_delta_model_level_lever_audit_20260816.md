@@ -196,6 +196,15 @@ mu 上失败）在 **r56b mu** 上有微弱正增益。更关键的是 r62 揭�
 | per-context y~mu 斜率稳定性 | r77 (diag) | split-half slope corr = 0.527（n=18，不稳定）vs intercept corr = 0.993 | 斜率是噪声；intercept 仍是唯一稳定 context 结构（r56b 已用）|
 | σ_c 网格 ceiling 扩展（1.6→5/7.5/10）| r78/r79 | 0.7199/0.7193/0.7190（censored 0.199→0.175，edit CI [0.002,0.0079] lower>0）| **UNBOUNDED 弃权对冲，不采用**（见下）|
 | context EB mu 应用于 censored 行 | r80 | 0.7299（+0.0056 vs r62）| NEGATIVE：censored 行 mu 修正伤 measured 层 |
+| per-scaf σ 重训 base 成员（train/eval σ 不匹配）| r81 | sig-train t7 在 2 smoke fold 均更差（+0.088/+0.070）| NEGATIVE：统一 0.7 训练最优，σ 不匹配不损失 mu 质量 |
+| censored 专属 per-scaf mu 修正 | r82 | 0.7031（censored 0.199→0.081）但同 r78 **无界弃权** | REJECTED：censored survival NLL 随 mu→+inf 单调→0，grid-edge 选取非真增益 |
+| junction-mean 残差解释率 | r82b (diag) | 只解释 measured 残差方差 2.4%（且 jid 单 fold=泄漏）| 无未利用 junction 级结构 |
+
+**r81/r82 追加闭合**：r81 证明 base 成员固定 σ=0.7 训练是正确选择（train/eval σ
+不匹配不损失 mu 质量）。r82 与 r78 同构：censored 行 survival likelihood
+−log Φ((mu−CAP)/σ) 随 mu→+inf 单调→0（即"预测全部 censored"弃权），任何有界网格
+都选 +0.8 边缘，非真实改进。r82b 确认 junction-mean 只占残差方差 2.4%，且 jid
+单 fold = 泄漏，无可用结构。**至此 measured/censored 两个方向的模型级杠杆全部闭合**。
 
 **r78/r79 诚实裁定（重要）**：σ_c ceiling 扩展确实降低 pooled NLL 且 edit CI 下界 >0，
 但机制是 **无界单调向 log(2)=0.693 的对冲** —— 对任何 mu<CAP 的 censored 行，
