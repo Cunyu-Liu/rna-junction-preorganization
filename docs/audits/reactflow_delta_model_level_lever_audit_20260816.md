@@ -130,6 +130,28 @@ r51 joint mu-affine + σ 重扫）。继续增加 base 模型复杂度无法带�
 - **新冻结方法 = 7-member 集成（wg=0.5）+ r56b = 0.7314**
   （`submission_horizontal_table_v3.json`，四口径 definitive 表）。
 
+### 4.y r57 收敛诊断（2026-08-16）：r56b 已到 context mu 修正极限
+
+确认 r56b 是收敛冻结方法，残余方向全部闭合：
+
+1. **jid 层随机效应 = 泄漏，禁止**：1336/1336 个 junction 严格单 fold
+   （每个 junction 只出现在一个 edit component 中），jid 级修正会看到
+   held-out 自身 —— 死路。
+2. **残余 context bias 不可再提取**：r56b 后 context bias sd 0.341→0.313
+   （mean|b| 0.266→0.216），split-half 残余相关 +0.622 但仅 n=18 稳定
+   context（不稳定）。更细超参扫描：mm3_kappa0.5=0.7308 vs r56b 0.7314，
+   paired CI [-0.0014, 0.0021] **穿 0** —— 无显著差异，r56b 保持冻结。
+3. **迭代修正崩溃**：n_iter=2 → 0.8245、n_iter=3 → 1.0127 —— 二次修正
+   把噪声当信号，强烈过拟合，证实残余 +0.622 相关是稀疏 context 噪声而非
+   可提取结构。
+4. **H1 扫描**：mm5/8/10/12 全部 ≥0.742（更差），min_meas=3 + kappa=2
+   是唯一最优区。
+5. **fold 层偏置**（sd 0.223）不可修正 —— fold 是 leave-out 独立单位，
+   修正 fold 自身即泄漏。
+
+**结论：r56b（mm3, κ=2）= 0.7314 是 context mu 校准的收敛点**；
+   kappa0.5 vs r51 的 CI [0.0096, 0.0871] 下界 > 0 确认该家族显著正向。
+
 这些方向的预期收益全部在 edit-cluster CI 宽度（±0.05-0.1）以内，无法
 产生统计上可检测的改善。
 
