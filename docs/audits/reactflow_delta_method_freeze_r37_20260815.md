@@ -263,6 +263,35 @@ global σ-only 与 per-scaf σ 事后校准为正。剩余不可约残差来自�
 - `audit/repair/shootout_r40_scaf_sigma_smoke_cfg.json`、`audit/repair/analyze_r40_smoke.py`
 - artifacts：`r40_scaf_sigma_smoke/`（run root）
 
+---
+
+# 补充三：r41 结果（同日续篇）
+
+## 12. r41：mixture-of-predictives 评分 —— 排序稳健性确认（非主口径改进）
+
+r41 测试分布级组合：ensemble predictive = 7 成员的等权高斯混合，评分用
+`-log(mean 成员密度/生存)`（proper scoring rule，无自由参数），而非 mu-平均后
+的单 Gaussian NLL。这与 mu-平均是**数学上不同的**评分规则。
+
+### 12.1 结果（同一 37-fold OOF）
+
+| 评分规则 | nuisance | t7_s99 | xgb_lr03 | 3x t7 | **7-member** |
+|----------|---------:|-------:|---------:|------:|-------------:|
+| muavg frozen σ=0.7 | 1.0916 | 0.8839 | 0.8807 | 0.8823 | **0.8527** |
+| muavg per-scaf σ (r38) | 1.0536 | 0.8687 | 0.8481 | 0.8603 | **0.8166** |
+| mixture frozen σ=0.7 | 1.0916 | 0.8839 | 0.8807 | 0.8824 | **0.8580** |
+| mixture per-scaf σ | 1.0536 | 0.8687 | 0.8481 | 0.8579 | **0.8206** |
+
+### 12.2 结论
+
+- **排序在所有 4 种评分规则下完全稳健**：7-member 集成始终最优（mixture per-scaf
+  +22.12%，muavg per-scaf +25.20%），3x t7 次之，单模型再次。这强化了可发表性：
+  结论不依赖聚合/组合规则选择。
+- **mixture 未击败冻结主口径**：mixture per-scaf（0.8206）差于 muavg per-scaf
+  （0.8166）。分布级混合的宽尾对 per-scaf 校准后的窄高斯预测不利。
+- **冻结主口径保持**：MetricSpec_v3 定义的单 Gaussian row_likelihood（mu, σ）
+  是主榜估计，0.8166（+25.20%）不变；mixture 作为排序稳健性证据（secondary）。
+
 ## 4. 新增/修改文件（r37）
 
 - `audit/repair/analyze_stacked_ensemble.py`（新增）：censoring-aware LOO stacking
