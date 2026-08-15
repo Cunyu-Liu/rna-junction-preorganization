@@ -292,6 +292,51 @@ r41 测试分布级组合：ensemble predictive = 7 成员的等权高斯混合�
 - **冻结主口径保持**：MetricSpec_v3 定义的单 Gaussian row_likelihood（mu, σ）
   是主榜估计，0.8166（+25.20%）不变；mixture 作为排序稳健性证据（secondary）。
 
+---
+
+# 补充四：r42 结果（同日续篇）
+
+## 13. r42：per-scaffold 输出头（scaffold-conditional mu）—— 阴性（边界闭合）
+
+r38（σ 事后校准）与 r40（σ 训练联合）已覆盖算子异方差的 σ 侧；真正未测试的
+结构轴是 **per-operator mu**：共享隐藏主干（96→64→32）+ per-scaffold 专用
+Linear(32,1) 输出头，行按其 scaffold 选择对应头。这直接针对残差诊断发现的
+per-scaffold 系统性 mu 偏差（scaf9 −0.99、scaf1 −0.44），且 sigma 保持冻结 0.7
+（避免 r40 的 σ 退化）。
+
+### 13.1 smoke 结果（2 折，GPU6，r42_scafmu_smoke）
+
+| 模型 | pooled NLL（2 折） |
+|------|------------------:|
+| t7（共享头，冻结 σ=0.7） | 0.7886 |
+| **t7_scafmu（per-scaf 输出头）** | **0.8344** |
+
+**结论：NEGATIVE。** per-scaf mu 头在单 study、9 算子、37 不平衡 edit 组件上
+过拟合：每个算子专用输出层只有其子集行训练，容量稀释，mu 拟合劣于共享头。
+与契约 §9.3 预警一致——显式 sequence×operator interaction 在嵌套 context 下
+不可识别，per-operator 参数增加不可识别自由度。
+
+## 14. 方法级边界完全闭合（r37–r42 总结）
+
+| # | 方向 | 形态 | 结果 |
+|---|------|------|------|
+| 1 | kernel RBF 成员 | r36 | NEGATIVE（误差相关过高） |
+| 2 | 学习式 stacking 权重 | r37 | NEGATIVE（成员已均衡） |
+| 3 | per-row 校准 σ | r37 | NEGATIVE（过度分散） |
+| 4 | 算子加性截距 α | r37 | NEGATIVE（伤 censored 行） |
+| 5 | Student-t GBDT 族 | r34 smoke | DEAD END（数值不稳定） |
+| 6 | global σ-only 校准 | r37 | **POSITIVE（0.8460）** |
+| 7 | **per-scaf σ 事后校准** | **r38** | **POSITIVE（0.8166, +25.20%）** |
+| 8 | censoring-aware 算子截距 | r39 | NEGATIVE（收缩后无增益） |
+| 9 | per-scaf σ 训练期联合 | r40 | NEGATIVE（σ 吸收残差） |
+| 10 | mixture-of-predictives | r41 | 排序稳健（非主口径改进） |
+| 11 | per-scaf mu 输出头 | r42 | NEGATIVE（算子级过拟合） |
+
+**最终冻结方法不变**：7-member 混合集成（4x GBDT + 3x t7 MLP，family-equal mu
+平均）+ 留一折 per-scaffold σ 校准 = **0.8166（+25.20%）**。这是该数据上方法层
+可榨取的全部边界；剩余不可约残差来自测量噪声与高删失算子系统偏差，需
+prospective 数据或新测量，非进一步结构调参可解。
+
 ## 4. 新增/修改文件（r37）
 
 - `audit/repair/analyze_stacked_ensemble.py`（新增）：censoring-aware LOO stacking
