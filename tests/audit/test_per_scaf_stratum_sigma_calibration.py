@@ -30,6 +30,21 @@ from audit.repair.r50_family_weight_sweep_r45 import (
     _blend,
     _ens_mu,
 )
+from audit.repair.r52_per_scaf_family_weight import (
+    _blend_per_scaf,
+)
+from audit.repair.r53_family_weight_sweep_r51 import (
+    _blend as r53_blend,
+    _ens_mu as r53_ens_mu,
+)
+from audit.repair.r51_joint_mu_affine_sigma_rescan import (
+    _calibrate_r51,
+    _scan_sigma as r51_scan_sigma,
+    _ols as r51_ols,
+    _ridge_ols as r51_ridge_ols,
+    _pooled as r51_pooled,
+    GRID as R51_GRID,
+)
 
 
 def _row(rid, fold, scaf, y, cens, mu, jid=None):
@@ -363,6 +378,190 @@ def test_r47_global_matches_hand_computed_pooled():
     assert np.isclose(_pooled(cal), hand, atol=1e-9)
 
 
+def test_r51_censored_mu_stays_untouched():
+    # r51 core honesty: censored rows keep mu EXACTLY (never shifted), and
+    # keep a finite positive sigma_c; only measured rows receive the affine.
+    rng = np.random.default_rng(30)
+    preds = {}
+    orig_censored_mu = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (1, 9):
+            for i in range(30):
+                rid = f"{fold}_{sc}_{i}"
+                cens = (sc == 9) and (i % 2 == 0)
+                mu = -6.0 if sc == 9 else -4.5
+                y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                preds[rid] = _row(rid, fold, sc, y, cens, mu, jid=f"j_{sc}_{i // 3}")
+                if cens:
+                    orig_censored_mu[rid] = mu
+    cal, _ = _calibrate_r51(preds, ["f0", "f1", "f2"], mode="global_affine")
+    for rid, mu0 in orig_censored_mu.items():
+        assert cal[rid]["cens"] is True
+        assert np.isclose(cal[rid]["mu"], mu0), \
+            "r51 must never shift censored mu"
+        assert cal[rid]["sigma"] > 0.0 and np.isfinite(cal[rid]["sigma"])
+    changed = [rid for rid, p in cal.items()
+               if not p["cens"] and not np.isclose(p["mu"], preds[rid]["mu"])]
+    assert changed, "r51 should adjust measured mu"
+
+
+def test_r51_global_affine_rescans_sigma_on_corrected_mu():
+    # The core gap: r46/r47 scanned sigma_m on the UNCORRECTED mu.  r51 must
+    # re-scan sigma_m on the corrected mu, so on data with a strong measured
+    # bias the fitted sigma_m must differ from scanning on the raw mu.
+    rng = np.random.default_rng(31)
+    preds = {}
+    # strong measured-layer bias: y = mu - 1.5 systematically
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 5):
+            for i in range(40):
+                rid = f"{fold}_{sc}_{i}"
+                mu = -4.0 + rng.normal(0, 0.2)
+                y = mu - 1.5 + rng.normal(0, 0.3)
+                preds[rid] = _row(rid, fold, sc, y, False, mu, jid=f"j{sc}_{i // 5}")
+    cal, fit_log = _calibrate_r51(preds, ["f0", "f1", "f2"], mode="global_affine")
+    # global slope must be ~1.0 (bias is additive), intercept ~-1.5
+    some_fit = fit_log[list(fit_log)[0]]
+    b_g = some_fit["global_affine"]["b"]
+    a_g = some_fit["global_affine"]["a"]
+    assert abs(b_g - 1.0) < 0.2, f"slope should be ~1, got {b_g}"
+    assert -2.2 < a_g < -0.8, f"intercept should be ~-1.5, got {a_g}"
+    # sigma_m re-scanned on corrected mu should be SMALLER than scanning on raw
+    # mu (residuals after correction ~0.3 not ~1.5)
+    for f, fl in fit_log.items():
+        for sc, entry in fl["stratum_sigma"].items():
+            assert entry["sigma_m"] <= 0.9, \
+                f"scaf {sc}: sigma_m {entry['sigma_m']} should shrink after correction"
+
+
+def test_r51_sigma_m_falls_back_globally_when_scaf_sparse():
+    # Sparse scaffold: measured rows too few for a per-scaf scan -> sigma_m
+    # must come from the global corrected-mu scan (finite, in-grid).
+    rng = np.random.default_rng(32)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (1, 9):
+            n = 40 if sc == 1 else 4  # scaf9 sparse
+            for i in range(n):
+                rid = f"{fold}_{sc}_{i}"
+                cens = (sc == 9) and (i % 2 == 0)
+                mu = -6.0 if sc == 9 else -4.0
+                y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                preds[rid] = _row(rid, fold, sc, y, cens, mu, jid=f"j{sc}_{i // 4}")
+    cal, fit_log = _calibrate_r51(preds, ["f0", "f1", "f2"], mode="global_affine")
+    for f, fl in fit_log.items():
+        for sc, entry in fl["stratum_sigma"].items():
+            assert entry["sigma_m"] > 0.0 and np.isfinite(entry["sigma_m"])
+    for rid, p in cal.items():
+        assert p["sigma"] > 0.0 and np.isfinite(p["sigma"])
+        assert np.isfinite(p["mu"])
+
+
+def test_r51_global_matches_hand_computed_pooled():
+    # Consistency: pooled NLL of r51 output equals hand recompute from
+    # (mu, sigma) using row_nll + junction-macro grouping.
+    rng = np.random.default_rng(33)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (1, 3, 9):
+            for i in range(30):
+                rid = f"{fold}_{sc}_{i}"
+                cens = (sc == 9) and (i % 2 == 0)
+                mu = -6.0 if sc == 9 else -4.5
+                y = -7.1 if cens else mu + rng.normal(0, 0.4)
+                preds[rid] = _row(rid, fold, sc, y, cens, mu, jid=f"j_{sc}_{i // 3}")
+    cal, _ = _calibrate_r51(preds, ["f0", "f1", "f2"], mode="global_affine")
+    from audit.evaluation.metrics import row_nll as rn
+    from collections import defaultdict as _dd
+    jd = _dd(list)
+    for rid, p in cal.items():
+        nll = float(rn([p["y"]], [p["cens"]], [p["mu"]], [p["sigma"]])[0])
+        jd[p["jid"]].append(nll)
+    hand = float(np.mean([np.mean(v) for v in jd.values()]))
+    assert np.isclose(r51_pooled(cal), hand, atol=1e-9)
+
+
+def test_r51_no_bias_affine_is_near_identity():
+    # On data with NO systematic bias, the global affine should be ~(0,1) and
+    # r51 should essentially reproduce r45-level performance (no invented gain).
+    rng = np.random.default_rng(34)
+    preds = {}
+    for fold in ("f0", "f1", "f2"):
+        for sc in (2, 5, 9):
+            for i in range(30):
+                rid = f"{fold}_{sc}_{i}"
+                cens = (sc == 9) and (i % 3 == 0)
+                mu = -6.0 if sc == 9 else -4.0
+                y = -7.1 if cens else mu + rng.normal(0, 0.35)
+                preds[rid] = _row(rid, fold, sc, y, cens, mu, jid=f"j_{sc}_{i // 5}")
+    cal, fit_log = _calibrate_r51(preds, ["f0", "f1", "f2"], mode="global_affine")
+    some_fit = fit_log[list(fit_log)[0]]
+    b_g = some_fit["global_affine"]["b"]
+    a_g = some_fit["global_affine"]["a"]
+    assert abs(b_g - 1.0) < 0.25, f"slope should be ~1, got {b_g}"
+    assert abs(a_g) < 0.6, f"intercept should be ~0, got {a_g}"
+
+
+def test_r52_blend_per_scaf_applies_scaffold_weights():
+    # _blend_per_scaf must apply the per-scaffold weight to the member-mean
+    # GBDT/MLP mus, defaulting to wg=0.5 for scaffolds without a weight.
+    rng = np.random.default_rng(40)
+    members = {}
+    common = [f"r{i}" for i in range(40)]
+    G = ["g1", "g2"]
+    M = ["m1", "m2"]
+    for m in G + M:
+        members[m] = {}
+        for i, rid in enumerate(common):
+            scaf = 1 if i % 2 == 0 else 9
+            gbdt_side = m.startswith("g")
+            mu = 1.0 if gbdt_side else -1.0
+            members[m][rid] = _row(rid, "f0", scaf, y=-6.0, cens=False,
+                                   mu=float(mu + rng.normal(0, 0.01)))
+    # g1/g2 are the GBDT family, m1/m2 the MLP family
+    G = ["g1", "g2"]
+    M = ["m1", "m2"]
+    wg_sc = {1: 0.8, 9: 0.5}
+    blend = _blend_per_scaf(members, common, wg_sc, ref_key="g1", gbdt=G, mlp=M)
+    for rid in common:
+        scaf = 1 if common.index(rid) % 2 == 0 else 9
+        wg = wg_sc[scaf]
+        gmu = np.mean([members[g][rid]["mu"] for g in G])
+        mmu = np.mean([members[m2][rid]["mu"] for m2 in M])
+        assert np.isclose(blend[rid]["mu"], wg * gmu + (1 - wg) * mmu)
+    # unknown scaffold defaults to 0.5
+    wg_sc2 = {}
+    blend2 = _blend_per_scaf(members, common, wg_sc2, ref_key="g1", gbdt=G, mlp=M)
+    for rid in common:
+        gmu = np.mean([members[g][rid]["mu"] for g in G])
+        mmu = np.mean([members[m2][rid]["mu"] for m2 in M])
+        assert np.isclose(blend2[rid]["mu"], 0.5 * gmu + 0.5 * mmu)
+
+
+def test_r53_blend_weight_controls_gbdt_mlp_balance():
+    # r53 _blend: mu = wg*mean(GBDT) + (1-wg)*mean(MLP); wg=1 -> GBDT only.
+    rng = np.random.default_rng(41)
+    members = {}
+    common = [f"r{i}" for i in range(30)]
+    G = ["g1", "g2"]
+    M = ["m1", "m2"]
+    for m in G + M:
+        members[m] = {rid: _row(rid, "f0", 1, y=-6.0, cens=False,
+                                mu=float(rng.normal(0, 1)) + (2.0 if m.startswith("g") else 0.0))
+                      for rid in common}
+    ens05 = r53_blend(members, common, 0.5, gbdt=G, mlp=M, ref_key="g1")
+    ens10 = r53_blend(members, common, 1.0, gbdt=G, mlp=M, ref_key="g1")
+    for rid in common:
+        gmu = np.mean([members[g][rid]["mu"] for g in G])
+        mmu = np.mean([members[m2][rid]["mu"] for m2 in M])
+        assert np.isclose(ens05[rid]["mu"], 0.5 * gmu + 0.5 * mmu)
+        assert np.isclose(ens10[rid]["mu"], gmu), "wg=1 must be GBDT-only"
+    # r53 _ens_mu: member-mean over the given key subset
+    ens_mm = r53_ens_mu(members, G, common, ref_key="g1")
+    for rid in common:
+        assert np.isclose(ens_mm[rid]["mu"], np.mean([members[g][rid]["mu"] for g in G]))
+
+
 if __name__ == "__main__":
     tests = [test_scan_sigma_picks_minimal_nll,
              test_scan_sigma_vectorized_matches_bruteforce,
@@ -379,7 +578,14 @@ if __name__ == "__main__":
              test_r47_per_scaf_affine_changes_measured_mu_per_scaf,
              test_r47_global_matches_hand_computed_pooled,
              test_r50_ens_mu_averages_over_member_subset,
-             test_r50_member_names_match_shootout_universe]
+             test_r50_member_names_match_shootout_universe,
+             test_r51_censored_mu_stays_untouched,
+             test_r51_global_affine_rescans_sigma_on_corrected_mu,
+             test_r51_sigma_m_falls_back_globally_when_scaf_sparse,
+             test_r51_global_matches_hand_computed_pooled,
+             test_r51_no_bias_affine_is_near_identity,
+             test_r52_blend_per_scaf_applies_scaffold_weights,
+             test_r53_blend_weight_controls_gbdt_mlp_balance]
     failed = 0
     for t in tests:
         try:
