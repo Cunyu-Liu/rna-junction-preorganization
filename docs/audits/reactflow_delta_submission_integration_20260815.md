@@ -119,3 +119,54 @@ python -c "from audit.repair.per_scaf_stratum_sigma_figure import main; main()"
 # Figure 2 + Table 2（已生成）
 python -c "from audit.repair.horizontal_nll_figure import main; main()"
 ```
+
+## 12. P0.6 重新裁定（修正后 0.7907）
+
+基于修正后的 37 折双门 eligible 预测，以 VALID eligibility 重新裁定核心假设
+（sequence map 相对 matched no-sequence 的 true joint 增量）：
+
+| 字段 | 值 |
+|------|-----|
+| eligibility_status | **VALID** |
+| corrected_v1_31（full）r45 NLL | 1.3989 |
+| no_sequence（matched）r45 NLL | 1.1126 |
+| sequence 相对增益 | **−25.73%（full 劣于 no-sequence）** |
+| scientific_verdict | **NOT_SUPPORTED_AT_PRE_REGISTERED_GATE** |
+| D1 decision | **TRACK_A_LOCKED**（benchmark 轨） |
+
+artifacts：`adjudication_v3/ComparisonEligibilityDecision_v3.json`、
+`CoreHypothesisDecision_v4.json`、`DecisionGateD1_v2.json`、
+`ClaimAuthorization.json`。
+
+**含义**：63-D sequence-map 路线永久关闭；项目的可发表贡献是 **benchmark 轨**
+（censor-aware 评估 + 方法边界闭合 + per-operator stratum σ 校准），不是
+transferable mechanism。冻结方法（7mem + r45 = 0.7907，+27.57% vs nuisance）
+是 benchmark 轨内的方法贡献。
+
+## 13. TaskEquivalence.csv（P0.4）
+
+见 `TaskEquivalence.csv`（11 行）：Denny/RNAMake/frozen-LM/Geng/trRosettaRNA2/
+CHANRG 均不能直接排名（任务不等价或 head 不匹配）；本工作 3 个变体（r10b
+非线性头、7mem 集成、冻结方法）为可直接排名的内部配置。禁止把 proxy 命名成
+published baseline。
+
+## 14. 投稿材料最终清单
+
+| 材料 | 状态 | 路径 |
+|------|------|------|
+| Table 1（横向表） | ✅ | `submission_horizontal_table.json` |
+| Figure 1（per-op σ） | ✅ | `per_scaf_stratum_sigma_figure.*` |
+| Figure 2（横向 NLL） | ✅ | `horizontal_nll_figure.*` |
+| Table 2（消融阶梯） | ✅ | `fig2_and_ablation_ladder.json` |
+| P0.6 裁定 | ✅ | `adjudication_v3/`（VALID, TRACK_A_LOCKED） |
+| Task equivalence | ✅ | `TaskEquivalence.csv` |
+| Claim 矩阵 | ✅ | `audit/release/SubmissionClaimMatrix.csv` |
+| 方法冻结记录 | ✅ | `reactflow_delta_method_freeze_r37_20260815.md` |
+| 稿件 draft | ⏳ | 需 owner 选择故事线（benchmark 轨） |
+
+## 15. 剩余投稿前置（需 owner）
+
+1. 稿件 draft（benchmark 轨故事线）；
+2. Release seal 重建（当前 checksum 7/13 失败，需以修正后 0.7907 为准重跑）；
+3. Legal closure（数据/derivative 许可）；
+4. 最终综合审查。
