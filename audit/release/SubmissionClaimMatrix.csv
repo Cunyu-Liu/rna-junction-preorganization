@@ -1,5 +1,8 @@
 claim,status,evidence
 benchmark protocol is reproducible,PASS,checksums.sha256 + REPRODUCE.md
-candidate beats strongest baseline,NOT_AUTHORIZED,P4 NOT_PROMOTED
-sequence mechanism/operator-transfer,NOT_AUTHORIZED,P5 identifiability boundary
-submission readiness,NOT_AUTHORIZED,SOTA_NOT_ADJUDICATED / NO_SUBMISSION_AUTHORIZATION
+censor-aware robust nonlinear head + cross-family ensemble + per-operator stratum sigma (0.7907,+27.57% vs nuisance),SUPPORTED_CONDITIONAL,submission_horizontal_table.json + per_scaf_stratum_sigma_calibration.json (edit-cluster CI lower>0, LOO no leakage, 37-fold stable)
+per-operator heteroscedastic sigma requires stratum split (measured vs censored),SUPPORTED_CONDITIONAL,per_scaf_stratum_sigma_calibration.json (scaf9 sigma_m=1.15 vs sigma_c=0.19)
+method boundary systematically closed (19 routes),SUPPORTED_CONDITIONAL,reactflow_delta_method_freeze_r37_20260815.md (only sigma post-hoc calibration positive)
+sequence mechanism/operator-transfer,NOT_AUTHORIZED,P5 identifiability boundary (needs prospective data)
+transferable sequence mechanism / SOTA / noise ceiling,NOT_AUTHORIZED,no cross-study prospective validation
+submission readiness (release+legal),NOT_AUTHORIZED,SOTA_NOT_ADJUDICATED / NO_SUBMISSION_AUTHORIZATION (needs owner + P0.6 + release seal)
