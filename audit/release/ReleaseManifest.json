@@ -1,14 +1,21 @@
 {
-  "run_id": "V1_28_V1_31_AUDIT_20260807T090244Z",
-  "git_commit": "8df99c154c07c0eade92c9bfe9287d2f541944bf",
+  "run_id": "RNA_JUNCTION_REPAIR_20260811T090000Z_R62_FROZEN",
+  "git_commit": "fa5649a113626efb1e3372767192843217620bf8",
   "git_remote": "git@github.com:Cunyu-Liu/rna-junction-preorganization.git",
-  "run_root": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z",
+  "run_root": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z",
   "environment": {
     "conda_env": "rna_junction_preorganization_v1_1",
     "numpy": "2.2.6",
     "scipy": "1.15.2",
     "pandas": "2.3.3",
     "scikit_learn": "1.7.2"
+  },
+  "frozen_method": {
+    "ensemble": "7-member (XGB, XGB_LR03, XGB_S99, XGB_S2026, T7, T7_S99, T7_S2026)",
+    "family_weight": "wg=0.5 (GBDT mean, MLP mean)",
+    "calibration": "r62 = r56b per-context EB mu (Stage 1) + independent per-scaf x stratum sigma re-scan (Stage 2)",
+    "frozen_pooled_nll": 0.7243,
+    "rel_gain_vs_nuisance": "27.86% (CI [0.2416, 0.3794] lower>0)"
   },
   "phases": {
     "P0": "P0_PASS_COMPARISON_ELIGIBLE",
@@ -17,7 +24,8 @@
     "P3": "CANDIDATE_C_RETAINED_AS_TARGETED_EXTRAPOLATION_FIX",
     "P4": "NOT_PROMOTED",
     "P5": "IDENTIFIABILITY_BOUNDARY_NARRATIVE",
-    "P6": "RELEASE_PREPARED"
+    "P0.6": "VALID / NOT_SUPPORTED_AT_PRE_REGISTERED_GATE / TRACK_A_LOCKED",
+    "P6": "RELEASE_PREPARED (seal rebuilt on r62 frozen lineage)"
   },
   "overall_scientific_state": {
     "sota_status": "SOTA_NOT_ADJUDICATED",
@@ -26,70 +34,80 @@
     "narrative": "benchmark_identifiability_boundary"
   },
   "artifacts": {
-    "data/CleaningLedger.jsonl": {
-      "sha256": "0a0abf1c4acc5ba0988c444e0d93cc074362c6db4151b3ef145dbc86a52f6df5",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/CleaningLedger.jsonl"
+    "r24_t7_seed7/combined_r20_r21_r23_r24_preds.jsonl": {
+      "sha256": "86c68600fe4cf4f61b92a499736c06dcd631bdfd9be3ce27827f9eecb3fa2f6f",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/r24_t7_seed7/combined_r20_r21_r23_r24_preds.jsonl"
     },
-    "data/EffectiveNReport.json": {
-      "sha256": "dbb371068b054771abb008d4d61c9a64b687d89cbce9580d0595c6e093e59611",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/EffectiveNReport.json"
+    "r33_xgboost_full/Predictions_v3.jsonl": {
+      "sha256": "1a6240ceb1f1efb0f4b382795d4b634da3c660fb4d612ca10d8f7fd0f53c6afb",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/r33_xgboost_full/Predictions_v3.jsonl"
     },
-    "data/ExposureRegistry.json": {
-      "sha256": "508b8cedd5fef5a48d4831fd98f41ffee71a7747ff5d53ca9e2a158f57ca5343",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/data/ExposureRegistry.json"
+    "r34_gbdt_seeds_full/Predictions_v3.jsonl": {
+      "sha256": "c476d11aa3076c958d2531e8d494a7dac0d840f9412b39cf0ece17971870c69a",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/r34_gbdt_seeds_full/Predictions_v3.jsonl"
     },
-    "protocol/SplitManifest_symmetry_5fold.jsonl": {
-      "sha256": "a2afb4cdc8f99128ac398582037f81420dd458c6d59d591c94e3b5f2b7296dbf",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_symmetry_5fold.jsonl"
+    "r35_gbdt_hp_full/Predictions_v3.jsonl": {
+      "sha256": "1c1d8be1aec5f7e80a0c5056900c3614b4e8a0b3a6dac8e7f038419f528d6059",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/r35_gbdt_hp_full/Predictions_v3.jsonl"
     },
-    "protocol/SplitManifest_edit_5fold.jsonl": {
-      "sha256": "ba599e216c6d1a9d7215e9b5fdc3aebe5916b835ef57316f4aaf0782ceecc761",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_edit_5fold.jsonl"
+    "r62_decoupled_sigma.json": {
+      "sha256": "a99d2723315d0b1fa8d9f048f3bf2bd80acce9530c480cfcf430e481a7bbee38",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/r62_decoupled_sigma.json"
     },
-    "protocol/SplitManifest_context_lomo.jsonl": {
-      "sha256": "b167555af6d23d5843cfca26d3f2eafd39fa9963efe32fc6b3d08f58239915a5",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_context_lomo.jsonl"
+    "submission_horizontal_table_v4.json": {
+      "sha256": "a7fdb01cabbbecc24b36d4807f2794ab18f4b281c66cd92ea0ac9a8ee8d62eb0",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/submission_horizontal_table_v4.json"
     },
-    "protocol/SplitManifest_scaffold_lomo.jsonl": {
-      "sha256": "3d09ba993879b9edb1e6d6e99bb1f7ec1fb73ea84947b51b7a2f7c521dd5352b",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/protocol/SplitManifest_scaffold_lomo.jsonl"
+    "submission_boundary_closure_table.json": {
+      "sha256": "227094385097daa494959017dba1a29dd6ef96ad06d9fb0706df112d3a409d0a",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/submission_boundary_closure_table.json"
     },
-    "p1_full/Predictions.jsonl": {
-      "sha256": "0774eacfccff78341e280c3b45eaa25bbbe702f591596e8728f5dead613bb521",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p1_full/Predictions.jsonl"
+    "TaskEquivalence.csv": {
+      "sha256": "575672bdb72187f7aeac7d6b07b15800e6af0bc267f92435a1b67603bd63444e",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/TaskEquivalence.csv"
     },
-    "p3_full_v2/SelectedGateEvaluation.csv": {
-      "sha256": "8aeff04314c9c69eb53cc5b026b8231300ab41e69a4f9183e698f88ca311a562",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p3_full_v2/SelectedGateEvaluation.csv"
+    "adjudication_v3/CoreHypothesisDecision_v4.json": {
+      "sha256": "e4c4147130b1630a8d141fd9df7eb5530e224d61a489ab4928ee231a14999a63",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication_v3/CoreHypothesisDecision_v4.json"
     },
-    "p4_final/FinalPredictions.parquet": {
-      "sha256": "4f52f0486d8f0c2dd649eab76cb77a154fde3cd1af5459fc55647498e0bbc2a3",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/FinalPredictions.parquet"
+    "adjudication_v3/ClaimAuthorization.json": {
+      "sha256": "f1c2d2245f5ca2a5f903079d7e44daf1acc9251cf6f56b63ffdc9c2b395bd8ae",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication_v3/ClaimAuthorization.json"
     },
-    "p4_final/FinalLeaderboard.csv": {
-      "sha256": "f74117fe76a6a82e39befab851cacc343af710cf33f66a97bf3135f717aa6355",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/FinalLeaderboard.csv"
-    },
-    "p4_final/BootstrapIntervals.csv": {
-      "sha256": "feaa30390de52ab18bbe323fad2f0414bc1cc8fe10bb3d4368c3cd69b7ab9935",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/BootstrapIntervals.csv"
-    },
-    "p4_final/CandidatePromotionDecision.json": {
-      "sha256": "0a78d28bbd8f6cda76e3db8a43cece896862f71d09d3855cc5be8e1f50c19982",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p4_final/CandidatePromotionDecision.json"
-    },
-    "p5_diagnostics/FailureAtlas.parquet": {
-      "sha256": "7debbbfdd8c2c1dddf49411b8cc2935eef8cbd19dd9721641e6746253c7b5122",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p5_diagnostics/FailureAtlas.parquet"
-    },
-    "p5_diagnostics/ContextSensitivity.csv": {
-      "sha256": "580218935113d0437eb6ef00c4ab3229736003a4dc91cc3d30fe90e2e3a51d07",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p5_diagnostics/ContextSensitivity.csv"
-    },
-    "p5_diagnostics/ClaimEvidenceMatrix.csv": {
-      "sha256": "26e3423a6112326b64d670dc74674aab07f044b06b340abbd4668868a889c931",
-      "path": "/mnt/cunyuliu/rna_junction_audit_20260807T090244Z/p5_diagnostics/ClaimEvidenceMatrix.csv"
+    "adjudication_v3/STATUS.json": {
+      "sha256": "b8f083539b7235d4eabb640fd2db9736b04a89f6a559eaa49cb10a92034adcd7",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication_v3/STATUS.json"
     }
   },
-  "missing_artifacts": []
+  "optional_artifacts_sealed": {},
+  "missing_artifacts": [],
+  "replay_verification": {
+    "phase": "P6",
+    "deliverable": "dual-env raw->final replay (frozen r62 method)",
+    "git_commit": "fa5649a113626efb1e3372767192843217620bf8",
+    "frozen_method": "7-member ensemble wg=0.5 + r62 calibration",
+    "sealed_frozen_nll": 0.7243,
+    "same_env_tol": 1e-10,
+    "cross_env_tol": 1e-08,
+    "env1": {
+      "conda_env": "rna_junction_preorganization_v1_1",
+      "numpy": "2.2.6",
+      "scipy": "1.15.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "frozen_nll": 0.724302
+    },
+    "env2": {
+      "conda_env": "pc_cng",
+      "numpy": "2.2.6",
+      "scipy": "1.15.3",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "frozen_nll": 0.724302
+    },
+    "same_env_pass": true,
+    "cross_env_pass": true,
+    "overall_pass": true,
+    "note": "raw->final = r24/r33/r34/r35 predictions -> ensemble wg=0.5 -> r62 (kappa=1,mm3) -> pooled NLL"
+  }
 }

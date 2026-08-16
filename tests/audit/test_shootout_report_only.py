@@ -25,7 +25,7 @@ from audit.repair.shootout_run import _pooled_contrast, _pooled_nll_by_model
 def _pred(model_id, jid, y, mu, sigma, cens=False, support=True, abstain=False):
     return {
         "axis": "edit_x_nested_context", "fold": "e:AAAC_GAAC",
-        "source_row_id": f"{jid}:{model_id}", "jid": jid, "scaf": 0,
+        "source_row_id": f"row_{jid}", "jid": jid, "scaf": 0,
         "context": "AC", "model_id": model_id, "y": y, "cens": cens,
         "mu": mu, "sigma": sigma, "abstain": abstain, "support": support,
         "fallback_type": None,

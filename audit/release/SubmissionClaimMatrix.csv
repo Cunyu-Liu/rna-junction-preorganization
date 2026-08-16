@@ -1,8 +1,8 @@
 claim,status,evidence
-benchmark protocol is reproducible,PASS,checksums.sha256 + REPRODUCE.md
-censor-aware robust nonlinear head + cross-family ensemble + per-operator stratum sigma (0.7907,+27.57% vs nuisance),SUPPORTED_CONDITIONAL,submission_horizontal_table.json + per_scaf_stratum_sigma_calibration.json (edit-cluster CI lower>0, LOO no leakage, 37-fold stable)
-per-operator heteroscedastic sigma requires stratum split (measured vs censored),SUPPORTED_CONDITIONAL,per_scaf_stratum_sigma_calibration.json (scaf9 sigma_m=1.15 vs sigma_c=0.19)
-method boundary systematically closed (19 routes),SUPPORTED_CONDITIONAL,reactflow_delta_method_freeze_r37_20260815.md (only sigma post-hoc calibration positive)
-sequence mechanism/operator-transfer,NOT_AUTHORIZED,P5 identifiability boundary (needs prospective data)
-transferable sequence mechanism / SOTA / noise ceiling,NOT_AUTHORIZED,no cross-study prospective validation
-submission readiness (release+legal),NOT_AUTHORIZED,SOTA_NOT_ADJUDICATED / NO_SUBMISSION_AUTHORIZATION (needs owner + P0.6 + release seal)
+benchmark protocol is reproducible,SUPPORTED_CONDITIONAL,seal rebuilt on HEAD fa5649a (p6_r62_replay_verify.json: dual-env raw->final replay PASS, 11 artifacts checksum-verified, frozen 0.7243 reproduced in both envs)
+censor-aware robust nonlinear head + cross-family 7-member ensemble + per-operator stratum sigma (r62,0.7243,+27.86% vs nuisance),SUPPORTED_CONDITIONAL,submission_horizontal_table_v4.json (edit-cluster CI [0.2416,0.3794] lower>0, LOO no leakage, 37-fold stable)
+per-operator heteroscedastic sigma requires stratum split (measured vs censored),SUPPORTED_CONDITIONAL,per_scaf_stratum_sigma_calibration.json (scaf9 sigma_m vs sigma_c stratum difference largest)
+method boundary systematically closed (75+ routes r15-r82),SUPPORTED_CONDITIONAL,reactflow_delta_model_level_lever_audit_20260816.md + submission_boundary_closure_table.json (only post-hoc sigma/context-mu calibration positive; measured layer at Gaussian info floor)
+sequence mechanism/operator-transfer,NOT_AUTHORIZED,P0.6 TRACK_A_LOCKED (needs prospective data)
+transferable sequence mechanism / SOTA / noise ceiling,NOT_AUTHORIZED,no cross-study prospective validation; SOTA_NOT_ADJUDICATED
+submission readiness (release+legal),NOT_AUTHORIZED,NO_SUBMISSION_AUTHORIZATION (needs owner + seal rebuild + legal closure)

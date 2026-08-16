@@ -1,0 +1,29 @@
+{
+  "cross_env_pass": true,
+  "cross_env_tol": 1e-08,
+  "deliverable": "dual-env raw->final replay (frozen r62 method)",
+  "env1": {
+    "conda_env": "rna_junction_preorganization_v1_1",
+    "frozen_nll": 0.724302,
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scikit_learn": "1.7.2",
+    "scipy": "1.15.2"
+  },
+  "env2": {
+    "conda_env": "pc_cng",
+    "frozen_nll": 0.724302,
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scikit_learn": "1.7.2",
+    "scipy": "1.15.3"
+  },
+  "frozen_method": "7-member ensemble wg=0.5 + r62 calibration",
+  "git_commit": "fa5649a113626efb1e3372767192843217620bf8",
+  "note": "raw->final = r24/r33/r34/r35 predictions -> ensemble wg=0.5 -> r62 (kappa=1,mm3) -> pooled NLL",
+  "overall_pass": true,
+  "phase": "P6",
+  "same_env_pass": true,
+  "same_env_tol": 1e-10,
+  "sealed_frozen_nll": 0.7243
+}

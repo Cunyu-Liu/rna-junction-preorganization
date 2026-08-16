@@ -1,4 +1,4 @@
 asset,source,license_status,note
-dataset,Denny 2018 tectoRNA,UNKNOWN_NEEDS_LEGAL_REVIEW,source persisted as byte copy; distribution license not yet confirmed
-code,rna-junction-preorganization (audit/),OPEN_SOURCE_PENDING,author owns audit code; license to be declared before any public release
+dataset,Denny 2018 tectoRNA,RESTRICTED_REDISTRIBUTION_NOT_AUTHORIZED,source persisted as byte copy on server; not to be redistributed with repo; provide access path + checksum only
+code,rna-junction-preorganization (audit/),LICENSE_DECLARED,repo LICENSE = MIT (Cunyu Liu 2026); open-source permissive
 env,numpy/scipy/pandas/scikit-learn,BSD/OSI,permissive open-source dependencies
