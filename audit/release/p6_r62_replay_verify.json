@@ -19,7 +19,7 @@
     "scipy": "1.15.3"
   },
   "frozen_method": "7-member ensemble wg=0.5 + r62 calibration",
-  "git_commit": "fa5649a113626efb1e3372767192843217620bf8",
+  "git_commit": "61179122f8e1fdfd41503026495c0c3086480c30",
   "note": "raw->final = r24/r33/r34/r35 predictions -> ensemble wg=0.5 -> r62 (kappa=1,mm3) -> pooled NLL",
   "overall_pass": true,
   "phase": "P6",
