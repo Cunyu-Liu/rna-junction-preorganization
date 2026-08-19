@@ -1,6 +1,6 @@
 {
   "run_id": "RNA_JUNCTION_REPAIR_20260811T090000Z_R62_FROZEN",
-  "git_commit": "fa5649a113626efb1e3372767192843217620bf8",
+  "git_commit": "7851f18efca3878b74000683a09554cc4277d895",
   "git_remote": "git@github.com:Cunyu-Liu/rna-junction-preorganization.git",
   "run_root": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z",
   "environment": {
@@ -67,7 +67,7 @@
       "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/TaskEquivalence.csv"
     },
     "adjudication_v3/CoreHypothesisDecision_v4.json": {
-      "sha256": "e4c4147130b1630a8d141fd9df7eb5530e224d61a489ab4928ee231a14999a63",
+      "sha256": "d1df86f4c3b150cce2f2a42ffff7371dc0103ca9efbbaa15d4cec78ba41a8651",
       "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication_v3/CoreHypothesisDecision_v4.json"
     },
     "adjudication_v3/ClaimAuthorization.json": {
@@ -77,14 +77,20 @@
     "adjudication_v3/STATUS.json": {
       "sha256": "b8f083539b7235d4eabb640fd2db9736b04a89f6a559eaa49cb10a92034adcd7",
       "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/adjudication_v3/STATUS.json"
+    },
+    "r29_p05_rerun/NullArtifact.json": {
+      "sha256": "bb298cc5419d4d00059c8508c578bbcd69c2cae4f21a3e0ef26230c01cf5b846",
+      "path": "/mnt/cunyuliu/rna_junction_repair_20260811T090000Z/r29_p05_rerun/NullArtifact.json"
     }
   },
-  "optional_artifacts_sealed": {},
+  "optional_artifacts_sealed": {
+    "r29_p05_rerun/NullArtifact.json": "bb298cc5419d4d00059c8508c578bbcd69c2cae4f21a3e0ef26230c01cf5b846"
+  },
   "missing_artifacts": [],
   "replay_verification": {
     "phase": "P6",
     "deliverable": "dual-env raw->final replay (frozen r62 method)",
-    "git_commit": "fa5649a113626efb1e3372767192843217620bf8",
+    "git_commit": "7851f18efca3878b74000683a09554cc4277d895",
     "frozen_method": "7-member ensemble wg=0.5 + r62 calibration",
     "sealed_frozen_nll": 0.7243,
     "same_env_tol": 1e-10,

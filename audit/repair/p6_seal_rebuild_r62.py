@@ -213,7 +213,9 @@ def main():
             "scientific_claim_authorized": False,
             "narrative": "benchmark_identifiability_boundary",
         },
-        "artifacts": {k: {"sha256": v, "path": ARTIFACTS[k]} for k, v in hashes.items()},
+        "artifacts": {k: {"sha256": v,
+                          "path": {**ARTIFACTS, **OPTIONAL_ARTIFACTS}[k]}
+                      for k, v in hashes.items()},
         "optional_artifacts_sealed": sealed_optional,
         "missing_artifacts": missing,
         "replay_verification": replay,

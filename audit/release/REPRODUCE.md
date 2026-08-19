@@ -14,7 +14,7 @@ the surviving contribution. NO submission authorization.
   member predictions and the r62 calibration product.
 - Conda env `rna_junction_preorganization_v1_1` (see environment.lock);
   cross-env verification uses `pc_cng` (scipy 1.15.3).
-- Code: git repo `rna-junction-preorganization` at commit `fa5649a113626efb1e3372767192843217620bf8` (audit/ tree).
+- Code: git repo `rna-junction-preorganization` at commit `7851f18efca3878b74000683a09554cc4277d895` (audit/ tree).
 
 ## Steps (raw -> final replay)
 1. `conda activate rna_junction_preorganization_v1_1`
